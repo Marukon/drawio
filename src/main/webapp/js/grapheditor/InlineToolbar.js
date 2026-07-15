@@ -364,10 +364,7 @@ InlineToolbar.prototype.hide = function()
  */
 InlineToolbar.prototype.supportsCurvedBend = function(style)
 {
-	var shape = mxUtils.getValue(style, mxConstants.STYLE_SHAPE, null);
-
-	return shape == null || shape == 'connector' ||
-		shape == 'filledEdge' || shape == 'wire' || shape == 'pipe';
+	return Graph.edgeSupportsCurved(style);
 };
 
 /**
@@ -1969,6 +1966,8 @@ InlineToolbar.prototype.showConnStyleMenu = function(evt)
 			keys: [mxConstants.STYLE_EDGE, mxConstants.STYLE_CURVED, mxConstants.STYLE_NOEDGESTYLE, 'libavoidRouting'],
 			values: ['orthogonalEdgeStyle', null, null, null], reset: true});
 
+		// Shown only when the libavoid extensions bundle is loaded (a no-op in
+		// viewers / configs without extensions.min.js).
 		if (typeof LibavoidRouting !== 'undefined')
 		{
 			routingItems.push({img: Format.libavoidImage.src, title: mxResources.get('libavoidAutoRoute'),
@@ -1990,7 +1989,7 @@ InlineToolbar.prototype.showConnStyleMenu = function(evt)
 			keys: [mxConstants.STYLE_EDGE, mxConstants.STYLE_ELBOW, mxConstants.STYLE_CURVED, mxConstants.STYLE_NOEDGESTYLE, 'libavoidRouting'],
 			values: ['isometricEdgeStyle', 'vertical', null, null, null], reset: true});
 
-		if (shape == null || shape == 'connector')
+		if (this.supportsCurvedBend(style))
 		{
 			routingItems.push({img: Format.curvedImage.src, title: mxResources.get('curved'),
 				keys: [mxConstants.STYLE_EDGE, mxConstants.STYLE_CURVED, mxConstants.STYLE_NOEDGESTYLE, 'libavoidRouting'],

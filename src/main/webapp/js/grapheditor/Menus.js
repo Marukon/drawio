@@ -71,6 +71,8 @@ Menus.prototype.init = function()
 				['orthogonalEdgeStyle', null, null, null], null, parent, true, Format.orthogonalImage.src)).setAttribute('title', mxResources.get('orthogonal'));
 
 			// libavoid obstacle-avoiding routing (orthogonal + flag, routed at once).
+			// Shown only when the libavoid extensions bundle is loaded (a no-op
+			// in viewers / configs without extensions.min.js).
 			if (typeof LibavoidRouting !== 'undefined')
 			{
 				Format.processMenuIcon(this.edgeStyleChange(menu, '', [mxConstants.STYLE_EDGE, mxConstants.STYLE_CURVED, mxConstants.STYLE_NOEDGESTYLE, 'libavoidRouting'],
@@ -89,7 +91,7 @@ Menus.prototype.init = function()
 			Format.processMenuIcon(this.edgeStyleChange(menu, '', [mxConstants.STYLE_EDGE, mxConstants.STYLE_ELBOW, mxConstants.STYLE_CURVED, mxConstants.STYLE_NOEDGESTYLE, 'libavoidRouting'],
 				['isometricEdgeStyle', 'vertical', null, null, null], null, parent, true, Format.verticalIsometricImage.src)).setAttribute('title', mxResources.get('isometric'));
 
-			if (shape == null || shape == 'connector')
+			if (state == null || Graph.edgeSupportsCurved(state.style))
 			{
 				Format.processMenuIcon(this.edgeStyleChange(menu, '', [mxConstants.STYLE_EDGE, mxConstants.STYLE_CURVED, mxConstants.STYLE_NOEDGESTYLE, 'libavoidRouting'],
 					['orthogonalEdgeStyle', '1', null, null], null, parent, true, Format.curvedImage.src)).setAttribute('title', mxResources.get('curved'));

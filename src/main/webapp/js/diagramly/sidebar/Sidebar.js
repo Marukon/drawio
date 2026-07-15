@@ -442,7 +442,8 @@
 							libs.push(entry.id + '.' + k);
 						}
 						
-						this.showPalettes('', libs, visible[entry.id]);
+						// Missing entries must hide the palette or showPalette toggles it
+						this.showPalettes('', libs, visible[entry.id] == true);
 					}
 				}
 			}
@@ -704,11 +705,11 @@
 	// Overrides addPalette to persist expanded/collapsed library state
 	var sidebarAddPalette = Sidebar.prototype.addPalette;
 
-	Sidebar.prototype.addPalette = function(id, title, expanded, onInit)
+	Sidebar.prototype.addPalette = function(id, title, expanded, onInit, eager)
 	{
 		expanded = this.editorUi.getLibraryExpanded(id, expanded);
 
-		var result = sidebarAddPalette.call(this, id, title, expanded, onInit);
+		var result = sidebarAddPalette.call(this, id, title, expanded, onInit, eager);
 
 		// Tags title and content divs with palette id
 		if (id != null && this.palettes[id] != null)

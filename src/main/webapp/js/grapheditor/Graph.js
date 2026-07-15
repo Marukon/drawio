@@ -201,7 +201,7 @@ mxGraphView.prototype.gridSteps = 4;
 mxGraphView.prototype.minGridSize = 4;
 
 // UrlParams is null in embed mode
-mxGraphView.prototype.defaultGridColor = '#d0d0d0';
+mxGraphView.prototype.defaultGridColor = '#e6e6e6';
 mxGraphView.prototype.defaultDarkGridColor = '#424242';
 mxGraphView.prototype.gridColor = mxGraphView.prototype.defaultGridColor;
 
@@ -3488,6 +3488,20 @@ Graph.isLink = function(text)
  * Graph inherits from mxGraph.
  */
 mxUtils.extend(Graph, mxGraph);
+
+/**
+ * Returns true if the edge shape in the given style paints the curved style
+ * (see mxPolyline.paintCurvedLine and mxArrowConnector.getCurvePoints). A
+ * missing shape renders via mxConnector, which supports it.
+ */
+Graph.edgeSupportsCurved = function(style)
+{
+	var shape = mxUtils.getValue(style, mxConstants.STYLE_SHAPE, null);
+
+	return shape == null || shape == 'connector' || shape == 'filledEdge' ||
+		shape == 'wire' || shape == 'pipe' || shape == 'link' ||
+		shape == 'flexArrow';
+};
 
 /**
  * Subdivides the given absolute points into a fine polyline that approximates
@@ -8799,6 +8813,105 @@ Graph.prototype.updateShapes = function(source, targets, replaceStyles)
 };
 
 /**
+ * Replaces the style of the given edge label with the one of the given
+ * source cell and adapts its size to the label text with the given padding
+ * (default is 3), keeping its text, text styles and position on the edge.
+ * If an edge is given, its label is moved to a new child cell. Returns the
+ * label cell.
+ */
+Graph.prototype.updateEdgeLabelShape = function(source, cell, padding)
+{
+	padding = (padding != null) ? padding : 3;
+	var textStyle = this.copyStyle(cell);
+	var label = cell;
+
+	this.model.beginUpdate();
+	try
+	{
+		// Moves the label of the edge to a new child cell
+		if (this.model.isEdge(cell))
+		{
+			var value = this.model.getValue(cell);
+			var text = value;
+
+			// Keeps other data on the edge and moves the label text
+			if (value != null && typeof value == 'object')
+			{
+				text = this.convertValueToString(cell);
+				value = value.cloneNode(true);
+
+				if (Graph.translateDiagram && Graph.diagramLanguage != null &&
+					value.hasAttribute('label_' + Graph.diagramLanguage))
+				{
+					value.setAttribute('label_' + Graph.diagramLanguage, '');
+				}
+				else
+				{
+					value.setAttribute('label', '');
+				}
+			}
+			else
+			{
+				value = '';
+			}
+
+			var edgeGeo = this.getCellGeometry(cell);
+			label = new mxCell(text, new mxGeometry(0, 0, 0, 0), '');
+			label.geometry.relative = true;
+			label.vertex = true;
+
+			if (edgeGeo != null)
+			{
+				label.geometry.x = edgeGeo.x;
+				label.geometry.y = edgeGeo.y;
+
+				if (edgeGeo.offset != null)
+				{
+					label.geometry.offset = edgeGeo.offset.clone();
+				}
+			}
+
+			label = this.addCell(label, cell);
+			this.model.setValue(cell, value);
+		}
+
+		this.updateShapes(source, [label], true);
+
+		// Maintains the text styles of the original label, which are
+		// replaced by updateShapes and must be applied before the
+		// preferred size for the cell is computed below
+		this.pasteStyle(textStyle, [label], ['fontFamily', 'fontSource',
+			'fontSize', 'fontColor', 'fontStyle', 'textOpacity',
+			'horizontal', 'textDirection']);
+		this.setCellStyles('resizable', null, [label]);
+
+		// Adapts the size to the label text with padding and keeps the
+		// label centered at its position on the edge
+		var geo = this.getCellGeometry(label);
+		var size = this.getPreferredSizeForCell(label, null, false);
+
+		if (geo != null && size != null)
+		{
+			var width = size.width + 2 * padding;
+			var height = size.height + 2 * padding;
+			geo = geo.clone();
+			var offset = (geo.offset != null) ? geo.offset : new mxPoint(0, 0);
+			geo.offset = new mxPoint(Math.round(offset.x + (geo.width - width) / 2),
+				Math.round(offset.y + (geo.height - height) / 2));
+			geo.width = width;
+			geo.height = height;
+			this.model.setGeometry(label, geo);
+		}
+	}
+	finally
+	{
+		this.model.endUpdate();
+	}
+
+	return label;
+};
+
+/**
  * Selects cells for connect vertex return value.
  */
 Graph.prototype.selectCellsForConnectVertex = function(cells, evt, hoverIcons)
@@ -13487,25 +13600,28 @@ TableLayout.prototype.execute = function(parent)
 									var dx = pt.x - p0.x;
 									var dy = pt.y - p0.y;
 									var temp = {distSq: dx * dx + dy * dy, x: pt.x, y: pt.y};
-								
+
 									// Intersections must be ordered by distance from start of segment
+									var idx = list.length;
+
 									for (var t = 0; t < list.length; t++)
 									{
 										if (list[t].distSq > temp.distSq)
 										{
-											list.splice(t, 0, temp);
-											temp = null;
-											
+											idx = t;
+
 											break;
 										}
 									}
-									
-									// Ignores multiple intersections at segment joint
-									if (temp != null && (list.length == 0 ||
-										list[list.length - 1].x !== temp.x ||
-										list[list.length - 1].y !== temp.y))
+
+									// Ignores multiple intersections at segment joints and
+									// where overlapping edges cross the current segment
+									if ((idx == 0 || Math.abs(list[idx - 1].x - temp.x) > thresh ||
+										Math.abs(list[idx - 1].y - temp.y) > thresh) &&
+										(idx == list.length || Math.abs(list[idx].x - temp.x) > thresh ||
+										Math.abs(list[idx].y - temp.y) > thresh))
 									{
-										list.push(temp);
+										list.splice(idx, 0, temp);
 									}
 								}
 
@@ -15906,6 +16022,42 @@ if (typeof mxVertexHandler !== 'undefined')
 		};
 
 		/**
+		 * Returns true if the given cell is a group whose rotation must be
+		 * applied by rotating its children as a rigid body (via rotateCell)
+		 * rather than by spinning the group's own shape. Tables, table rows,
+		 * table cells and swimlanes keep the plain per-shape rotation.
+		 */
+		Graph.prototype.isRotatableGroup = function(cell)
+		{
+			var model = this.getModel();
+
+			return model.isVertex(cell) && model.getChildCount(cell) > 0 &&
+				!this.isTable(cell) && !this.isTableRow(cell) &&
+				!this.isTableCell(cell) && !this.isSwimlane(cell);
+		};
+
+		/**
+		 * Sets the absolute rotation of the given cell. Rotatable groups are
+		 * routed through rotateCell with the delta to their current rotation
+		 * so the children rotate as a rigid body like the rotation handle;
+		 * all other cells (and non-numeric values) get the plain style write.
+		 */
+		Graph.prototype.setCellRotation = function(cell, value)
+		{
+			var angle = parseFloat(value);
+
+			if (!isNaN(angle) && this.isRotatableGroup(cell))
+			{
+				this.rotateCell(cell, angle - (parseFloat(this.getCurrentCellStyle(
+					cell)[mxConstants.STYLE_ROTATION]) || 0));
+			}
+			else
+			{
+				this.setCellStyles(mxConstants.STYLE_ROTATION, value, [cell]);
+			}
+		};
+
+		/**
 		 * Rotates the given cell and its non-relative children by the given angle
 		 * (in degrees) about the cell's center, baking the rotation into the child
 		 * geometries so a group rotates as a rigid body. This mirrors the algorithm
@@ -15921,34 +16073,42 @@ if (typeof mxVertexHandler !== 'undefined')
 
 				if (model.isVertex(cell) || model.isEdge(cell))
 				{
-					if (!model.isEdge(cell))
+					model.beginUpdate();
+					try
 					{
-						var total = (this.getCurrentCellStyle(cell)[mxConstants.STYLE_ROTATION] || 0) + angle;
-						this.setCellStyles(mxConstants.STYLE_ROTATION, total, [cell]);
-					}
-
-					var geo = this.getCellGeometry(cell);
-
-					if (geo != null)
-					{
-						var pgeo = this.getCellGeometry(parent);
-
-						if (pgeo != null && !model.isEdge(parent))
+						if (!model.isEdge(cell))
 						{
-							geo = geo.clone();
-							geo.rotate(angle, new mxPoint(pgeo.width / 2, pgeo.height / 2));
-							model.setGeometry(cell, geo);
+							var total = (this.getCurrentCellStyle(cell)[mxConstants.STYLE_ROTATION] || 0) + angle;
+							this.setCellStyles(mxConstants.STYLE_ROTATION, total, [cell]);
 						}
 
-						if ((model.isVertex(cell) && !geo.relative) || model.isEdge(cell))
-						{
-							var childCount = model.getChildCount(cell);
+						var geo = this.getCellGeometry(cell);
 
-							for (var i = 0; i < childCount; i++)
+						if (geo != null)
+						{
+							var pgeo = this.getCellGeometry(parent);
+
+							if (pgeo != null && !model.isEdge(parent))
 							{
-								this.rotateCell(model.getChildAt(cell, i), angle, cell);
+								geo = geo.clone();
+								geo.rotate(angle, new mxPoint(pgeo.width / 2, pgeo.height / 2));
+								model.setGeometry(cell, geo);
+							}
+
+							if ((model.isVertex(cell) && !geo.relative) || model.isEdge(cell))
+							{
+								var childCount = model.getChildCount(cell);
+
+								for (var i = 0; i < childCount; i++)
+								{
+									this.rotateCell(model.getChildAt(cell, i), angle, cell);
+								}
 							}
 						}
+					}
+					finally
+					{
+						model.endUpdate();
 					}
 				}
 			}
@@ -16066,8 +16226,7 @@ if (typeof mxVertexHandler !== 'undefined')
 					{
 						// Groups rotate as a rigid body (children baked) like the rotation
 						// handle, instead of the leaf-shape size/direction swap below
-						if (model.getChildCount(cell) > 0 && !this.isTable(cell) &&
-							!this.isTableRow(cell) && !this.isTableCell(cell) && !this.isSwimlane(cell))
+						if (this.isRotatableGroup(cell))
 						{
 							this.rotateCell(cell, (backwards) ? -90 : 90);
 							select.push(cell);
@@ -21364,6 +21523,15 @@ if (typeof mxVertexHandler !== 'undefined')
 						var pt = new mxPoint(
 							self.bounds.x - 12 - padding.x / 2 - offset,
 							self.bounds.y - 12 - padding.y / 2 - offset);
+
+						// Shifts below the move icon when both are present (the
+						// move icon holds the corner, the edit icon goes right).
+						if (graph.isMoveIconVisible(cell) &&
+							graph.isCellMovable(cell))
+						{
+							pt.y += 24;
+						}
+
 						var deg = Number((self.currentAlpha != null) ? self.currentAlpha :
 							(self.state.style[mxConstants.STYLE_ROTATION] || '0'));
 						var alpha = mxUtils.toRadians(deg);
@@ -21471,7 +21639,7 @@ if (typeof mxVertexHandler !== 'undefined')
 							self.bounds.y - 12 - padding.y / 2 - offset);
 
 						// Shifts right along the top edge when the lock and/or
-						// move icon occupies the corner (lock above move), so
+						// move icon occupies the corner (move above lock), so
 						// the icons form an L: corner column plus this one.
 						if (graph.isCellMovable(cell) &&
 							(graph.isLockedGroupIconVisible(cell) ||
@@ -21559,13 +21727,8 @@ if (typeof mxVertexHandler !== 'undefined')
 						var x = self.bounds.x - 12 - padding.x / 2 - offset;
 						var y = self.bounds.y - 12 - padding.y / 2 - offset;
 
-						// Shifts below the lock icon when both are present so
-						// the top-left corner can host them stacked vertically.
-						if (graph.isLockedGroupIconVisible(cell))
-						{
-							y += 24;
-						}
-
+						// Holds the top-left corner; the lock icon shifts below
+						// it when both are present.
 						this.shape.bounds.width = size;
 						this.shape.bounds.height = size;
 						this.shape.bounds.x = x - size / 2;
@@ -22189,21 +22352,63 @@ if (typeof mxVertexHandler !== 'undefined')
 		};
 
 		/**
+		 * Creates the expanded or collapsed folding icon for the given size.
+		 */
+		Graph.createFoldingImage = function(s, collapsed)
+		{
+			return (collapsed) ?
+				Graph.createSvgImage(s, s, '<defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">' +
+					'<stop offset="30%" style="stop-color:#f0f0f0;" /><stop offset="100%" style="stop-color:#AFB0B6;" /></linearGradient></defs>' +
+					'<rect x="0" y="0" width="9" height="9" stroke="#8A94A5" fill="url(#grad1)" stroke-width="2"/>' +
+					'<path d="M 4.5 2 L 4.5 7 M 2 4.5 L 7 4.5 z" stroke="#000"/>', 9, 9) :
+				Graph.createSvgImage(s, s, '<defs><linearGradient id="grad1" x1="50%" y1="0%" x2="50%" y2="100%">' +
+					'<stop offset="30%" style="stop-color:#f0f0f0;" /><stop offset="100%" style="stop-color:#AFB0B6;" /></linearGradient></defs>' +
+					'<rect x="0" y="0" width="9" height="9" stroke="#8A94A5" fill="url(#grad1)" stroke-width="2"/>' +
+					'<path d="M 2 4.5 L 7 4.5 z" stroke="#000"/>', 9, 9);
+		};
+
+		/**
 		 * Replaces folding icons with SVG.
 		 */
 		Graph.updateFoldingImages = function(s)
 		{
-			Graph.prototype.expandedImage = Graph.createSvgImage(s, s, '<defs><linearGradient id="grad1" x1="50%" y1="0%" x2="50%" y2="100%">' +
-				'<stop offset="30%" style="stop-color:#f0f0f0;" /><stop offset="100%" style="stop-color:#AFB0B6;" /></linearGradient></defs>' +
-				'<rect x="0" y="0" width="9" height="9" stroke="#8A94A5" fill="url(#grad1)" stroke-width="2"/>' +
-				'<path d="M 2 4.5 L 7 4.5 z" stroke="#000"/>', 9, 9);
-			Graph.prototype.collapsedImage = Graph.createSvgImage(s, s, '<defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">' +
-				'<stop offset="30%" style="stop-color:#f0f0f0;" /><stop offset="100%" style="stop-color:#AFB0B6;" /></linearGradient></defs>' +
-				'<rect x="0" y="0" width="9" height="9" stroke="#8A94A5" fill="url(#grad1)" stroke-width="2"/>' +
-				'<path d="M 4.5 2 L 4.5 7 M 2 4.5 L 7 4.5 z" stroke="#000"/>', 9, 9);
+			Graph.prototype.expandedImage = Graph.createFoldingImage(s, false);
+			Graph.prototype.collapsedImage = Graph.createFoldingImage(s, true);
 		};
 
 		Graph.updateFoldingImages(9);
+
+		/**
+		 * Cache for folding icons created for the foldingIconSize style.
+		 */
+		Graph.foldingImages = {};
+
+		/**
+		 * Overridden to honor the foldingIconSize style.
+		 */
+		Graph.prototype.getFoldingImage = function(state)
+		{
+			var image = mxGraph.prototype.getFoldingImage.apply(this, arguments);
+
+			if (image != null)
+			{
+				var size = parseInt(mxUtils.getValue(state.style, 'foldingIconSize', 0));
+
+				if (size > 0)
+				{
+					var key = size + '-' + this.isCellCollapsed(state.cell);
+					image = Graph.foldingImages[key];
+
+					if (image == null)
+					{
+						image = Graph.createFoldingImage(size, this.isCellCollapsed(state.cell));
+						Graph.foldingImages[key] = image;
+					}
+				}
+			}
+
+			return image;
+		};
 
 		/**
 		 * Updates the hint for the current operation.
@@ -23097,9 +23302,7 @@ if (typeof mxVertexHandler !== 'undefined')
 				var graph = this.state.view.graph;
 
 				// Groups rotate as a rigid body (children baked) like the rotation handle
-				if (graph.model.getChildCount(this.state.cell) > 0 && !graph.isTable(this.state.cell) &&
-					!graph.isTableRow(this.state.cell) && !graph.isTableCell(this.state.cell) &&
-					!graph.isSwimlane(this.state.cell))
+				if (graph.isRotatableGroup(this.state.cell))
 				{
 					graph.rotateCell(this.state.cell, 90);
 				}
