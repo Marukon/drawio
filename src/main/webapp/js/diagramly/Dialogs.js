@@ -649,14 +649,14 @@ var SplashDialog = function(editorUi)
 /**
  * Constructs a new embed dialog
  */
-var EmbedDialog = function(editorUi, result, timeout, ignoreSize, previewFn, title, tweet, previewTitle, filename)
+var EmbedDialog = function(editorUi, result, timeout, ignoreSize, previewFn, title, tweet, previewTitle, filename, hideExport)
 {
 	tweet = (tweet != null) ? tweet : 'Check out the diagram I made using @drawio';
 	var div = document.createElement('div');
 	div.style.height = '100%';
 	div.style.display = 'flex';
 	div.style.flexDirection = 'column';
-	var maxSize = 500000;
+	var maxSize = EmbedDialog.maxSize;
 
 	// Checks if result is a link
 	var validUrl = /^https?:\/\//.test(result) || /^mailto:\/\//.test(result);
@@ -804,14 +804,18 @@ var EmbedDialog = function(editorUi, result, timeout, ignoreSize, previewFn, tit
 		buttons.appendChild(previewBtn);
 	}
 	
-	var downloadBtn = mxUtils.button(mxResources.get('export'), function()
+	if (!hideExport)
+	{
+		var downloadBtn = mxUtils.button(mxResources.get('export'), function()
 		{
 			editorUi.hideDialog();
-			editorUi.saveData((filename != null) ? filename : 'embed.txt', 'txt', result, 'text/plain');
+			editorUi.saveData((filename != null) ? filename : 'embed.txt',
+				'txt', result, 'text/plain');
 		});
-		
+
 		downloadBtn.className = 'geBtn';
 		buttons.appendChild(downloadBtn);
+	}
 
 	if (!editorUi.isOffline() && result.length < maxSize)
 	{
@@ -852,6 +856,7 @@ var EmbedDialog = function(editorUi, result, timeout, ignoreSize, previewFn, tit
 		editorUi.hideDialog();
 	});
 
+	closeBtn.className = 'geBtn';
 	buttons.appendChild(closeBtn);
 
 	var copyBtn = mxUtils.button(mxResources.get('copy'), function()
@@ -878,7 +883,6 @@ var EmbedDialog = function(editorUi, result, timeout, ignoreSize, previewFn, tit
 		{
 			buttons.appendChild(copyBtn);
 			copyBtn.className = 'geBtn gePrimaryBtn';
-			closeBtn.className = 'geBtn';
 		}
 		else
 		{
@@ -888,7 +892,6 @@ var EmbedDialog = function(editorUi, result, timeout, ignoreSize, previewFn, tit
 	else if (previewBtn != null)
 	{
 		buttons.appendChild(previewBtn);
-		closeBtn.className = 'geBtn';
 		previewBtn.className = 'geBtn gePrimaryBtn';
 	}
 	
@@ -900,6 +903,11 @@ var EmbedDialog = function(editorUi, result, timeout, ignoreSize, previewFn, tit
  * Add embed dialog option.
  */
 EmbedDialog.showPreviewOption = true;
+
+/**
+ * Maximum size for contents to be displayed in the dialog.
+ */
+EmbedDialog.maxSize = 500000;
 
 /**
  * Constructs a new parse dialog.
@@ -4027,7 +4035,29 @@ var SaveDialog = function(editorUi, title, saveFn, disabledModes, data, mimeType
 			preview.setAttribute('title', mxResources.get('preview'));
 		}
 	}
-	
+	else if (data != null && !base64Encoded && mimeType != null &&
+		(mimeType.substring(0, 5) == 'text/' || mimeType == 'application/json') &&
+		navigator.clipboard != null && navigator.clipboard.writeText != null)
+	{
+		copyBtn = mxUtils.button(mxResources.get('copy'), function()
+		{
+			editorUi.writeTextToClipboard(data, function(e)
+			{
+				editorUi.handleError(e);
+			}, function()
+			{
+				if (defaultMode == 'copy')
+				{
+					editorUi.hideDialog();
+				}
+				else
+				{
+					editorUi.alert(mxResources.get('copiedToClipboard'));
+				}
+			});
+		}, null, 'geBtn');
+	}
+
 	var left = document.createElement('div');
 	left.style.display = 'flex';
 	left.style.padding = '1px';
@@ -18095,7 +18125,8 @@ AspectDialog.prototype.init = function()
 	}
 	else
 	{
-		this.createPageItem('1', 'Page-1', mxUtils.parseXml(xml).documentElement);
+		this.createPageItem('1', mxResources.get('pageWithNumber', [1]),
+			mxUtils.parseXml(xml).documentElement);
 	}
 };
 
@@ -18940,6 +18971,7 @@ var ConnectionPointsDialog = function(editorUi, cell)
 		xInput.setAttribute('type', 'number');
 		xInput.setAttribute('min', '0');
 		xInput.setAttribute('max', '100');
+		xInput.setAttribute('step', 'any');
 		xInput.style.width = '45px';
 		xInput.style.margin = '0 4px 0 4px';
 		pointPropsDiv.appendChild(xInput);
@@ -18960,6 +18992,7 @@ var ConnectionPointsDialog = function(editorUi, cell)
 		yInput.setAttribute('type', 'number');
 		yInput.setAttribute('min', '0');
 		yInput.setAttribute('max', '100');
+		yInput.setAttribute('step', 'any');
 		yInput.style.width = '45px';
 		yInput.style.margin = '0 4px 0 4px';
 		pointPropsDiv.appendChild(yInput);
@@ -18975,17 +19008,18 @@ var ConnectionPointsDialog = function(editorUi, cell)
 
 		function applyPointProp()
 		{
-			var x = parseInt(xInput.value) || 0;
+			var x = parseFloat(xInput.value) || 0;
 			x = x < 0? 0 : (x > 100? 100 : x);
 			xInput.value = x;
 
-			var y = parseInt(yInput.value) || 0;
+			var y = parseFloat(yInput.value) || 0;
 			y = y < 0? 0 : (y > 100? 100 : y);
 			yInput.value = y;
 
 			var dx = parseInt(dxInput.value) || 0;
 			var dy = parseInt(dyInput.value) || 0;
-			var constObj = new mxConnectionConstraint(new mxPoint(x/100, y/100), false, null, dx, dy);
+			var constObj = new mxConnectionConstraint(new mxPoint(parseFloat((x / 100).toFixed(6)),
+				parseFloat((y / 100).toFixed(6))), false, null, dx, dy);
 			var cp = editingGraph.getConnectionPoint(state, constObj);
 
 			var cell = editingGraph.getSelectionCell();
@@ -19009,9 +19043,11 @@ var ConnectionPointsDialog = function(editorUi, cell)
 				return {x: cp.constObj.point.x, y: cp.constObj.point.y, dx: cp.constObj.dx, dy: cp.constObj.dy};
 			}
 
+			// Two decimal places (mxUtils.format) are not enough precision as
+			// points drift off the grid on shapes larger than 100pt
 			var dx = 0, dy = 0, mGeo = mainCell.geometry;
-			var x = mxUtils.format((cp.geometry.x + CP_HLF_SIZE - mGeo.x) / mGeo.width);
-			var y = mxUtils.format((cp.geometry.y + CP_HLF_SIZE - mGeo.y) / mGeo.height);
+			var x = parseFloat(((cp.geometry.x + CP_HLF_SIZE - mGeo.x) / mGeo.width).toFixed(6));
+			var y = parseFloat(((cp.geometry.y + CP_HLF_SIZE - mGeo.y) / mGeo.height).toFixed(6));
 
 			if (x < 0)
 			{
@@ -19051,8 +19087,8 @@ var ConnectionPointsDialog = function(editorUi, cell)
 				}
 				
 				var constraint = getConstraintFromCPoint(cell);
-				xInput.value = constraint.x * 100;
-				yInput.value = constraint.y * 100;
+				xInput.value = parseFloat((constraint.x * 100).toFixed(4));
+				yInput.value = parseFloat((constraint.y * 100).toFixed(4));
 				dxInput.value = constraint.dx;
 				dyInput.value = constraint.dy;
 				pointPropsDiv.style.visibility = '';
