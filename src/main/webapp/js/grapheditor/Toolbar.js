@@ -27,48 +27,51 @@ function Toolbar(editorUi, container)
  */
 Toolbar.prototype.init = function()
 {
+	var minWidth = (urlParams['embed'] == '1') ? 1050 : 720;
+	
 	var viewMenu = this.addMenu(this.editorUi.menus.get('viewPanels'), null, Editor.dockRightImage);
-	viewMenu.setAttribute('data-min-width', '720');
-	this.addSeparator(null, 720);
+	this.addSeparator();
 
 	var zoomInput = this.editorUi.createZoomInput();
-	zoomInput.setAttribute('data-min-width', '660');
+	zoomInput.setAttribute('data-min-width', minWidth + 10);
 	this.container.appendChild(zoomInput);
-	this.addSeparator(null, 660);
+	this.addSeparator(null, minWidth + 10);
 
 	this.addItems(['zoomIn', 'zoomOut'], null, null,
-		[Editor.zoomInImage, Editor.zoomOutImage], 460);
-	this.addSeparator(null, 460);
-	
+		[Editor.zoomInImage, Editor.zoomOutImage], minWidth - 60);
+	this.addSeparator(null, minWidth - 60);
+
 	this.addItems(['undo', 'redo'], null, null, [Editor.undoImage, Editor.redoImage]);
-	this.addSeparator(null, 260);
-	this.addItems(['delete'], null, null, [Editor.trashImage], 260);
-	this.addSeparator(null, 300);
-	this.addItems(['toFront', 'toBack'], null, null, [Editor.toFrontImage, Editor.toBackImage], 800);
-	this.addSeparator(null, 800);
-	this.addItems(['fillColor'], null, null, [Editor.fillColorImage], 820);
-	this.addItems(['strokeColor'], null, null, [Editor.strokeColorImage], 840);
-	this.addItems(['shadow'], null, null, [Editor.shadowImage], 900);
-	this.addSeparator(null, 900);
+	this.addSeparator(null, minWidth - 460);
+	this.addItems(['delete'], null, null, [Editor.trashImage], minWidth - 460);
+	this.addSeparator(null, minWidth - 420);
+	this.addItems(['toFront', 'toBack'], null, null, [Editor.toFrontImage, Editor.toBackImage], minWidth + 120);
+	this.addSeparator(null, minWidth + 80);
+	this.addItems(['fillColor'], null, null, [Editor.fillColorImage], minWidth + 160);
+	this.addItems(['strokeColor'], null, null, [Editor.strokeColorImage], minWidth + 180);
+	this.addItems(['shadow'], null, null, [Editor.shadowImage], minWidth + 200);
+	this.addSeparator(null, minWidth + 180);
 	this.edgeShapeMenu = this.addMenu(this.editorUi.menus.get('edgeShape'));
-	this.edgeShapeMenu.setAttribute('data-min-width', 440);
+	this.edgeShapeMenu.setAttribute('data-min-width', minWidth - 280);
 	this.edgeStyleMenu = this.addMenu(this.editorUi.menus.get('edgeStyle'));
-	this.edgeStyleMenu.setAttribute('data-min-width', 500);
-	this.addSeparator(null, 460);
+	this.edgeStyleMenu.setAttribute('data-min-width', minWidth - 220);
+	this.addSeparator(null, minWidth - 260);
 
 	var insertMenu = this.addMenu(this.editorUi.menus.get('insert'), null, Editor.plusImage);
-	insertMenu.setAttribute('data-min-width', 300);
+	insertMenu.setAttribute('data-min-width', minWidth - 420);
 	var shapesElt = insertMenu.cloneNode(true);
-	shapesElt.setAttribute('data-min-width', 330);
+	shapesElt.setAttribute('data-min-width', minWidth - 390);
 	shapesElt.style.backgroundImage = 'url(' + Editor.shapesImage + ')';
 	this.editorUi.addShapePicker(shapesElt, true);
 	this.container.appendChild(shapesElt);
 	var tableMenu = this.addTableDropDown();
-	tableMenu.setAttribute('data-min-width', 360);
-	this.addSeparator(null, 600);
+	tableMenu.setAttribute('data-min-width', minWidth - 360);
+	this.addSeparator(null, minWidth - 120);
 	this.addItems(['insertFreehand', 'generate'], null, null,
-		[Editor.freehandImage, Editor.sparklesImage], 600);
-	
+		[Editor.freehandImage, Editor.sparklesImage], minWidth - 120);
+	var layoutMenu = this.addMenu(this.editorUi.menus.get('layout'), null, Editor.layoutImage);
+	layoutMenu.setAttribute('data-min-width', minWidth - 120);
+
 	this.editorUi.dependsOnLanguage(mxUtils.bind(this, function()
 	{
 		if (this.edgeShapeMenu != null)
@@ -85,6 +88,7 @@ Toolbar.prototype.init = function()
 		insertMenu.setAttribute('title', mxResources.get('insert') + ' (' + mxResources.get('doubleClickTooltip') + ')');
 		shapesElt.setAttribute('title', mxResources.get('shapes'));
 		tableMenu.setAttribute('title', mxResources.get('table'));
+		layoutMenu.setAttribute('title', mxResources.get('layout'));
 	}));
 };
 
@@ -191,7 +195,7 @@ Toolbar.prototype.createTextToolbar = function()
 	// to catch the focus on click in these browsers. NOTE: Workaround in mxPopupMenu for icon items (without text).
 	var alignMenu = this.addMenu(new Menu(mxUtils.bind(this, function(menu)
 	{
-		elt = menu.addItem('', Editor.alignLeftImage, mxUtils.bind(this, function(evt)
+		var elt = menu.addItem('', Editor.alignLeftImage, mxUtils.bind(this, function(evt)
 		{
 			graph.cellEditor.alignText(mxConstants.ALIGN_LEFT, evt);
 			ui.fireEvent(new mxEventObject('styleChanged',
@@ -225,7 +229,7 @@ Toolbar.prototype.createTextToolbar = function()
 		{
 			document.execCommand('justifyfull', false, null);
 		}));
-		elt.setAttribute('title', mxResources.get('justifyfull'));
+		elt.setAttribute('title', mxResources.get('block'));
 		
 		elt = menu.addItem('', Editor.orderedListImage, mxUtils.bind(this, function()
 		{
@@ -256,7 +260,7 @@ Toolbar.prototype.createTextToolbar = function()
 	
 	var formatMenu = this.addMenu(new Menu(mxUtils.bind(this, function(menu)
 	{
-		elt = menu.addItem('', Editor.subscriptImage, this.editorUi.actions.get('subscript').funct);
+		var elt = menu.addItem('', Editor.subscriptImage, this.editorUi.actions.get('subscript').funct);
 		elt.setAttribute('title', mxResources.get('subscript') + ' (' + Editor.ctrlKey + '+,)');
 		
 		elt = menu.addItem('', Editor.superscriptImage, this.editorUi.actions.get('superscript').funct);
@@ -321,8 +325,8 @@ Toolbar.prototype.createTextToolbar = function()
 	var tableMenu = this.addMenu(new Menu(mxUtils.bind(this, function(menu)
 	{
 		var elt = graph.getSelectedElement();
-		var cell = graph.getParentByNames(elt, ['TD', 'TH'], graph.cellEditor.text2);
-		var row = graph.getParentByName(elt, 'TR', graph.cellEditor.text2);
+		var cell = graph.getParentByNames(elt, ['TD', 'TH'], graph.cellEditor.textarea);
+		var row = graph.getParentByName(elt, 'TR', graph.cellEditor.textarea);
 
 		if (row == null)
     	{
@@ -330,7 +334,7 @@ Toolbar.prototype.createTextToolbar = function()
     	}
 		else
     	{
-			var table = graph.getParentByName(row, 'TABLE', graph.cellEditor.text2);
+			var table = graph.getParentByName(row, 'TABLE', graph.cellEditor.textarea);
 
 			elt = menu.addItem('', Editor.addColumnLeftImage, mxUtils.bind(this, function()
 			{
@@ -435,10 +439,10 @@ Toolbar.prototype.createTextToolbar = function()
 						table.style.border = '1px solid ' + newColor;
 						table.style.borderCollapse = 'collapse';
 					}
-				});
+				}, null, null, null, mxResources.get('borderColor'));
 			}));
 			elt.setAttribute('title', mxResources.get('borderColor'));
-			
+
 			elt = menu.addItem('', Editor.fillColorImage, mxUtils.bind(this, function()
 			{
 				// Converts rgb(r,g,b) values
@@ -457,7 +461,7 @@ Toolbar.prototype.createTextToolbar = function()
 					{
 						table.style.backgroundColor = newColor;
 					}
-				});
+				}, null, null, null, mxResources.get('backgroundColor'));
 			}));
 			elt.setAttribute('title', mxResources.get('backgroundColor'));
 			
@@ -529,7 +533,14 @@ Toolbar.prototype.hideMenu = function()
  */
 Toolbar.prototype.setMenuText = function(menu, text)
 {
-	menu.getElementsByTagName('span')[0].innerText = text
+	var span = menu.getElementsByTagName('span')[0];
+
+	// The label is missing if the DOM was changed outside of the app,
+	// eg. by a browser extension
+	if (span != null)
+	{
+		span.innerText = text;
+	}
 };
 
 /**
@@ -654,21 +665,28 @@ Toolbar.prototype.addItem = function(sprite, key, container, noListeners)
 			}
 		});
 
+		var updateTitle = function()
+		{
+			var tooltip = action.getTitle();
+
+			if (action.shortcut != null)
+			{
+				tooltip += ' (' + action.shortcut + ')';
+			}
+
+			elt.setAttribute('title', tooltip);
+		};
+
 		if (!noListeners)
 		{
-			this.editorUi.dependsOnLanguage(mxUtils.bind(this, function()
-			{
-				var tooltip = action.getTitle();
-			
-				if (action.shortcut != null)
-				{
-					tooltip += ' (' + action.shortcut + ')';
-				}
-				
-				elt.setAttribute('title', tooltip);
-			}));
-
+			this.editorUi.dependsOnLanguage(updateTitle);
 			action.addListener('stateChanged', stateChangedListener);
+		}
+		else
+		{
+			// Sets the title once for items without listeners, eg. in the format
+			// panel, as it is also the name of the button for screen readers
+			updateTitle();
 		}
 		
 		stateChangedListener();

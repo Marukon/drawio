@@ -198,15 +198,19 @@ Editor.themes.push('atlas');
 					footer.appendChild(undoElt);
 					footer.appendChild(redoElt);
 					footer.appendChild(deleteElt);
-					
+
 					// Page menu only visible for multiple pages
 					var refreshMenu = mxUtils.bind(this, function()
 					{
 						var iw = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+						var eo = (urlParams['embed'] == '1' && this.buttonContainer != null) ?
+							(this.buttonContainer.offsetWidth || 300) : 0;
 
-						pagesElt.style.display = (iw < 480) ? 'none' : '';
-						zoomInput.style.display = (iw < 750) ? 'none' : '';
-						deleteElt.style.display = (iw < 290) ? 'none' : '';
+						pagesElt.style.display = (iw < 480 + eo) ? 'none' : '';
+						zoomInput.style.display = (iw < 750 + eo) ? 'none' : '';
+						deleteElt.style.display = (iw < 290 + eo) ? 'none' : '';
+						undoElt.style.display = (iw < 360 + eo) ? 'none' : '';
+						redoElt.style.display = (iw < 360 + eo) ? 'none' : '';
 					});
 
 					mxEvent.addListener(window, 'resize', refreshMenu);
@@ -290,11 +294,8 @@ Editor.themes.push('atlas');
 				
 				var freehandElt = this.createMenuItem('insertFreehand', (value == 'simple') ?
 					Editor.thinGestureImage : Editor.freehandImage, true);
-				var generateElt = this.createMenuItem('generate', (value == 'simple') ?
-					Editor.thinSparklesImage : Editor.sparklesImage, true);
 				var insertElt = this.createMenu('insert', (value == 'simple') ?
 					Editor.thinAddCircleImage : Editor.addBoxImage);
-				var tableElt = this.createMenu('table', Editor.thinTableImage);
 				var shapesElt = insertElt.cloneNode(true);
 				shapesElt.style.backgroundImage = 'url(' + ((value == 'simple') ?
 					Editor.thinShapesImage : Editor.shapesImage) + ')';
@@ -313,14 +314,12 @@ Editor.themes.push('atlas');
 						{
 							freehandElt.classList.add('mxDisabled');
 							insertElt.classList.add('mxDisabled');
-							tableElt.classList.add('mxDisabled');
 							shapesElt.classList.add('mxDisabled');
 						}
 						else
 						{
 							freehandElt.classList.remove('mxDisabled');
 							insertElt.classList.remove('mxDisabled');
-							tableElt.classList.remove('mxDisabled');
 							shapesElt.classList.remove('mxDisabled');
 						}
 
@@ -348,6 +347,8 @@ Editor.themes.push('atlas');
 								elt.setAttribute('title', title);
 							}
 							
+							// Shapes in the toolbar are controls for Tab (see Sidebar.addClickHandler)
+							elt.setAttribute('tabindex', '0');
 							picker.appendChild(elt);
 
 							if (value != 'simple' && key != null)
@@ -368,14 +369,16 @@ Editor.themes.push('atlas');
 						if (!collapsed)
 						{
 							var iw = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+							var eo = (urlParams['embed'] == '1' && this.buttonContainer != null) ?
+								(this.buttonContainer.offsetWidth || 300) : 0;
 
 							// Thinner previews in simple toolbar
 							if (value == 'simple')
 							{
 								this.sidebar.graph.cellRenderer.minSvgStrokeWidth = 0.9;
 							}
-						
-							if (value != 'simple' || iw >= 660)
+
+							if (value != 'simple' || iw >= 780 + eo)
 							{
 								var textElt = this.sidebar.createVertexTemplate(graph.appendFontSize(Editor.defaultTextStyle,
 									graph.vertexFontSize), 60, 30, 'Text', mxResources.get('text') + ' (A)', true, false,
@@ -390,40 +393,28 @@ Editor.themes.push('atlas');
 
 							if (value == 'simple')
 							{
-								if (iw >= 600)
+								if (iw >= 800 + eo)
 								{
 									addElt(boxElt, mxResources.get('rectangle') + ' (D)', null, 'D');
 								}
 
-								if (iw >= 400)
+								if (iw >= 540 + eo)
 								{
 									this.sketchPickerMenuElt.appendChild(shapesElt);
 								}
-								
-								if (iw >= 460)
+
+								if (iw >= 680 + eo)
 								{
 									addElt(freehandElt, mxResources.get('freehand') + ' (X)', null, 'X');
-								}
-
-								if (iw >= 500)
-								{
-									addElt(generateElt, mxResources.get('generate'));
-								}
-	
-								if (iw >= 540)
-								{
-									this.sketchPickerMenuElt.appendChild(tableElt);
 								}
 							}
 							else
 							{
-								addElt(this.sidebar.createVertexTemplate('shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;' +
-									'fontColor=#000000;darkOpacity=0.05;fillColor=#FFF9B2;strokeColor=none;fillStyle=solid;' +
-									'direction=west;gradientDirection=north;gradientColor=#FFF2A1;shadow=1;size=20;pointerEvents=1;',
-									140, 160, '', mxResources.get('note') + ' (S)', true, false, null, true, null, tw, th),
+								addElt(this.sidebar.createVertexTemplate(Editor.defaultNoteStyle, 160, 160, '',
+									mxResources.get('note') + ' (S)', true, false, null, true, null, tw, th),
 									mxResources.get('note') + ' (S)', null, 'S');
 								addElt(boxElt, mxResources.get('rectangle') + ' (D)', null, 'D');
-								addElt(this.sidebar.createVertexTemplate('ellipse;whiteSpace=wrap;html=1;', 160, 100, '',
+								addElt(this.sidebar.createVertexTemplate('ellipse;whiteSpace=wrap;html=1;shapeInside=1;', 160, 100, '',
 									mxResources.get('ellipse') + ' (F)', true, false, null, true, null, tw, th),
 									mxResources.get('ellipse') + ' (F)', null, 'F');
 
@@ -445,14 +436,8 @@ Editor.themes.push('atlas');
 								cell.geometry.width = this.editor.graph.defaultEdgeLength + 20;
 								cell.geometry.setTerminalPoint(new mxPoint(0, 20), true);
 								cell.geometry.setTerminalPoint(new mxPoint(cell.geometry.width, 20), false);
-				
-								addElt(this.sidebar.createEdgeTemplateFromCells([cell],
-									cell.geometry.width, 40, mxResources.get('arrow'),
-									true, null, true, false, null, tw, th),
-									mxResources.get('arrow'));
 								
 								addElt(freehandElt, mxResources.get('freehand') + ' (X)', null, 'X');
-								addElt(generateElt, mxResources.get('generate'));
 								this.sketchPickerMenuElt.appendChild(shapesElt);
 							}
 							
@@ -473,6 +458,8 @@ Editor.themes.push('atlas');
 				
 				mxEvent.addListener(foldImg, 'click', mxUtils.bind(this, function()
 				{
+					var focused = document.activeElement == foldImg;
+
 					if (collapsed)
 					{
 						picker.classList.remove('geCollapsedToolbar');
@@ -488,7 +475,15 @@ Editor.themes.push('atlas');
 						foldImg.style.backgroundImage = 'url(' + Editor.expandLessImage + ')';
 						collapsed = true;
 					}
+
+					// Keeps the focus for the keyboard as the toolbar is created again
+					if (focused)
+					{
+						foldImg.focus();
+					}
 				}));
+
+				this.initKeyboardButton(foldImg);
 				
 				var lastWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 				var currentThread = null;
@@ -525,7 +520,8 @@ Editor.themes.push('atlas');
 				if (value == 'simple')
 				{
 					this.sketchPickerMenuElt.style.cssText = 'position:relative;white-space:nowrap;user-select:none;' +
-						'display:flex;align-items:center;justify-content:flex-end;flex-grow:1;gap:6px;flex-shrink:0;';
+						'display:flex;align-items:center;justify-content:flex-end;flex-grow:1;gap:6px;' +
+						'flex-shrink:0;';
 					this.sketchMainMenuElt.appendChild(this.sketchPickerMenuElt);
 				}
 				else
@@ -543,6 +539,36 @@ Editor.themes.push('atlas');
 		else
 		{
 			editorUiCreatePickerMenuForTheme.apply(this, arguments);
+		}
+	};
+
+	/**
+	 * Tab order of the simple and sketch themes: the toolbars at the top and
+	 * left, the shapes, the diagram, the format panel and the page tabs or the
+	 * zoom at the bottom (see EditorUi.getTabStops).
+	 */
+	var editorUiGetTabRegions = EditorUi.prototype.getTabRegions;
+
+	EditorUi.prototype.getTabRegions = function()
+	{
+		var sidebar = (this.sidebar != null) ? this.sidebar.container : null;
+		var graph = this.editor.graph;
+
+		if (Editor.currentTheme == 'simple')
+		{
+			return [this.sketchMainMenuElt, this.sketchFooterMenuElt, this.sketchPickerMenuElt,
+				this.sketchMenubarElt, sidebar, graph.container, this.getFormatRegion(),
+				this.tabContainer];
+		}
+		else if (Editor.currentTheme == 'sketch')
+		{
+			return [this.sketchMainMenuElt, this.sketchMenubarElt, this.sketchPickerMenuElt,
+				sidebar, graph.container, this.getFormatRegion(), this.tabContainer,
+				this.sketchFooterMenuElt];
+		}
+		else
+		{
+			return editorUiGetTabRegions.apply(this, arguments);
 		}
 	};
 
@@ -565,14 +591,21 @@ Editor.themes.push('atlas');
 
 				if (value == 'simple')
 				{
-					this.sketchMenubarElt.style.cssText = 'position:relative;flex-grow:0.5;' +
-						'overflow:visible;' + ((urlParams['embed'] != '1') ?
-						'flex-shrink:0;' : 'min-width:0;') + css;
+					this.sketchMenubarElt.style.cssText = 'position:relative;' +
+						((urlParams['embed'] != '1') ? 'flex-grow:0.5;overflow:visible;' : '') +
+						'flex-shrink:0;' + css;
 
 					if (this.commentElt == null)
 					{
 						this.commentElt = this.createMenuItem('comments', Editor.thinCommentImage, true);
 						this.commentElt.style.backgroundSize = '24px';
+
+						// Shows the number of unresolved comments of the file
+						this.addCommentsBadge(this.commentElt);
+
+						// Dragging the button to the canvas starts a comment
+						// on the shape or point it is dropped on
+						this.installCommentDragSource(this.commentElt);
 					}
 
 					if (this.shareElt == null && urlParams['embed'] != '1' &&
@@ -637,20 +670,22 @@ Editor.themes.push('atlas');
 						else if (Editor.currentTheme == 'simple')
 						{
 							var iw = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+							var eo = (urlParams['embed'] == '1' && this.buttonContainer != null) ?
+								(this.buttonContainer.offsetWidth || 300) : 0;
 
 							if (this.commentElt != null)
 							{
-								this.commentElt.style.display = (iw > 560 && this.commentsSupported()) ? '' : 'none';
+								this.commentElt.style.display = (iw > 560 + eo && this.commentsSupported()) ? '' : 'none';
 							}
 
 							if (this.shareElt != null)
 							{
-								this.shareElt.style.display = (iw > 360) ? '' : 'none';
+								this.shareElt.style.display = (iw > 360 + eo) ? '' : 'none';
 							}
 
 							if (this.overflowMenuElt != null)
 							{
-								this.overflowMenuElt.style.display = (iw < 750) ? '' : 'none';
+								this.overflowMenuElt.style.display = (iw < 750 + eo) ? '' : 'none';
 							}
 						}
 					});
@@ -750,7 +785,13 @@ Editor.themes.push('atlas');
 				else
 				{
 					this.statusContainer.style.justifyContent = 'center';
-					this.statusContainer.style.width = '22%';
+					this.statusContainer.style.minWidth = '0';
+					this.statusContainer.style.overflow = 'hidden';
+
+					if (urlParams['embed'] != '1')
+					{
+						this.statusContainer.style.width = '22%';
+					}
 				}
 			}
 			

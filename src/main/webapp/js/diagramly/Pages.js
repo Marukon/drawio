@@ -3,15 +3,11 @@
  * Copyright (c) 2006-2016, draw.io AG
  */
 /**
- * Constructs a new point for the optional x and y coordinates. If no
- * coordinates are given, then the default values for <x> and <y> are used.
- * @constructor
- * @class Implements a basic 2D point. Known subclassers = {@link mxRectangle}.
- * @param {number} x X-coordinate of the point.
- * @param {number} y Y-coordinate of the point.
+ * Global types
  */
 /**
- * Global types
+ * Constructs a new page for the given diagram node. The node gets the given
+ * ID, or a new ID if it has none.
  */
 function DiagramPage(node, id)
 {
@@ -49,6 +45,13 @@ DiagramPage.prototype.viewState = null;
 DiagramPage.prototype.diagramModified = false;
 
 /**
+ * Specifies if the root of the page was changed without updating the cached
+ * XML data, eg. by a patch while the page is not the current page. See
+ * <invalidateNode>.
+ */
+DiagramPage.prototype.needsUpdate = false;
+
+/**
  * 
  */
 DiagramPage.prototype.getId = function()
@@ -80,6 +83,116 @@ DiagramPage.prototype.setName = function(value)
 };
 
 /**
+ * Returns the name of the group of the page or null if the page is in no
+ * group. Groups are consecutive pages with the same group, which the tabs
+ * show if the file has page groups (see EditorUi.isPageGroupsEnabled). The
+ * pages stay a flat list, so readers without groups show all pages.
+ */
+DiagramPage.prototype.getGroup = function()
+{
+	var value = this.node.getAttribute('group');
+
+	return (value != null && value.length > 0) ? value : null;
+};
+
+/**
+ * Sets the name of the group of the page or removes it if value is null.
+ */
+DiagramPage.prototype.setGroup = function(value)
+{
+	if (value == null)
+	{
+		this.node.removeAttribute('group');
+	}
+	else
+	{
+		this.node.setAttribute('group', value);
+	}
+};
+
+/**
+ * Returns the stored initial view as {x, y, width, height, scale} or null.
+ * The view is persisted as a space-separated "x y width height [scale]"
+ * attribute on the diagram node (see Graph.getCurrentViewBox /
+ * EditorUi.fitInitialView). The scale is optional so externally authored or
+ * legacy four-value strings still resolve (the restore then falls back to a
+ * fit). Returns null unless at least the four geometry values are finite and
+ * width/height are positive.
+ */
+DiagramPage.prototype.getViewBox = function()
+{
+	var value = this.node.getAttribute('viewBox');
+
+	if (value != null)
+	{
+		var t = value.split(' ');
+		var x = parseFloat(t[0]);
+		var y = parseFloat(t[1]);
+		var w = parseFloat(t[2]);
+		var h = parseFloat(t[3]);
+		var s = (t.length > 4) ? parseFloat(t[4]) : null;
+
+		if (isFinite(x) && isFinite(y) && isFinite(w) && isFinite(h) && w > 0 && h > 0)
+		{
+			return {x: x, y: y, width: w, height: h,
+				scale: (s != null && isFinite(s) && s > 0) ? s : null};
+		}
+	}
+
+	return null;
+};
+
+/**
+ * Stores the given {x, y, width, height, scale} as the initial view, or
+ * removes the attribute when vb is null. The scale token is omitted when null.
+ */
+DiagramPage.prototype.setViewBox = function(vb)
+{
+	if (vb == null)
+	{
+		this.node.removeAttribute('viewBox');
+	}
+	else
+	{
+		var value = vb.x + ' ' + vb.y + ' ' + vb.width + ' ' + vb.height;
+
+		if (vb.scale != null)
+		{
+			value += ' ' + vb.scale;
+		}
+
+		this.node.setAttribute('viewBox', value);
+	}
+};
+
+/**
+ * Returns the text alternative of the page or null. Exports write it as the
+ * accessible name of the SVG of the page (see Graph.addSvgTitle).
+ */
+DiagramPage.prototype.getAlt = function()
+{
+	return this.node.getAttribute('alt');
+};
+
+/**
+ * Sets the given text alternative without the characters that are invalid
+ * in XML, or removes it if the given value is null or empty.
+ */
+DiagramPage.prototype.setAlt = function(value)
+{
+	value = (value != null) ? Graph.zapGremlins(value) : '';
+
+	if (value == '')
+	{
+		this.node.removeAttribute('alt');
+	}
+	else
+	{
+		this.node.setAttribute('alt', value);
+	}
+};
+
+/**
  * Sets the diagram modified flag.
  */
 DiagramPage.prototype.setDiagramModified = function(value)
@@ -93,6 +206,26 @@ DiagramPage.prototype.setDiagramModified = function(value)
 DiagramPage.prototype.isDiagramModified = function()
 {
 	return this.diagramModified;
+};
+
+/**
+ * Marks the cached XML data of the page as older than its root, eg. after
+ * the root was changed while the page is not the current page.
+ */
+DiagramPage.prototype.invalidateNode = function()
+{
+	this.needsUpdate = true;
+};
+
+/**
+ * Returns true if the cached XML data of the page is older than its root:
+ * the root was changed (see <invalidateNode>) or the diagram was edited while
+ * the page was the current page. Copies of pages keep both flags (see
+ * EditorUi.clonePage), so the XML data of a copy is encoded from its root.
+ */
+DiagramPage.prototype.isNodeStale = function()
+{
+	return this.needsUpdate || this.diagramModified;
 };
 
 /**
@@ -122,6 +255,192 @@ RenamePage.prototype.execute = function()
 };
 
 /**
+ * Undoable change of the ID of a page. The caller checks that the ID is not
+ * used by another page.
+ */
+function ChangePageId(ui, page, id)
+{
+	this.ui = ui;
+	this.page = page;
+	this.previous = id;
+}
+
+/**
+ * Implementation of the undoable page ID change. Keeps the ID if another page
+ * has taken the new ID in the meantime, eg. in a remote change.
+ */
+ChangePageId.prototype.execute = function()
+{
+	var tmp = this.page.getId();
+	var page = this.ui.getPageById(this.previous);
+
+	if (page == null || page == this.page)
+	{
+		this.page.node.setAttribute('id', this.previous);
+	}
+
+	this.previous = tmp;
+
+	// Updates the ID in the tooltip of the tab and in the URL
+	this.ui.updateTabContainer();
+
+	if (this.page == this.ui.currentPage)
+	{
+		this.ui.updateHashObject();
+	}
+};
+
+/**
+ * Undoable change of a page's stored initial view (see DiagramPage.getViewBox).
+ */
+function ChangePageView(ui, page, viewBox)
+{
+	this.ui = ui;
+	this.page = page;
+	this.viewBox = viewBox;
+	this.previous = viewBox;
+}
+
+/**
+ * Implementation of the undoable initial-view change.
+ */
+ChangePageView.prototype.execute = function()
+{
+	var tmp = this.page.getViewBox();
+	this.page.setViewBox(this.previous);
+	this.viewBox = this.previous;
+	this.previous = tmp;
+
+	this.ui.editor.fireEvent(new mxEventObject('pageViewChanged'));
+};
+
+/**
+ * Adds the text alternative of the current page, which exports write as the
+ * accessible name of the SVG of the page (see DiagramPage.getAlt).
+ */
+EditorUi.prototype.addPageSetupOptions = function(parent, styleLabel, styleContent)
+{
+	var page = this.currentPage;
+	var result = null;
+
+	if (page != null)
+	{
+		var row = document.createElement('div');
+		row.className = 'geDialogFormRow geDialogFormRowTop';
+
+		var label = document.createElement('span');
+		label.className = 'geDialogFormLabel';
+		mxUtils.write(label, mxResources.get('altText', null, 'Alt Text') + ':');
+		row.appendChild(styleLabel(label));
+
+		var initialAlt = page.getAlt() || '';
+		var input = document.createElement('textarea');
+		input.setAttribute('rows', '2');
+		input.setAttribute('aria-label', mxResources.get('altText', null, 'Alt Text'));
+		input.style.fontFamily = 'inherit';
+		input.style.resize = 'vertical';
+		input.value = initialAlt;
+		row.appendChild(styleContent(input));
+		parent.appendChild(row);
+
+		// Applies the text alternative if it was changed in the dialog, so that
+		// a change of a collaborator is kept (whitespace only removes it)
+		result = mxUtils.bind(this, function()
+		{
+			if (input.value != initialAlt)
+			{
+				var alt = Graph.zapGremlins(input.value);
+				alt = (mxUtils.trim(alt) != '') ? alt : '';
+
+				if (alt != (page.getAlt() || ''))
+				{
+					this.editor.graph.model.execute(new ChangePageAlt(this, page, alt));
+				}
+			}
+		});
+	}
+
+	return result;
+};
+
+/**
+ * Undoable change of the text alternative of a page (see DiagramPage.getAlt).
+ */
+function ChangePageAlt(ui, page, alt)
+{
+	this.ui = ui;
+	this.page = page;
+	this.alt = alt;
+	this.previous = alt;
+}
+
+/**
+ * Implementation of the undoable text alternative change.
+ */
+ChangePageAlt.prototype.execute = function()
+{
+	var tmp = this.page.getAlt();
+	this.page.setAlt(this.previous);
+	this.alt = this.previous;
+	this.previous = tmp;
+};
+
+/**
+ * Undoable change of the group of a page (see DiagramPage.getGroup). The
+ * tabs are updated once per edit (see EditorUi.initPages), so changes of
+ * many pages, eg. if a group is renamed, update them once.
+ */
+function ChangePageGroup(ui, page, group)
+{
+	this.ui = ui;
+	this.page = page;
+	this.group = group;
+	this.previous = group;
+}
+
+/**
+ * Implementation of the undoable page group change.
+ */
+ChangePageGroup.prototype.execute = function()
+{
+	var tmp = this.page.getGroup();
+	this.page.setGroup(this.previous);
+	this.group = this.previous;
+	this.previous = tmp;
+};
+
+/**
+ * Undoable change of the root of a page. An edit that replaces the root of
+ * the model (mxGraphModel.setRoot, Editor.setGraphXml) must replace the
+ * root of the current page with this change in the same edit: the flush
+ * and the save diff the pages, so an undo that restored only the root of
+ * the model left the page with the replaced root, and every later edit on
+ * that page was lost (jgraph/drawio#5795).
+ */
+function ChangePageRoot(ui, page, root)
+{
+	this.ui = ui;
+	this.page = page;
+	this.root = root;
+	this.previous = root;
+}
+
+/**
+ * Implementation of the undoable page root change.
+ */
+ChangePageRoot.prototype.execute = function()
+{
+	var tmp = this.page.root;
+	this.page.root = this.previous;
+	this.root = this.previous;
+	this.previous = tmp;
+
+	// The cached XML of a page that is not viewed is encoded from the
+	// root (see getXmlFileData)
+	this.page.invalidateNode();
+};
+
+/**
  * Undoable change of page title.
  */
 function MovePage(ui, oldIndex, newIndex)
@@ -136,14 +455,20 @@ function MovePage(ui, oldIndex, newIndex)
  */
 MovePage.prototype.execute = function()
 {
-	this.ui.pages.splice(this.newIndex, 0, this.ui.pages.splice(this.oldIndex, 1)[0]);
+	var pages = this.ui.pages;
+
+	// Moving a page that does not exist would insert an undefined page
+	if (pages != null && this.oldIndex >= 0 && this.oldIndex < pages.length)
+	{
+		pages.splice(this.newIndex, 0, pages.splice(this.oldIndex, 1)[0]);
+	}
+
 	var tmp = this.oldIndex;
 	this.oldIndex = this.newIndex;
 	this.newIndex = tmp;
-	
-	// Required to update page numbers in placeholders
-	this.ui.editor.graph.updatePlaceholders();
-	this.ui.editor.fireEvent(new mxEventObject('pageMoved'));
+
+	// The page numbers in placeholders and the tabs are updated once per
+	// edit (see initPages), as groups of pages move page by page
 };
 
 /**
@@ -213,6 +538,7 @@ SelectPage.prototype.execute = function()
 		page = this.ui.currentPage;
 	
 		// Switches the root cell and sets the view state
+		this.ui.applyHiddenTagsForPage(page);
 		graph.model.prefix = Editor.guid() + '-';
 		graph.model.rootChanged(page.root);
 		graph.setViewState(page.viewState);
@@ -271,7 +597,326 @@ ChangePage.prototype.execute = function()
 };
 
 /**
- * 
+ * Execute-time repair for replayed page changes, the page-level twin
+ * of the cell change repair in EditorUi.js: the undo history holds
+ * DiagramPage OBJECT references, but patches may have removed the
+ * page or replaced it with a new object of the same id. Every replay
+ * resolves the reference fresh against ui.pages:
+ * - the id is taken by a new object: redirected to the canonical page
+ *   (an insert replay of an already present page becomes a no-op
+ *   instead of a duplicate array entry; a remove replay removes the
+ *   canonical instance instead of hitting indexOf -1, whose
+ *   splice(-1, 1) silently removed the LAST page)
+ * - the id is gone on a remove replay: no-op with the field cycle of
+ *   a real remove, so a later insert replay revives the page
+ * The first execution is transparent (fresh references by
+ * construction).
+ */
+(function()
+{
+	var canonicalPage = function(ui, page)
+	{
+		if (page != null && ui != null && ui.pages != null)
+		{
+			for (var i = 0; i < ui.pages.length; i++)
+			{
+				if (ui.pages[i].getId() == page.getId())
+				{
+					return ui.pages[i];
+				}
+			}
+		}
+
+		return null;
+	};
+
+	// The viewed page must stay part of the document. A remove replay
+	// can take it out while the page-switch that follows stays inert
+	// (its own target was deleted by a peer), leaving ui.currentPage
+	// outside ui.pages: it still renders and accepts edits, but those
+	// belong to no page in any diff, so they reach neither a flush nor
+	// a save and vanish when the next patch heals the reference.
+	// Selected quietly, so the repair stays out of the undo history.
+	// Drained ONCE after the undo or redo (EditorUi.undo/redo), not
+	// per replayed change: the undo of a wholesale replacement passes
+	// through one such state per page, and a select per state was a
+	// full page render each (the undo of a restore took seconds).
+	EditorUi.prototype.healCurrentPage = function()
+	{
+		if (this.pages != null && this.pages.length > 0 &&
+			mxUtils.indexOf(this.pages, this.currentPage) < 0)
+		{
+			this.selectPage(this.pages[0], true);
+		}
+	};
+
+	var changePageExecute = ChangePage.prototype.execute;
+
+	ChangePage.prototype.execute = function()
+	{
+		if (this.repairExecuted && this.relatedPage != null)
+		{
+			var canonical = canonicalPage(this.ui, this.relatedPage);
+
+			if (this.index == null)
+			{
+				// Remove replay
+				if (canonical != null)
+				{
+					this.relatedPage = canonical;
+				}
+				else
+				{
+					// The page is already gone: no-op with the field
+					// cycle of a real remove (a later insert replay
+					// revives the recorded page object)
+					this.ui.editor.fireEvent(new mxEventObject(
+						'beforePageChange', 'change', this));
+					this.previousIndex = null;
+					this.index = this.ui.pages.length;
+
+					if (!this.noSelect && this.page != null)
+					{
+						SelectPage.prototype.execute.apply(this, arguments);
+					}
+
+					this.repairExecuted = true;
+
+					return;
+				}
+			}
+			else if (canonical != null)
+			{
+				// Insert replay of a page that is already present (a
+				// remote patch re-added it): no-op with the field
+				// cycle of a real insert
+				this.relatedPage = canonical;
+				this.ui.editor.fireEvent(new mxEventObject(
+					'beforePageChange', 'change', this));
+				this.previousIndex = this.index;
+				this.index = null;
+
+				// The select replay walks by direction and skips a
+				// self-select itself (see SelectPage.execute below)
+				if (!this.noSelect && this.page != null)
+				{
+					SelectPage.prototype.execute.apply(this, arguments);
+				}
+
+				this.repairExecuted = true;
+
+				return;
+			}
+		}
+
+		changePageExecute.apply(this, arguments);
+		this.repairExecuted = true;
+	};
+
+	var selectPageExecute = SelectPage.prototype.execute;
+
+	// A replay has a direction: the undo returns to the page viewed
+	// before the first execution, the redo to the target, each
+	// resolved by id, and a destination that is not in the document
+	// (deleted by a peer, or not yet back in a composite undo) keeps
+	// the current page. The base toggle - previousPage is the next
+	// destination and is swapped on every executed switch - breaks as
+	// soon as one replay is inert: its destination stays put and the
+	// next replay walks the wrong way. In the undo of a wholesale
+	// replacement the inert step is the rule (the origin returns only
+	// with the last change), so the redo left the target unselected
+	// and the client ended on the last page.
+	SelectPage.prototype.execute = function()
+	{
+		if (this.repairExecuted)
+		{
+			var dest = (this.page != null) ? canonicalPage(this.ui,
+				(this.applied) ? this.origin : this.page) : null;
+			this.applied = !this.applied;
+
+			// A self-select would overwrite the current page's view
+			// state (scroll/zoom) with a stale one
+			if (dest != null && dest != this.ui.currentPage)
+			{
+				this.previousPage = dest;
+				selectPageExecute.apply(this, arguments);
+			}
+		}
+		else
+		{
+			this.origin = this.ui.currentPage;
+			this.applied = true;
+			selectPageExecute.apply(this, arguments);
+			this.repairExecuted = true;
+		}
+	};
+
+	var renamePageExecute = RenamePage.prototype.execute;
+
+	RenamePage.prototype.execute = function()
+	{
+		if (this.repairExecuted)
+		{
+			var canonical = canonicalPage(this.ui, this.page);
+
+			if (canonical != null)
+			{
+				this.page = canonical;
+			}
+		}
+
+		renamePageExecute.apply(this, arguments);
+		this.repairExecuted = true;
+	};
+
+	var changePageIdExecute = ChangePageId.prototype.execute;
+
+	ChangePageId.prototype.execute = function()
+	{
+		if (this.repairExecuted)
+		{
+			var canonical = canonicalPage(this.ui, this.page);
+
+			if (canonical != null)
+			{
+				this.page = canonical;
+			}
+		}
+
+		changePageIdExecute.apply(this, arguments);
+		this.repairExecuted = true;
+	};
+
+	var changePageRootExecute = ChangePageRoot.prototype.execute;
+
+	ChangePageRoot.prototype.execute = function()
+	{
+		if (this.repairExecuted)
+		{
+			var canonical = canonicalPage(this.ui, this.page);
+
+			if (canonical != null)
+			{
+				this.page = canonical;
+			}
+		}
+
+		changePageRootExecute.apply(this, arguments);
+		this.repairExecuted = true;
+	};
+
+	// A root change of the main model belongs to the page that was viewed
+	// when it was first executed. The history holds no page switch that
+	// is not the user's (following a collaborator, the select after a
+	// peer removed the viewed page), so a replay on another page put the
+	// old root of the first page behind the viewed page, which the next
+	// page switch then copied into the viewed page. Such a replay leaves
+	// the model as it is; the page of the change gets its root from the
+	// ChangePageRoot in the same edit (jgraph/drawio#5795).
+	var rootChangeExecute = mxRootChange.prototype.execute;
+
+	mxRootChange.prototype.execute = function()
+	{
+		var ui = (this.model != null) ? this.model.repairUi : null;
+
+		if (ui != null)
+		{
+			var pageId = (ui.currentPage != null) ?
+				ui.currentPage.getId() : null;
+
+			if (!this.repairExecuted)
+			{
+				this.repairPageId = pageId;
+				this.repairExecuted = true;
+			}
+			else if (pageId != this.repairPageId)
+			{
+				// Field cycle of an executed change
+				var tmp = this.root;
+				this.root = this.previous;
+				this.previous = tmp;
+
+				return;
+			}
+		}
+
+		rootChangeExecute.apply(this, arguments);
+	};
+
+	var changePageViewExecute = ChangePageView.prototype.execute;
+
+	ChangePageView.prototype.execute = function()
+	{
+		if (this.repairExecuted)
+		{
+			var canonical = canonicalPage(this.ui, this.page);
+
+			if (canonical != null)
+			{
+				this.page = canonical;
+			}
+		}
+
+		changePageViewExecute.apply(this, arguments);
+		this.repairExecuted = true;
+	};
+
+	var changePageAltExecute = ChangePageAlt.prototype.execute;
+
+	ChangePageAlt.prototype.execute = function()
+	{
+		if (this.repairExecuted)
+		{
+			var canonical = canonicalPage(this.ui, this.page);
+
+			if (canonical != null)
+			{
+				this.page = canonical;
+			}
+		}
+
+		changePageAltExecute.apply(this, arguments);
+		this.repairExecuted = true;
+	};
+
+	var changePageGroupExecute = ChangePageGroup.prototype.execute;
+
+	ChangePageGroup.prototype.execute = function()
+	{
+		if (this.repairExecuted)
+		{
+			var canonical = canonicalPage(this.ui, this.page);
+
+			if (canonical != null)
+			{
+				this.page = canonical;
+			}
+		}
+
+		changePageGroupExecute.apply(this, arguments);
+		this.repairExecuted = true;
+	};
+
+	var movePageExecute = MovePage.prototype.execute;
+
+	MovePage.prototype.execute = function()
+	{
+		// Index-based: clamp against the current page count so a
+		// replay after remote inserts/removes stays in bounds
+		if (this.repairExecuted && this.ui != null && this.ui.pages != null)
+		{
+			var max = Math.max(0, this.ui.pages.length - 1);
+			this.oldIndex = Math.min(this.oldIndex, max);
+			this.newIndex = Math.min(this.newIndex, max);
+		}
+
+		movePageExecute.apply(this, arguments);
+		this.repairExecuted = true;
+	};
+})();
+
+/**
+ *
  */
 function ReplaceDiagram(ui, data)
 {
@@ -375,6 +1020,14 @@ EditorUi.prototype.getSelectedPageIndex = function()
  };
  
 /**
+ * Changes the ID of the given page with an undoable change.
+ */
+EditorUi.prototype.setPageId = function(page, id)
+{
+	this.editor.graph.model.execute(new ChangePageId(this, page, id));
+};
+
+/**
  * Returns the page with the given ID from the optional array of pages.
  */
 EditorUi.prototype.getPageById = function(id, pages)
@@ -393,6 +1046,20 @@ EditorUi.prototype.getPageById = function(id, pages)
 	}
 
 	return null;
+};
+
+/**
+ * Returns the page for the given data:page/id, link or null. Whitespace
+ * around the ID of a hand-typed link is ignored: "data:page/id, abc" gave
+ * "Page not found" (Kym, 2026-09-25). Page IDs from Editor.guid never
+ * contain whitespace, and an exact match still wins.
+ */
+EditorUi.prototype.getPageByLink = function(href, pages)
+{
+	var id = href.substring(href.indexOf(',') + 1);
+
+	return this.getPageById(id, pages) ||
+		this.getPageById(mxUtils.trim(id), pages);
 };
 
 /**
@@ -432,6 +1099,9 @@ EditorUi.prototype.pageSelected = function()
 
 	if (page != null)
 	{
+		// Keeps the fit window mode and fits the new page below
+		var fitWindow = this.fitWindowEnabled;
+
 		graph.tooltipHandler.hide();
 
 		if (page.viewState == null ||
@@ -446,12 +1116,22 @@ EditorUi.prototype.pageSelected = function()
 			{
 				this.lightboxFit();
 			}
+			// Skips the fit while a file is opening since resetGraphView
+			// resets the scroll position and fileLoaded fits the diagram
+			else if (Editor.fitDiagramOnPage && !this.openingFile)
+			{
+				this.fitInitialView();
+			}
 
 			if (this.chromelessResize != null)
 			{
-				graph.container.scrollleft = 0;
+				graph.container.scrollLeft = 0;
 				graph.container.scrollTop = 0;
 				this.chromelessResize();
+
+				// Views with scrollbars pad the diagram, so the scroll
+				// position of the origin does not show it
+				this.centerChromelessDiagram();
 			}
 		}
 		else
@@ -460,9 +1140,13 @@ EditorUi.prototype.pageSelected = function()
 			graph.setScrollbarPositions(page.viewState,
 				graph.view.translate.x, graph.view.translate.y);
 		}
-		
+
+		if (fitWindow)
+		{
+			this.setFitWindowEnabled(true);
+		}
+
 		this.updateTabContainer();
-		this.scrollToPage();
 	}
 };
 
@@ -497,6 +1181,12 @@ EditorUi.prototype.getImageForPage = function(page, sourcePage, sourceGraph, add
 	
 	this.updatePageRoot(page);
 	graph.setAdaptiveColors(page.viewState.adaptiveColors);
+	graph.setMeasureScale(page.viewState.measureScale);
+
+	// Uses the root in the source graph for the current page since the
+	// root of the page is updated after the background image is set
+	graph.addPlaceholderRoot((sourcePage != null && sourcePage != this.currentPage) ?
+		sourcePage.root : sourceGraph.model.getRoot());
 	graph.model.setRoot(page.root);
 
 	var temp = Graph.foreignObjectWarningText;
@@ -510,6 +1200,195 @@ EditorUi.prototype.getImageForPage = function(page, sourcePage, sourceGraph, add
 
 	return new mxImage(Editor.createSvgDataUri(mxUtils.getXml(svgRoot)),
 		bounds.width, bounds.height, bounds.x, bounds.y);
+};
+
+/**
+ * Returns a temporary graph with the given page, which is not the current
+ * page, and the settings of the page for exports. The given index is the
+ * number of the page minus one. The container of the graph is added to the
+ * document and must be removed by the caller.
+ */
+EditorUi.prototype.createPageGraph = function(page, index)
+{
+	var graph = this.editor.graph;
+	var temp = this.createTemporaryGraph(graph.getStylesheet());
+	temp.shapeForegroundColor = graph.shapeForegroundColor;
+	temp.shapeBackgroundColor = graph.shapeBackgroundColor;
+	temp.enableFlowAnimation = graph.enableFlowAnimation;
+	this.updatePageRoot(page);
+	var state = page.viewState;
+
+	if (state != null)
+	{
+		var img = state.backgroundImage;
+
+		// Updates the image of background pages
+		if (img != null && img.originalSrc != null)
+		{
+			img = this.createImageForPageLink(img.originalSrc, page);
+		}
+
+		temp.pageVisible = state.pageVisible;
+		temp.pageFormat = state.pageFormat;
+		temp.pageScale = state.pageScale;
+		temp.mathEnabled = state.mathEnabled;
+		temp.shadowVisible = state.shadowVisible;
+		temp.background = state.background;
+		temp.backgroundImage = img;
+		temp.gridSize = Graph.parseGridSize(state.gridSize);
+		temp.hiddenTags = state.hiddenTags || [];
+		temp.setBackgroundGradient(state.backgroundGradient,
+			state.backgroundGradientDirection);
+		temp.setMeasureScale(state.measureScale);
+		temp.setAdaptiveColors(state.adaptiveColors);
+	}
+
+	// Resolves the other placeholders like in the current page
+	temp.getGlobalVariable = function(name)
+	{
+		if (name == 'page')
+		{
+			return page.getName();
+		}
+		else if (name == 'pagenumber')
+		{
+			return index + 1;
+		}
+
+		return graph.getGlobalVariable.apply(graph, arguments);
+	};
+
+	document.body.appendChild(temp.container);
+	temp.model.setRoot(page.root);
+
+	return temp;
+};
+
+/**
+ * Returns an SVG with all pages and a view for each page that shows the
+ * current page (see Graph.createSvgWithViews). The given function returns
+ * the SVG root for the graph and the page. Math and the outlines of images
+ * in other pages are only in the SVG if MathJax is loaded and the outlines
+ * are traced (see prepareOtherPages).
+ */
+EditorUi.prototype.getSvgWithViews = function(fn)
+{
+	var pages = [];
+
+	for (var i = 0; i < this.pages.length; i++)
+	{
+		var page = this.pages[i];
+		var graph = (page == this.currentPage) ? this.editor.graph :
+			this.createPageGraph(page, i);
+
+		try
+		{
+			pages.push({svg: fn(graph, page), id: page.getId(), name: page.getName()});
+		}
+		finally
+		{
+			if (graph != this.editor.graph)
+			{
+				graph.container.parentNode.removeChild(graph.container);
+			}
+		}
+	}
+
+	return Graph.createSvgWithViews(pages, mxUtils.indexOf(
+		this.pages, this.currentPage));
+};
+
+/**
+ * Invokes the given function once the pages other than the current page can
+ * be exported (see getSvgWithViews): MathJax is loaded if they use math, and
+ * the images of their shapes with an outline perimeter are traced, whose
+ * outlines are then cached (see Graph.waitForOutlines).
+ */
+EditorUi.prototype.prepareOtherPages = function(fn)
+{
+	var math = false;
+	var graphs = [];
+
+	for (var i = 0; this.pages != null && i < this.pages.length; i++)
+	{
+		var page = this.pages[i];
+
+		if (page != this.currentPage)
+		{
+			try
+			{
+				this.updatePageRoot(page);
+				math = math || (page.viewState != null && page.viewState.mathEnabled == true);
+
+				// Starts the traces in a graph of the page
+				if (EditorUi.hasOutlinePerimeter(page.root))
+				{
+					graphs.push(this.createPageGraph(page, i));
+				}
+			}
+			catch (e)
+			{
+				// The export reports the error
+			}
+		}
+	}
+
+	var pending = graphs.length + 1;
+
+	var done = function()
+	{
+		if (--pending == 0)
+		{
+			if (math && typeof Editor.loadMath === 'function')
+			{
+				Editor.loadMath(fn);
+			}
+			else
+			{
+				fn();
+			}
+		}
+	};
+
+	for (var i = 0; i < graphs.length; i++)
+	{
+		(function(graph)
+		{
+			graph.waitForOutlines(function()
+			{
+				graph.container.parentNode.removeChild(graph.container);
+				done();
+			}, 10000);
+		})(graphs[i]);
+	}
+
+	done();
+};
+
+/**
+ * Returns true if a cell under the given root has perimeter=outlinePerimeter
+ * in its style (see Graph.isOutlinePerimeter and getOutlinePages in export.js).
+ */
+EditorUi.hasOutlinePerimeter = function(root)
+{
+	var cells = [root];
+
+	while (cells.length > 0)
+	{
+		var cell = cells.pop();
+
+		if (cell.style != null && /(^|;)\s*perimeter=outlinePerimeter\s*(;|$)/.test(cell.style))
+		{
+			return true;
+		}
+
+		for (var i = 0; cell.children != null && i < cell.children.length; i++)
+		{
+			cells.push(cell.children[i]);
+		}
+	}
+
+	return false;
 };
 
 /**
@@ -555,16 +1434,35 @@ EditorUi.prototype.initPages = function()
 		{
 			var edit = evt.getProperty('edit');
 			var changes = edit.changes;
+			var tabs = false;
+			var moved = false;
 			
 			for (var i = 0; i < changes.length; i++)
 			{
-				if (changes[i] instanceof RenamePage ||
+				if (changes[i] instanceof MovePage)
+				{
+					moved = true;
+				}
+				else if (changes[i] instanceof RenamePage ||
 					changes[i] instanceof ChangePage ||
+					changes[i] instanceof ChangePageGroup ||
 					changes[i] instanceof mxRootChange)
 				{
-					this.updateTabContainer();
-					break;	
+					tabs = true;
 				}
+			}
+
+			// Updates the page numbers in placeholders and the tabs once for all
+			// moved pages: moving a group of G pages updated them G times (a
+			// group of 500 pages: 9.4 s)
+			if (moved)
+			{
+				graph.updatePlaceholders();
+				this.editor.fireEvent(new mxEventObject('pageMoved'));
+			}
+			else if (tabs)
+			{
+				this.updateTabContainer();
 			}
 
 			if (this.currentPage != null && !(changes.length == 1 &&
@@ -586,7 +1484,7 @@ EditorUi.prototype.initPages = function()
 			if (ui.currentPage != null &&
 				lastPage != ui.currentPage)
 			{
-				lastPage = ui.currentPage;
+					lastPage = ui.currentPage;
 				ui.pageSelected();
 			}
 
@@ -613,22 +1511,27 @@ EditorUi.prototype.initPages = function()
 
 		this.editor.addListener('pageSelected', mxUtils.bind(this, function(sender, evt)
 		{
-			this.scrollToPage();
-			this.updateHashObject();
 			this.updateTabContainer();
+			this.updateHashObject();
 			this.updateDocumentTitle();
 		}));
 
 		this.editor.addListener('pageMoved', mxUtils.bind(this, function(sender, evt)
 		{
-			this.scrollToPage();
 			this.updateHashObject();
 		}));
 
-		mxEvent.addListener(window, 'resize', mxUtils.bind(this, function()
+		var resizeHandler = mxUtils.bind(this, function()
 		{
 			this.checkTabScrollerOverflow();
-		}));
+		});
+
+		mxEvent.addListener(window, 'resize', resizeHandler);
+
+		this.destroyFunctions.push(function()
+		{
+			mxEvent.removeListener(window, 'resize', resizeHandler);
+		});
 
 		this.addListener('languageChanged', mxUtils.bind(this, function()
 		{
@@ -646,18 +1549,20 @@ EditorUi.prototype.scrollToPage = function(page, force)
 		this.getSelectedPageIndex();
 	var scrollPage = (page != null) ?
 		page : this.currentPage;
-	
-	if (index != null && this.tabScroller != null &&
-		this.tabScroller.children.length > index &&
-		this.tabScroller.children[index] != null &&
+
+	// The tabs of the pages are not the only children of the tab scroller
+	// if the tabs show page groups
+	var tab = (index != null && this.pageTabs != null) ?
+		this.pageTabs[index] : null;
+
+	if (tab != null && this.tabScroller != null &&
 		(scrollPage != this.lastScrollPage || force))
 	{
-		this.tabScroller.children[index].scrollIntoView(
-			{block: 'nearest', inline: (page != null) ?
+		tab.scrollIntoView({block: 'nearest', inline: (page != null) ?
 			'nearest' : 'center'});
-		this.tabScroller.children[index].className =
-			'geTab gePageTab geActivePage';
+		tab.classList.add('geActivePage');
 		this.lastScrollPage = scrollPage;
+		this.btKnownTabScroll = this.tabScroller.scrollLeft;
 	}
 };
 
@@ -668,7 +1573,7 @@ EditorUi.prototype.restoreViewState = function(page, viewState, selection)
 {
 	var newPage = (page != null) ? this.getPageById(page.getId()) : null;
 	var graph = this.editor.graph;
-	
+
 	if (newPage != null && this.currentPage != null && this.pages != null)
 	{
 		if (newPage != this.currentPage)
@@ -719,25 +1624,39 @@ Graph.prototype.createViewState = function(node)
 		}
 	}
 
+	// Validated gradient of the page background
+	var gradient = Graph.parseBackgroundGradient(
+		node.getAttribute('backgroundGradient'),
+		node.getAttribute('backgroundGradientDirection'));
+
 	return {
 		gridEnabled: node.getAttribute('grid') != '0',
 		//gridColor: node.getAttribute('gridColor') || mxSettings.getGridColor(Editor.isDarkMode()),
-		gridSize: parseFloat(node.getAttribute('gridSize')) || mxGraph.prototype.gridSize,
+		gridSize: Graph.parseGridSize(node.getAttribute('gridSize')),
 		guidesEnabled: node.getAttribute('guides') != '0',
-		foldingEnabled: node.getAttribute('fold') != '0',
+		foldingEnabled: (function() { var fold = node.getAttribute('fold');
+			return fold != null && (Editor.config == null || Editor.config.defaultFoldingEnabled == null) ?
+			fold != '0' : Graph.prototype.defaultFoldingEnabled; })(),
 		shadowVisible: node.getAttribute('shadow') == '1',
 		pageVisible: (this.isLightboxView()) ? false : ((pv != null) ? (pv != '0') : this.defaultPageVisible),
 		background: (bg != null && bg.length > 0) ? bg : null,
+		backgroundGradient: gradient.color,
+		backgroundGradientDirection: gradient.direction,
 		backgroundImage: bgImg,
 		pageScale: (!isNaN(ps)) ? ps : mxGraph.prototype.pageScale,
 		pageFormat: (!isNaN(pw) && !isNaN(ph)) ? new mxRectangle(0, 0, pw, ph) :
 			((typeof mxSettings === 'undefined' || this.defaultPageFormat != null) ?
 				mxGraph.prototype.pageFormat : mxSettings.getPageFormat()),
 		tooltips: node.getAttribute('tooltips') != '0',
-		connect: node.getAttribute('connect') != '0',
-		arrows: node.getAttribute('arrows') != '0',
+		connect: (function() { var connect = node.getAttribute('connect');
+			return connect != null && (Editor.config == null || Editor.config.defaultConnectable == null) ?
+			connect != '0' : Graph.prototype.defaultConnectable; })(),
+		arrows: (function() { var arrows = node.getAttribute('arrows');
+			return arrows != null && (Editor.config == null || Editor.config.defaultConnectionArrowsEnabled == null) ?
+			arrows != '0' : Graph.prototype.defaultConnectionArrowsEnabled; })(),
 		mathEnabled: node.getAttribute('math') == '1',
 		adaptiveColors: node.getAttribute('adaptiveColors'),
+		measureScale: Graph.parseMeasureScale(node.getAttribute('measureScale')),
 		selectionCells: null,
 		defaultParent: null,
 		scrollbars: this.defaultScrollbars,
@@ -786,6 +1705,20 @@ Graph.prototype.saveViewState = function(vs, node, ignoreTransient, resolveRefer
 			node.setAttribute('background', vs.background);
 		}
 
+		// Validated gradient of the page background
+		var gradient = Graph.parseBackgroundGradient(
+			vs.backgroundGradient, vs.backgroundGradientDirection);
+
+		if (gradient.color != null)
+		{
+			node.setAttribute('backgroundGradient', gradient.color);
+
+			if (gradient.direction != null)
+			{
+				node.setAttribute('backgroundGradientDirection', gradient.direction);
+			}
+		}
+
 		var bgImg = this.getBackgroundImageObject(vs.backgroundImage,
 			resolveReferences, sourcePage);
 
@@ -805,6 +1738,18 @@ Graph.prototype.saveViewState = function(vs, node, ignoreTransient, resolveRefer
 	else
 	{
 		node.setAttribute('adaptiveColors', vs.adaptiveColors);
+	}
+
+	// Only written if it is not the default so that other files are unchanged
+	var measureScale = (vs != null) ? Graph.parseMeasureScale(vs.measureScale) : 1;
+
+	if (measureScale != 1)
+	{
+		node.setAttribute('measureScale', measureScale);
+	}
+	else
+	{
+		node.removeAttribute('measureScale');
 	}
 	
 	if (vs != null && vs.extFonts != null && vs.extFonts.length > 0)
@@ -832,6 +1777,8 @@ Graph.prototype.getViewState = function()
 		scrollbars: this.scrollbars,
 		pageVisible: this.pageVisible,
 		background: this.background,
+		backgroundGradient: this.backgroundGradient,
+		backgroundGradientDirection: this.backgroundGradientDirection,
 		backgroundImage: this.backgroundImage,
 		pageScale: this.pageScale,
 		pageFormat: this.pageFormat,
@@ -846,6 +1793,7 @@ Graph.prototype.getViewState = function()
 		pasteCounter: this.pasteCounter,
 		mathEnabled: this.mathEnabled,
 		adaptiveColors: this.adaptiveColors,
+		measureScale: this.measureScale,
 		hiddenTags: this.hiddenTags,
 		extFonts: this.extFonts
 	};
@@ -862,14 +1810,17 @@ Graph.prototype.setViewState = function(state, removeOldExtFonts)
 		this.pasteCounter = state.pasteCounter || 0;
 		this.mathEnabled = state.mathEnabled;
 		this.adaptiveColors = state.adaptiveColors;
-		this.gridEnabled = state.gridEnabled;
-		this.gridSize = state.gridSize;
+		this.setMeasureScale(state.measureScale);
+		this.gridEnabled = urlParams['grid'] != null ? urlParams['grid'] != '0' : state.gridEnabled;
+		this.gridSize = Graph.parseGridSize(state.gridSize);
 		this.graphHandler.guidesEnabled = state.guidesEnabled;
 		this.foldingEnabled = state.foldingEnabled;
 		this.setShadowVisible(state.shadowVisible, false);
 		this.scrollbars = state.scrollbars;
-		this.pageVisible = !this.isViewer() && state.pageVisible;
+		this.pageVisible = !this.isViewer() && (urlParams['pv'] != null ? urlParams['pv'] != '0' : state.pageVisible);
 		this.background = state.background;
+		this.setBackgroundGradient(state.backgroundGradient,
+			state.backgroundGradientDirection);
 		this.pageScale = state.pageScale;
 		this.pageFormat = state.pageFormat;
 		this.view.currentRoot = state.currentRoot;
@@ -942,19 +1893,21 @@ Graph.prototype.setViewState = function(state, removeOldExtFonts)
 			mxGraph.prototype.pageFormat : mxSettings.getPageFormat();
 		this.pageVisible = this.defaultPageVisible;
 		this.background = null;
+		this.setBackgroundGradient(null);
 		this.backgroundImage = null;
 		this.scrollbars = this.defaultScrollbars;
 		this.graphHandler.guidesEnabled = true;
-		this.foldingEnabled = true;
+		this.foldingEnabled = this.defaultFoldingEnabled;
 		this.setShadowVisible(false, false);
 		this.defaultParent = null;
 		this.setTooltips(true);
-		this.setConnectable(true);
+		this.setConnectable(this.defaultConnectable);
 		this.lastPasteXml = null;
 		this.pasteCounter = 0;
 		this.mathEnabled = this.defaultMathEnabled;
 		this.adaptiveColors = null;
-		this.connectionArrowsEnabled = true;
+		this.setMeasureScale(null);
+		this.connectionArrowsEnabled = this.defaultConnectionArrowsEnabled;
 		this.hiddenTags = [];
 		this.extFonts = [];
 	}
@@ -994,27 +1947,15 @@ Graph.prototype.addExtFont = function(fontName, fontUrl, dontRemember)
 	{
 		var fontId = 'extFont_' + fontName;
 
-		if (document.getElementById(fontId) == null)
+		// Font URLs come from the file and are untrusted. Invalid URLs are
+		// not loaded but still remembered so that saving keeps the file as
+		// it is, same as in getCustomFonts which filters them for exports.
+		if (document.getElementById(fontId) == null && Graph.isValidFontUrl(fontUrl))
 		{
-			if (fontUrl.indexOf(Editor.GOOGLE_FONTS) == 0)
-			{
-				mxClient.link('stylesheet', fontUrl, null, fontId);
-			}
-			else
-			{
-				var head = document.getElementsByTagName('head')[0];
-				
-				// KNOWN: Should load fonts synchronously
-				var style = document.createElement('style');
-				
-				style.appendChild(document.createTextNode('@font-face {\n' +
-					'\tfont-family: "'+ fontName +'";\n' + 
-					'\tsrc: url("'+ fontUrl +'");\n}'));
-				
-				style.setAttribute('id', fontId);
-				var head = document.getElementsByTagName('head')[0];
-		   		head.appendChild(style);
-			}
+			// KNOWN: Should load fonts synchronously
+			var elt = Graph.createFontElement(fontName, fontUrl);
+			elt.setAttribute('id', fontId);
+			document.getElementsByTagName('head')[0].appendChild(elt);
 		}
 		
 		if (!dontRemember)
@@ -1076,7 +2017,7 @@ EditorUi.prototype.updatePageRoot = function(page, checked)
 			page.root.children[0].setId('1');
 
 			// Marks the page as needing an update
-			page.needsUpdate = true;
+			page.invalidateNode();
 		}
 	}
 	else if (page.viewState == null)
@@ -1110,7 +2051,7 @@ EditorUi.prototype.updatePageRoot = function(page, checked)
 		page.root.insert(layer);
 
 		// Marks the page as needing an update
-		page.needsUpdate = true;
+		page.invalidateNode();
 	}
 	
 	return page;
@@ -1125,28 +2066,159 @@ EditorUi.prototype.getDiagramSnapshot = function()
 };
 
 /**
- * 
+ * Applies the given XML node to the page of the given snapshot as a diff,
+ * so that the page and the model keep the same root. Whole files (eg. from
+ * generators or a file dropped on the Edit Diagram dialog), single pages
+ * and compressed, SVG or HTML data are unwrapped: the first page replaces
+ * the page of the snapshot and further pages are added after it. Throws
+ * for anything else, which would otherwise decode as an empty page.
  */
 EditorUi.prototype.updateDiagramData = function(snapshot, node)
 {
-	if (this.getPageIndex(snapshot.page) == null)
-	{
-		this.insertPage(null, null, node);
-	}
-	else
-	{
-		var dec = new mxCodec(snapshot.node.ownerDocument);
-		var oldModel = new mxGraphModel();
-		dec.decode(snapshot.node, oldModel);
+	var diagrams = null;
 
-		dec = new mxCodec(node.ownerDocument);
-		var newModel = new mxGraphModel();
-		dec.decode(node, newModel);
-
-		this.selectPage(snapshot.page);
-		var patch = this.diffCells(oldModel.root, newModel.root);
-		this.patchPage(snapshot.page, patch, null, true);
+	if (node != null && node.nodeName == 'diagram')
+	{
+		diagrams = [node];
 	}
+	else if (node != null && node.nodeName != 'mxGraphModel' &&
+		node.nodeName != 'root')
+	{
+		node = this.editor.extractGraphModel(node, true, true);
+
+		if (node != null && node.nodeName == 'mxfile')
+		{
+			var children = mxUtils.getChildNodes(node);
+			diagrams = [];
+
+			for (var i = 0; i < children.length; i++)
+			{
+				if (children[i].nodeName == 'diagram')
+				{
+					diagrams.push(children[i]);
+				}
+			}
+		}
+	}
+
+	if (diagrams != null)
+	{
+		node = (diagrams.length > 0) ? Editor.parseDiagramNode(diagrams[0], true) : null;
+	}
+
+	if (node != null && node.nodeName == 'root')
+	{
+		var wrapper = node.ownerDocument.createElement('mxGraphModel');
+		wrapper.appendChild(node);
+		node = wrapper;
+	}
+
+	// Cells outside of a root element are ignored by the codec
+	var hasRoot = false;
+
+	if (node != null && node.nodeName == 'mxGraphModel')
+	{
+		var children = mxUtils.getChildNodes(node);
+
+		for (var i = 0; i < children.length && !hasRoot; i++)
+		{
+			hasRoot = children[i].nodeName == 'root';
+		}
+	}
+
+	if (!hasRoot)
+	{
+		throw new Error(mxResources.get('notADiagramFile'));
+	}
+
+	// Parses further pages before anything is changed
+	var newPages = [];
+	var oldIds = [];
+
+	for (var i = 1; diagrams != null && i < diagrams.length; i++)
+	{
+		oldIds.push(diagrams[i].getAttribute('id'));
+		diagrams[i].removeAttribute('id');
+		newPages.push(this.updatePageRoot(new DiagramPage(diagrams[i])));
+	}
+
+	var graph = this.editor.graph;
+	var page = snapshot.page;
+
+	if (this.getPageIndex(page) != null)
+	{
+		this.selectPage(page);
+	}
+
+	graph.model.beginUpdate();
+	try
+	{
+		if (this.getPageIndex(page) == null)
+		{
+			page = this.insertPage(null, null, node);
+		}
+		else
+		{
+			var dec = new mxCodec(snapshot.node.ownerDocument);
+			var oldModel = new mxGraphModel();
+			dec.decode(snapshot.node, oldModel);
+
+			dec = new mxCodec(node.ownerDocument);
+			var newModel = new mxGraphModel();
+			dec.decode(node, newModel);
+
+			var patch = this.diffCells(oldModel.root, newModel.root);
+			this.patchPage(page, patch, null, true);
+		}
+
+		if (page != null && newPages.length > 0)
+		{
+			this.insertDiagramPages(page, diagrams[0].getAttribute('id'),
+				newPages, oldIds);
+		}
+	}
+	finally
+	{
+		graph.model.endUpdate();
+	}
+};
+
+/**
+ * Inserts the given new pages after the given page, which holds the first
+ * page of a file, and updates the links to the pages of the file from
+ * their IDs in the file (oldId, oldIds) to the IDs of the pages. Links to
+ * existing pages are kept.
+ */
+EditorUi.prototype.insertDiagramPages = function(page, oldId, newPages, oldIds)
+{
+	var graph = this.editor.graph;
+	var index = this.getPageIndex(page);
+
+	// Null prototype as the IDs are user data
+	var mapping = this.addLocalPagesToMapping(Object.create(null));
+
+	if (oldId != null)
+	{
+		mapping[oldId] = page.getId();
+	}
+
+	for (var i = 0; i < newPages.length; i++)
+	{
+		if (oldIds[i] != null)
+		{
+			mapping[oldIds[i]] = newPages[i].getId();
+		}
+
+		if (newPages[i].getName() == null)
+		{
+			newPages[i].setName(this.createPageName());
+		}
+
+		graph.model.execute(new ChangePage(this,
+			newPages[i], newPages[i], ++index, true));
+	}
+
+	this.updatePageLinks(mapping, [page].concat(newPages));
 };
 
 /**
@@ -1433,6 +2505,36 @@ EditorUi.prototype.duplicatePage = function(page, name)
 };
 
 /**
+ * Returns the XML of the given page for serialization into a diff,
+ * encoding the live root when the cached node is stale. The cached node
+ * is only rewritten when a page is switched away from, so a page that
+ * was inserted and drawn on without ever leaving it would ship an EMPTY
+ * insert - and once that insert is out, later diffs compare roots, find
+ * them equal and never resend the cells. The same holds for a page whose
+ * root was patched (needsUpdate, eg. an own page that a save merge
+ * brought cells into): its node is only re-encoded when the file is
+ * saved, so the cleanup's insert of such a page carried the pre-patch
+ * cells and the screen copy was stale until the next full diff. Does
+ * not mutate the page: the caller may be diffing a snapshot clone.
+ */
+EditorUi.prototype.getPageXmlForDiff = function(page)
+{
+	if (page.isNodeStale() && page.root != null)
+	{
+		var enc = new mxCodec(mxUtils.createXmlDocument());
+		var node = enc.encode(new mxGraphModel(page.root));
+		this.editor.graph.saveViewState(page.viewState, node);
+
+		var result = page.node.cloneNode(false);
+		result.appendChild(node);
+
+		return mxUtils.getXml(result);
+	}
+
+	return mxUtils.getXml(page.node);
+};
+
+/**
  * Duplicates the given page.
  */
 EditorUi.prototype.initDiagramNode = function(page, node)
@@ -1451,7 +2553,7 @@ EditorUi.prototype.initDiagramNode = function(page, node)
 /**
  * Duplicates the given page.
  */
-EditorUi.prototype.clonePages = function(pages)
+EditorUi.prototype.clonePages = function(pages, lazy)
 {
 	var errors = [];
 	var result = [];
@@ -1460,7 +2562,7 @@ EditorUi.prototype.clonePages = function(pages)
 	{
 		try
 		{
-			result.push(this.clonePage(pages[i]));
+			result.push(this.clonePage(pages[i], lazy));
 		}
 		catch (e)
 		{
@@ -1493,10 +2595,17 @@ EditorUi.prototype.clonePages = function(pages)
 };
 
 /**
- * Duplicates the given page.
+ * Duplicates the given page. If lazy is true then a page that was not
+ * decoded yet is copied without decoding it, so its copy is decoded when
+ * its root is needed (see <updatePageRoot>).
  */
-EditorUi.prototype.clonePage = function(page)
+EditorUi.prototype.clonePage = function(page, lazy)
 {
+	if (lazy && page.root == null)
+	{
+		return new DiagramPage(page.node.cloneNode(true));
+	}
+
 	this.updatePageRoot(page);
 
 	var result = new DiagramPage(page.node.cloneNode(true));
@@ -1507,7 +2616,11 @@ EditorUi.prototype.clonePage = function(page)
 		EditorUi.transientViewStateProperties)
 	result.root = this.editor.graph.model.cloneCell(
 		page.root, null, true);
+
+	// The cloned node is as stale as the node of the page, so it must be
+	// encoded from the cloned root when the clone is saved
 	result.diagramModified = page.diagramModified;
+	result.needsUpdate = page.needsUpdate;
 	
 	return result;
 };
@@ -1541,8 +2654,455 @@ EditorUi.prototype.renamePage = function(page)
  */
 EditorUi.prototype.movePage = function(oldIndex, newIndex)
 {
-	this.editor.graph.model.execute(new MovePage(this, oldIndex, newIndex));
+	// Ignores stale indices, eg. from a menu that was opened before a
+	// merge removed pages, so that no change is added to the history
+	if (this.pages != null && oldIndex >= 0 && oldIndex < this.pages.length)
+	{
+		this.editor.graph.model.execute(new MovePage(this, oldIndex, newIndex));
+	}
 }
+
+/**
+ * Sorts pages by name in natural ascending order as one undoable edit. If the
+ * tabs show page groups, the pages are sorted within their groups and the
+ * groups keep their order.
+ */
+EditorUi.prototype.sortPages = function()
+{
+	var groups = this.isPageGroupsEnabled();
+	var run = 0;
+
+	var entries = this.pages.map(function(page, index, pages)
+	{
+		if (groups && index > 0 && page.getGroup() != pages[index - 1].getGroup())
+		{
+			run++;
+		}
+
+		return {page: page, run: run};
+	});
+
+	var sorted = entries.sort(function(a, b)
+	{
+		return (a.run != b.run) ? a.run - b.run :
+			(a.page.getName() || '').localeCompare(b.page.getName() || '',
+				undefined, {numeric: true, sensitivity: 'base'});
+	}).map(function(entry)
+	{
+		return entry.page;
+	});
+
+	var model = this.editor.graph.model;
+	model.beginUpdate();
+	try
+	{
+		for (var i = 0; i < sorted.length; i++)
+		{
+			var index = mxUtils.indexOf(this.pages, sorted[i]);
+
+			if (index != i)
+			{
+				this.movePage(index, i);
+			}
+		}
+	}
+	finally
+	{
+		model.endUpdate();
+	}
+
+	this.scrollToPage(this.currentPage, true);
+};
+
+/**
+ * Returns true if the tabs show the groups of the pages (see
+ * DiagramPage.getGroup). The setting is stored in the file.
+ */
+EditorUi.prototype.isPageGroupsEnabled = function()
+{
+	return this.fileNode != null && this.fileNode.getAttribute('pageGroups') == '1';
+};
+
+/**
+ * Shows the pages in their groups or as a flat list in the tabs. The setting
+ * is stored in the file and the groups of the pages are kept if the tabs do
+ * not show them.
+ */
+EditorUi.prototype.setPageGroupsEnabled = function(enabled)
+{
+	if (this.fileNode != null && enabled != this.isPageGroupsEnabled())
+	{
+		if (enabled)
+		{
+			this.fileNode.setAttribute('pageGroups', '1');
+		}
+		else
+		{
+			this.fileNode.removeAttribute('pageGroups');
+		}
+
+		var file = this.getCurrentFile();
+
+		if (file != null)
+		{
+			file.fileChanged();
+		}
+
+		this.updateTabContainer();
+	}
+};
+
+/**
+ * Returns the names of the groups of the pages in the order of the pages.
+ */
+EditorUi.prototype.getPageGroups = function()
+{
+	// Null prototype as the names are user data
+	var lookup = Object.create(null);
+	var result = [];
+
+	for (var i = 0; this.pages != null && i < this.pages.length; i++)
+	{
+		var group = (this.pages[i] != null) ? this.pages[i].getGroup() : null;
+
+		if (group != null && !lookup[group])
+		{
+			lookup[group] = true;
+			result.push(group);
+		}
+	}
+
+	return result;
+};
+
+/**
+ * Returns the indices of the first and last page of the consecutive pages in
+ * the given group around the page at the given index as {start, end}. Uses
+ * the first pages of the group if the page at the index is not in the group,
+ * eg. if the pages were changed after a menu was opened, and returns null if
+ * no page is in the group.
+ */
+EditorUi.prototype.getPageGroupRun = function(group, index)
+{
+	var pages = this.pages;
+	var result = null;
+
+	if (pages != null && group != null)
+	{
+		var inGroup = function(i)
+		{
+			return i >= 0 && i < pages.length && pages[i] != null &&
+				pages[i].getGroup() == group;
+		};
+
+		if (!inGroup(index))
+		{
+			index = 0;
+
+			while (index < pages.length && !inGroup(index))
+			{
+				index++;
+			}
+		}
+
+		if (inGroup(index))
+		{
+			result = {start: index, end: index};
+
+			while (inGroup(result.start - 1))
+			{
+				result.start--;
+			}
+
+			while (inGroup(result.end + 1))
+			{
+				result.end++;
+			}
+		}
+	}
+
+	return result;
+};
+
+/**
+ * Returns a lookup for the names of the collapsed page groups, which are
+ * stored as a JSON array in the file (see setPageGroupCollapsed).
+ */
+EditorUi.prototype.getCollapsedPageGroups = function()
+{
+	var value = (this.fileNode != null) ?
+		this.fileNode.getAttribute('collapsedPageGroups') : null;
+
+	if (this.collapsedPageGroups == null || value !== this.collapsedPageGroupsValue)
+	{
+		// Null prototype as the names are user data
+		this.collapsedPageGroups = Object.create(null);
+		this.collapsedPageGroupsValue = value;
+
+		if (value != null)
+		{
+			try
+			{
+				var names = JSON.parse(value);
+
+				for (var i = 0; Array.isArray(names) && i < names.length; i++)
+				{
+					if (typeof names[i] === 'string')
+					{
+						this.collapsedPageGroups[names[i]] = true;
+					}
+				}
+			}
+			catch (e)
+			{
+				// Ignores invalid values
+			}
+		}
+	}
+
+	return this.collapsedPageGroups;
+};
+
+/**
+ * Returns true if the given page group is collapsed in the tabs.
+ */
+EditorUi.prototype.isPageGroupCollapsed = function(group)
+{
+	return this.getCollapsedPageGroups()[group] === true;
+};
+
+/**
+ * Collapses or expands the given page group in the tabs. The collapsed
+ * groups are view state like the scroll position of a page: they are saved
+ * with the file, but collapsing a group does not modify the file.
+ */
+EditorUi.prototype.setPageGroupCollapsed = function(group, collapsed)
+{
+	if (this.fileNode != null && collapsed != this.isPageGroupCollapsed(group))
+	{
+		var lookup = this.getCollapsedPageGroups();
+		var groups = this.getPageGroups();
+		var names = [];
+
+		// Drops the names of groups that no longer exist
+		for (var i = 0; i < groups.length; i++)
+		{
+			if ((groups[i] == group) ? collapsed : lookup[groups[i]])
+			{
+				names.push(groups[i]);
+			}
+		}
+
+		if (names.length > 0)
+		{
+			this.fileNode.setAttribute('collapsedPageGroups', JSON.stringify(names));
+		}
+		else
+		{
+			this.fileNode.removeAttribute('collapsedPageGroups');
+		}
+
+		this.updateTabContainer();
+	}
+};
+
+/**
+ * Moves the page at the given index to the new index and into the given
+ * group (null for no group) as one undoable edit.
+ */
+EditorUi.prototype.movePageToGroup = function(oldIndex, newIndex, group)
+{
+	var page = (this.pages != null) ? this.pages[oldIndex] : null;
+
+	if (page != null)
+	{
+		var model = this.editor.graph.model;
+
+		model.beginUpdate();
+		try
+		{
+			if (newIndex != oldIndex)
+			{
+				this.movePage(oldIndex, newIndex);
+			}
+
+			if (group != page.getGroup())
+			{
+				model.execute(new ChangePageGroup(this, page, group));
+			}
+		}
+		finally
+		{
+			model.endUpdate();
+		}
+	}
+};
+
+/**
+ * Moves the given page into the given group (null for no group) as one
+ * undoable edit. The pages of a group stay together: the page is moved after
+ * the last page of an existing group, or after the pages of its own group if
+ * it is between two of them.
+ */
+EditorUi.prototype.setPageGroup = function(page, group)
+{
+	var index = this.getPageIndex(page);
+
+	if (index != null && group != page.getGroup())
+	{
+		var target = index;
+		var last = -1;
+
+		for (var i = 0; group != null && i < this.pages.length; i++)
+		{
+			if (i != index && this.pages[i] != null &&
+				this.pages[i].getGroup() == group)
+			{
+				last = i;
+			}
+		}
+
+		if (last >= 0)
+		{
+			target = (last > index) ? last : last + 1;
+		}
+		else
+		{
+			var run = this.getPageGroupRun(page.getGroup(), index);
+
+			if (run != null && run.start < index && index < run.end)
+			{
+				target = run.end;
+			}
+		}
+
+		this.movePageToGroup(index, target, group);
+	}
+};
+
+/**
+ * Moves the pages of the given group into the group with the given name, or
+ * into no group if name is null, as one undoable edit. A renamed group stays
+ * collapsed.
+ */
+EditorUi.prototype.changePageGroup = function(group, name)
+{
+	var collapsed = this.isPageGroupCollapsed(group);
+	var model = this.editor.graph.model;
+
+	model.beginUpdate();
+	try
+	{
+		for (var i = 0; i < this.pages.length; i++)
+		{
+			if (this.pages[i] != null && this.pages[i].getGroup() == group)
+			{
+				model.execute(new ChangePageGroup(this, this.pages[i], name));
+			}
+		}
+	}
+	finally
+	{
+		model.endUpdate();
+	}
+
+	if (collapsed && name != null)
+	{
+		this.setPageGroupCollapsed(name, true);
+	}
+};
+
+/**
+ * Renames the given page group using a dialog.
+ */
+EditorUi.prototype.renamePageGroup = function(group)
+{
+	if (this.editor.graph.isEnabled())
+	{
+		var dlg = new FilenameDialog(this, group, mxResources.get('rename'),
+			mxUtils.bind(this, function(name)
+		{
+			if (name != null && name.length > 0 && name != group)
+			{
+				this.changePageGroup(group, name);
+			}
+		}), mxResources.get('rename'));
+		this.showDialog(dlg.container, 300, 80, true, true);
+		dlg.init();
+	}
+};
+
+/**
+ * Moves the given page into a new group whose name is entered in a dialog.
+ */
+EditorUi.prototype.addPageGroup = function(page)
+{
+	if (this.editor.graph.isEnabled())
+	{
+		var dlg = new FilenameDialog(this, '', mxResources.get('create'),
+			mxUtils.bind(this, function(name)
+		{
+			if (name != null && name.length > 0)
+			{
+				this.setPageGroup(page, name);
+			}
+		}), mxResources.get('name'));
+		this.showDialog(dlg.container, 300, 80, true, true);
+		dlg.init();
+	}
+};
+
+/**
+ * Inserts a new page after the last page of the given group (see
+ * getPageGroupRun) and returns the new page.
+ */
+EditorUi.prototype.insertPageInGroup = function(group, index)
+{
+	var run = this.getPageGroupRun(group, index);
+	var page = null;
+
+	if (run != null)
+	{
+		page = this.createPage(null, this.createPageId());
+		page.setGroup(group);
+		page = this.insertPage(page, run.end + 1);
+	}
+
+	return page;
+};
+
+/**
+ * Moves the consecutive pages from start to end so that the first of them
+ * is at the given index after the move, as one undoable edit.
+ */
+EditorUi.prototype.movePages = function(start, end, index)
+{
+	var model = this.editor.graph.model;
+	var count = end - start + 1;
+
+	if (index != start && count > 0)
+	{
+		model.beginUpdate();
+		try
+		{
+			for (var i = 0; i < count; i++)
+			{
+				if (index < start)
+				{
+					this.movePage(start + i, index + i);
+				}
+				else
+				{
+					this.movePage(start, index + count - 1);
+				}
+			}
+		}
+		finally
+		{
+			model.endUpdate();
+		}
+	}
+};
 
 /**
  * Returns true if the given string contains an mxfile.
@@ -1551,7 +3111,7 @@ EditorUi.prototype.createTabContainer = function()
 {
 	var div = document.createElement('div');
 	div.className = 'geTabContainer geTabItem';
-	
+
 	return div;
 };
 
@@ -1567,110 +3127,237 @@ EditorUi.prototype.updateTabContainer = function()
 	else if (this.tabContainer != null && this.pages != null)
 	{
 		this.tabContainer.style.display = '';
-		var graph = this.editor.graph;
 		var wrapper = document.createElement('div');
 		wrapper.className = 'geTabScroller';
-		var startIndex = null;
+		var activeTab = null;
+		var sl =(this.tabScroller != null) ? this.tabScroller.scrollLeft : 0;
+		var btCacheMiss = false;
+		var groups = this.isPageGroupsEnabled();
+		var lastGroup = null;
+		var pageTabs = [];
+
+		// Keeps the focus on the same control, eg. on the tab of a page that
+		// was selected with the keyboard (see focusTabContainerControl)
+		var focusKey = (mxUtils.isAncestorNode(this.tabContainer,
+			document.activeElement)) ? document.activeElement.tabKey : null;
 
 		for (var i = 0; i < this.pages.length; i++)
 		{
-			// Install drag and drop for page reorder
-			(mxUtils.bind(this, function(index, tab)
+			var page = this.pages[i];
+
+			if (page == null)
 			{
-				tab.className = 'geTab gePageTab';
+				lastGroup = null;
+				continue;
+			}
 
-				if (this.pages[index] == this.currentPage)
+			var group = (groups) ? page.getGroup() : null;
+
+			if (group != null && group != lastGroup)
+			{
+				var groupTab = this.createTabForPageGroup(group, i);
+				groupTab.pageGroup = group;
+				groupTab.setAttribute('draggable', 'true');
+				groupTab.setAttribute('data-index', i);
+				this.addTabDragListeners(groupTab);
+				wrapper.appendChild(groupTab);
+			}
+
+			lastGroup = group;
+
+			var pageId = page.getId();
+			var pageName = page.getName() || mxResources.get('untitled');
+			var cacheKey = pageId + ':' + pageName;
+			var tab = (this.btPageTabCache != null) ?
+				this.btPageTabCache[cacheKey] : null;
+
+			if (tab != null)
+			{
+				// Reuse cached tab (preserves browser translation)
+				tab.setAttribute('title', pageName + ((pageId != null) ?
+					' (' + pageId + ')' : '') + ' [' + (i + 1) + ']');
+			}
+			else
+			{
+				tab = this.createTabForPage(page, i + 1);
+				btCacheMiss = true;
+			}
+
+			// Update data-index for DnD (read at event time)
+			tab.setAttribute('draggable', 'true');
+			tab.setAttribute('data-index', i);
+			tab.className = 'geTab gePageTab';
+			tab.pageGroup = group;
+
+			if (group != null)
+			{
+				tab.classList.add('gePageTabGrouped');
+
+				// The current page is shown in a collapsed group
+				if (page != this.currentPage && this.isPageGroupCollapsed(group))
 				{
-					tab.classList.add('geActivePage');
+					tab.classList.add('gePageTabCollapsed');
 				}
-				
-				tab.setAttribute('draggable', 'true');
-				
-				mxEvent.addListener(tab, 'dragstart', mxUtils.bind(this, function(evt)
-				{
-					if (graph.isEnabled())
-					{
-						// Workaround for no DnD on DIV in FF
-						if (mxClient.IS_FF)
-						{
-							// LATER: Check what triggers a parse as XML on this in FF after drop
-							evt.dataTransfer.setData('Text', '<diagram/>');
-						}
-						
-						startIndex = index;
-					}
-					else
-					{
-						// Blocks event
-						mxEvent.consume(evt);
-					}
-				}));
-				
-				mxEvent.addListener(tab, 'dragend', mxUtils.bind(this, function(evt)
-				{
-					startIndex = null;
-					evt.stopPropagation();
-					evt.preventDefault();
-				}));
-				
-				mxEvent.addListener(tab, 'dragover', mxUtils.bind(this, function(evt)
-				{
-					if (startIndex != null)
-					{
-						evt.dataTransfer.dropEffect = 'move';
-					}
-					
-					evt.stopPropagation();
-					evt.preventDefault();
-				}));
-				
-				mxEvent.addListener(tab, 'drop', mxUtils.bind(this, function(evt)
-				{
-					if (startIndex != null && index != startIndex)
-					{
-						// LATER: Shift+drag for merge, ctrl+drag for clone 
-						this.movePage(startIndex, index);
-					}
+			}
 
-					evt.stopPropagation();
-					evt.preventDefault();
-				}));
-				
-				wrapper.appendChild(tab);
-			}))(i, this.createTabForPage(this.pages[i], i + 1));
+			// The name of the tab is the control for the keyboard (see addTabListeners)
+			if (page == this.currentPage)
+			{
+				tab.firstChild.setAttribute('aria-current', 'page');
+			}
+			else
+			{
+				tab.firstChild.removeAttribute('aria-current');
+			}
+
+			// Install DnD listeners once per tab element
+			if (tab.btDndInstalled == null)
+			{
+				tab.btDndInstalled = true;
+				this.addTabDragListeners(tab);
+			}
+
+			if (page == this.currentPage)
+			{
+				activeTab = tab;
+			}
+
+			pageTabs[i] = tab;
+			wrapper.appendChild(tab);
 		}
 
-		var sl = (this.tabScroller != null) ? this.tabScroller.scrollLeft : 0;
 		this.tabContainer.innerText = '';
 
 		// Not chromeless and not read-only file
 		if (this.isPageInsertTabVisible())
 		{
-			this.tabContainer.appendChild(this.createPageInsertTab());
+			var insertTab = this.createPageInsertTab();
+			insertTab.tabKey = 'insertPage';
+			this.tabContainer.appendChild(insertTab);
 		}
 	
 		if (Editor.currentTheme != 'simple')
 		{
 			this.pageMenuTab = this.createPageMenuTab();
+			this.pageMenuTab.tabKey = 'pages';
 			this.tabContainer.appendChild(this.pageMenuTab);
 		}
 		
 		this.tabContainer.appendChild(wrapper);
 		
 		this.leftScrollTab = this.createLeftScrollTab();
+		this.leftScrollTab.tabKey = 'scrollLeft';
 		this.tabContainer.appendChild(this.leftScrollTab);
 
 		this.rightScrollTab = this.createRightScrollTab();
+		this.rightScrollTab.tabKey = 'scrollRight';
 		this.tabContainer.appendChild(this.rightScrollTab);
 
+		// Cache tabs by page ID + name for reuse across rebuilds.
+		// This preserves browser translation <font> wrappers.
+		if (Graph.browserTranslate && Graph.isBrowserTranslated())
+		{
+			this.btPageTabCache = {};
+
+			for (var i = 0; i < pageTabs.length; i++)
+			{
+				var p = this.pages[i];
+
+				if (p != null && pageTabs[i] != null)
+				{
+					var key = p.getId() + ':' +
+						(p.getName() || mxResources.get('untitled'));
+					this.btPageTabCache[key] = pageTabs[i];
+				}
+			}
+		}
+
 		this.tabScroller = wrapper;
-		this.tabScroller.scrollLeft = sl;
-		this.checkTabScrollerOverflow();
+		this.pageTabs = pageTabs;
 
 		mxEvent.addListener(this.tabScroller, 'scroll', mxUtils.bind(this, function(evt)
 		{
 			this.checkTabScrollerOverflow();
 		}));
+
+		// Preserve tab scroll position across browser translation.
+		// A hidden "canary" paragraph in document.body contains text
+		// in the original language. After tab rebuild we reset the
+		// canary and save scroll position. When Chrome re-translates
+		// the canary we know translation is done and restore scroll.
+		if (Graph.browserTranslate && Graph.isBrowserTranslated())
+		{
+			if (this.btCanary == null)
+			{
+				var ui = this;
+
+				// Canary: a paragraph with enough content for Chrome
+				// to reliably translate. Positioned offscreen but not
+				// display:none. Placed at the end of document.body so
+				// Chrome translates it after the tab labels.
+				this.btCanary = document.createElement('p');
+				this.btCanary.setAttribute('aria-hidden', 'true');
+				this.btCanary.style.cssText = 'position:absolute;left:-10000px;' +
+					'top:0;width:1px;height:1px;overflow:hidden;pointer-events:none;';
+				this.btCanaryOriginal = 'Click here to insert a new page into the document';
+				this.btCanary.textContent = this.btCanaryOriginal;
+				document.body.appendChild(this.btCanary);
+				this.btCanarySavedScroll = null;
+
+				var btRestoreScroll = function()
+				{
+					if (ui.btCanarySavedScroll != null &&
+						ui.tabScroller != null)
+					{
+						ui.btCanarySavedScroll = null;
+						ui.scrollToPage(null, true);
+					}
+				};
+
+				this.btCanaryObserver = new MutationObserver(function()
+				{
+					if (ui.btCanarySavedScroll == null)
+					{
+						return;
+					}
+
+					var canaryText = ui.btCanary.textContent;
+
+					if (canaryText != ui.btCanaryOriginal)
+					{
+						setTimeout(btRestoreScroll, 100);
+					}
+				});
+
+				this.btCanaryObserver.observe(this.btCanary,
+				{
+					characterData: true,
+					childList: true,
+					subtree: true
+				});
+
+				// Initial translation is handled by tab caching —
+				// no canary restore needed for the first load.
+			}
+
+			// Reset canary to original text and save scroll position.
+			// Only save on the first rebuild in a translation cycle —
+			// subsequent rebuilds may already have a shifted scroll.
+			// Skip when there is no cached tab content yet (first load)
+			// or no meaningful scroll position to preserve.
+			// Only arm canary when new tabs were created (cache miss)
+			// that Chrome will need to translate.
+			if (this.btCanarySavedScroll == null && btCacheMiss &&
+				this.btKnownTabScroll > 0)
+			{
+				this.btCanarySavedScroll = this.btKnownTabScroll;
+
+				// Move canary to end of body so Chrome translates it
+				// after all other elements including the tab labels
+				this.btCanary.textContent = this.btCanaryOriginal;
+				document.body.appendChild(this.btCanary);
+			}
+		}
 
 		var ghLink = document.createElement('a');
 		ghLink.href = 'https://github.com/jgraph/drawio';
@@ -1695,6 +3382,325 @@ EditorUi.prototype.updateTabContainer = function()
 		});
 
 		this.tabContainer.appendChild(ghLink);
+
+		if (activeTab != null)
+		{
+			activeTab.classList.add('geActivePage');
+		}
+
+		// Restore scroll position after all DOM mutations (ghLink append,
+		// active class) so the wrapper has its final clientWidth/scrollWidth.
+		// Otherwise sl gets clamped to a temporarily smaller maxScrollLeft
+		// when the previous active page was at the right end.
+		this.tabScroller.scrollLeft = sl;
+		this.scrollToPage();
+		this.btKnownTabScroll = this.tabScroller.scrollLeft;
+		this.checkTabScrollerOverflow();
+
+		if (activeTab != null)
+		{
+			activeTab.scrollIntoView({behavior: 'smooth',
+				block: 'nearest', inline: 'nearest'});
+		}
+
+		this.focusTabContainerControl(focusKey);
+	}
+};
+
+/**
+ * Adds the listeners for dragging the given tab of a page, or of a page group
+ * with the tabs of the pages in the group, and for dropping other tabs on it.
+ * The state of a drag is stored in tabDrag, so that tabs which are reused
+ * (see btPageTabCache) and new tabs share it.
+ */
+EditorUi.prototype.addTabDragListeners = function(tab)
+{
+	var graph = this.editor.graph;
+	var ui = this;
+
+	mxEvent.addListener(tab, 'dragstart', mxUtils.bind(this, function(evt)
+	{
+		if (graph.isEnabled())
+		{
+			// Drag events created by scripts may have no dataTransfer
+			if (mxClient.IS_FF && evt.dataTransfer != null)
+			{
+				evt.dataTransfer.setData('Text', '<diagram/>');
+			}
+
+			var tabs = [tab];
+
+			// The tab of a group is dragged with the tabs of its pages
+			while (tab.classList.contains('gePageGroupTab') &&
+				tabs[tabs.length - 1].nextSibling != null &&
+				tabs[tabs.length - 1].nextSibling.classList.contains('gePageTab') &&
+				tabs[tabs.length - 1].nextSibling.pageGroup == tab.pageGroup)
+			{
+				tabs.push(tabs[tabs.length - 1].nextSibling);
+			}
+
+			var drag = {index: parseInt(tab.getAttribute('data-index'), 10),
+				tabs: tabs, previous: tab.previousSibling};
+			this.tabDrag = drag;
+
+			// Defer hiding so browser captures the drag image first
+			window.requestAnimationFrame(function()
+			{
+				for (var i = 0; ui.tabDrag == drag && i < tabs.length; i++)
+				{
+					tabs[i].classList.add('gePageTabDragPlaceholder');
+				}
+			});
+
+			// Suppress default drop highlight on other elements
+			ui._pageTabDragOverHandler = function(e)
+			{
+				if (e.dataTransfer != null)
+				{
+					e.dataTransfer.dropEffect = 'move';
+				}
+
+				e.preventDefault();
+
+				// Stop propagation for non-tab targets to suppress
+				// browser highlight on other elements. The name and
+				// the buttons of a tab are part of the tab.
+				if (e.target.closest == null ||
+					e.target.closest('.gePageTab, .gePageGroupTab') == null)
+				{
+					e.stopPropagation();
+				}
+			};
+
+			ui._pageTabDropHandler = function(e)
+			{
+				e.preventDefault();
+				e.stopPropagation();
+			};
+
+			document.addEventListener('dragover',
+				ui._pageTabDragOverHandler, true);
+			document.addEventListener('drop',
+				ui._pageTabDropHandler, true);
+		}
+		else
+		{
+			mxEvent.consume(evt);
+		}
+	}));
+
+	mxEvent.addListener(tab, 'dragend', mxUtils.bind(this, function(evt)
+	{
+		var drag = this.tabDrag;
+
+		if (drag != null)
+		{
+			for (var i = 0; i < drag.tabs.length; i++)
+			{
+				drag.tabs[i].classList.remove('gePageTabDragPlaceholder');
+			}
+
+			// Determine final position from DOM order
+			var tabs = tab.parentNode.querySelectorAll('.gePageTab');
+
+			if (tab.classList.contains('gePageGroupTab'))
+			{
+				this.movePages(drag.index, drag.index + drag.tabs.length - 2,
+					mxUtils.indexOf(tabs, drag.tabs[1]));
+			}
+			else
+			{
+				var page = this.pages[drag.index];
+				var group = (page != null) ? page.getGroup() : null;
+				var prev = tab.previousSibling;
+
+				// A page that is dropped after another tab joins the group
+				// of that tab, which is the tab of a group for the first
+				// page in a group
+				if (prev != drag.previous && this.isPageGroupsEnabled())
+				{
+					group = (prev != null) ? prev.pageGroup : null;
+
+					// A page that is dropped after the hidden tabs of a
+					// collapsed group joins it only before a tab of the group
+					if (prev != null && prev.classList.contains('gePageTabCollapsed') &&
+						(tab.nextSibling == null || tab.nextSibling.pageGroup != group))
+					{
+						group = null;
+					}
+				}
+
+				this.movePageToGroup(drag.index, mxUtils.indexOf(tabs, tab), group);
+
+				// A page that joins a collapsed group expands it to stay visible
+				if (group != null && page != this.currentPage &&
+					this.isPageGroupCollapsed(group))
+				{
+					this.setPageGroupCollapsed(group, false);
+				}
+			}
+		}
+
+		if (ui._pageTabDragOverHandler != null)
+		{
+			document.removeEventListener('dragover',
+				ui._pageTabDragOverHandler, true);
+			document.removeEventListener('drop',
+				ui._pageTabDropHandler, true);
+			ui._pageTabDragOverHandler = null;
+			ui._pageTabDropHandler = null;
+		}
+
+		this.tabDrag = null;
+		evt.stopPropagation();
+		evt.preventDefault();
+	}));
+
+	mxEvent.addListener(tab, 'dragover', mxUtils.bind(this, function(evt)
+	{
+		var drag = this.tabDrag;
+
+		if (drag != null && mxUtils.indexOf(drag.tabs, tab) < 0)
+		{
+			if (evt.dataTransfer != null)
+			{
+				evt.dataTransfer.dropEffect = 'move';
+			}
+
+			var rect = tab.getBoundingClientRect();
+			var before = evt.clientX < rect.left + rect.width / 2;
+			var dragTab = drag.tabs[0];
+			var parent = dragTab.parentNode;
+
+			if (dragTab.classList.contains('gePageGroupTab'))
+			{
+				// Groups are dropped before or after other groups
+				var first = tab;
+				var last = tab;
+
+				if (tab.pageGroup != null)
+				{
+					while (!first.classList.contains('gePageGroupTab') &&
+						first.previousSibling != null)
+					{
+						first = first.previousSibling;
+					}
+
+					while (last.nextSibling != null &&
+						last.nextSibling.classList.contains('gePageTab') &&
+						last.nextSibling.pageGroup == tab.pageGroup)
+					{
+						last = last.nextSibling;
+					}
+				}
+
+				var ref = (before) ? first : last.nextSibling;
+
+				if (mxUtils.indexOf(drag.tabs, ref) < 0 &&
+					drag.tabs[drag.tabs.length - 1].nextSibling != ref)
+				{
+					for (var i = 0; i < drag.tabs.length; i++)
+					{
+						parent.insertBefore(drag.tabs[i], ref);
+					}
+				}
+			}
+			else if (before)
+			{
+				parent.insertBefore(dragTab, tab);
+			}
+			else if (tab.nextSibling != dragTab)
+			{
+				parent.insertBefore(dragTab, tab.nextSibling);
+			}
+		}
+
+		evt.stopPropagation();
+		evt.preventDefault();
+	}));
+
+	mxEvent.addListener(tab, 'drop', function(evt)
+	{
+		evt.stopPropagation();
+		evt.preventDefault();
+	});
+};
+
+/**
+ * Moves the focus to the control of the page tabs with the given key (see
+ * updateTabContainer), eg. after the tabs were created again: the tab of the
+ * same page, the tab of the page whose menu button is hidden or the tab of
+ * the current page if the page was removed.
+ */
+EditorUi.prototype.focusTabContainerControl = function(key)
+{
+	if (key != null && this.tabContainer != null)
+	{
+		var stops = Dialog.getTabStops(this.tabContainer);
+		var keys = [key, key.replace(/^menu:/, 'page:').replace(/^groupMenu:/, 'group:')];
+		var elt = null;
+
+		for (var i = 0; i < keys.length && elt == null; i++)
+		{
+			for (var j = 0; j < stops.length && elt == null; j++)
+			{
+				if (stops[j].tabKey == keys[i])
+				{
+					elt = stops[j];
+				}
+			}
+		}
+
+		elt = (elt != null) ? elt : this.tabContainer.querySelector('.geActivePage > .geFocusLabel');
+
+		if (elt != null)
+		{
+			elt.focus();
+		}
+	}
+};
+
+/**
+ * Shows the given menu for the given event at the mouse or, for a keystroke
+ * or a click with the keyboard (see Editor.clickWithKeyboard), at the given
+ * control with the focus on its first item. The focus returns to the same
+ * control of the page tabs if they were created again, eg. after a page was
+ * duplicated (see focusTabContainerControl).
+ */
+EditorUi.prototype.popupTabMenu = function(menu, elt, evt)
+{
+	var keyboard = evt.type == 'keydown' || (evt.type == 'click' && evt.detail == 0);
+	var x = mxEvent.getClientX(evt);
+	var y = mxEvent.getClientY(evt);
+
+	if (keyboard)
+	{
+		var bounds = elt.getBoundingClientRect();
+		x = bounds.left;
+		y = bounds.top;
+	}
+
+	var menuRestoreFocus = menu.restoreFocus;
+
+	menu.restoreFocus = mxUtils.bind(this, function(target)
+	{
+		if (target != null && target.tabKey != null &&
+			!mxUtils.isAncestorNode(document.body, target))
+		{
+			this.focusTabContainerControl(target.tabKey);
+		}
+		else
+		{
+			menuRestoreFocus.apply(menu, arguments);
+		}
+	});
+
+	menu.popup(x, y, null, evt);
+
+	if (keyboard)
+	{
+		menu.returnFocus = elt;
+		menu.focusFirstItem();
 	}
 };
 
@@ -1757,6 +3763,11 @@ EditorUi.prototype.createTab = function()
 	var tab = document.createElement('div');
 	tab.className = 'geTab';
 
+	mxEvent.addListener(tab, 'click', mxUtils.bind(this, function(evt)
+	{
+		tab.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'nearest'});
+	}));
+
 	return tab;
 };
 
@@ -1799,6 +3810,7 @@ EditorUi.prototype.createControlTab = function(title, image, fn)
 
 	tab.appendChild(inner);
 	mxEvent.addListener(tab, 'click', fn);
+	this.initKeyboardButton(tab);
 
 	return tab;
 };
@@ -1811,15 +3823,7 @@ EditorUi.prototype.createPageInsertTab = function()
 	return this.createControlTab(mxResources.get('insertPage'),
 		Editor.plusImage, mxUtils.bind(this, function(evt)
 		{
-			try
-			{
-				this.insertPage();
-			}
-			catch (e)
-			{
-				this.handleError(e);
-			}
-
+			this.actions.get('insertPage').funct();
 			mxEvent.consume(evt);
 		}));
 };
@@ -1829,7 +3833,7 @@ EditorUi.prototype.createPageInsertTab = function()
  */
 EditorUi.prototype.createLeftScrollTab = function()
 {
-	return this.createControlTab(null, Editor.chevronLeftImage, mxUtils.bind(this, function(evt)
+	var tab = this.createControlTab(null, Editor.chevronLeftImage, mxUtils.bind(this, function(evt)
 		{
 			var dx = Math.max(60, this.tabScroller.clientWidth / 2);
 
@@ -1844,6 +3848,9 @@ EditorUi.prototype.createLeftScrollTab = function()
 
 			mxEvent.consume(evt);
 		}));
+	tab.setAttribute('aria-label', mxResources.get('left'));
+
+	return tab;
 };
 
 /**
@@ -1851,7 +3858,7 @@ EditorUi.prototype.createLeftScrollTab = function()
  */
 EditorUi.prototype.createRightScrollTab = function()
 {
-	return this.createControlTab(null, Editor.chevronRightImage, mxUtils.bind(this, function(evt)
+	var tab = this.createControlTab(null, Editor.chevronRightImage, mxUtils.bind(this, function(evt)
 		{
 			var dx = Math.max(60, this.tabScroller.clientWidth / 2);
 
@@ -1866,6 +3873,9 @@ EditorUi.prototype.createRightScrollTab = function()
 
 			mxEvent.consume(evt);
 		}));
+	tab.setAttribute('aria-label', mxResources.get('right'));
+
+	return tab;
 };
 
 /**
@@ -1894,9 +3904,7 @@ EditorUi.prototype.createPageMenuTab = function()
 			menu.destroy();
 		});
 	
-		var x = mxEvent.getClientX(evt);
-		var y = mxEvent.getClientY(evt);
-		menu.popup(x, y, null, evt);
+		this.popupTabMenu(menu, evt.currentTarget, evt);
 		
 		// Allows hiding by clicking on document
 		this.setCurrentMenu(menu);
@@ -1906,7 +3914,8 @@ EditorUi.prototype.createPageMenuTab = function()
 };
 
 /**
- * Returns true if the given string contains an mxfile.
+ * Returns a new tab for the given page with its name, ID and the given page
+ * number in the tooltip.
  */
 EditorUi.prototype.createTabForPage = function(page, pageNumber)
 {
@@ -1928,10 +3937,200 @@ EditorUi.prototype.createTabForPage = function(page, pageNumber)
 };
 
 /**
- * Translates this point by the given vector.
- * 
- * @param {number} dx X-coordinate of the translation.
- * @param {number} dy Y-coordinate of the translation.
+ * Adds the rules for the icons of the tabs of page groups to the document
+ * once. Chrome restyles inline background images with data URIs in
+ * quadratic time, so a background image on each tab made opening a file
+ * with 16,000 page groups take 9 s and each page switch 12 s.
+ */
+EditorUi.addPageGroupTabStyles = function()
+{
+	if (EditorUi.pageGroupTabStyles == null)
+	{
+		var style = document.createElement('style');
+		style.setAttribute('data-source', 'pageGroupTabs');
+		style.textContent = '.gePageGroupExpandedIcon{background-image:url(' + Editor.chevronDownImage + ');}' +
+			'.gePageGroupCollapsedIcon{background-image:url(' + Editor.chevronRightImage + ');}' +
+			'.gePageGroupMenuIcon{background-image:url(' + Editor.thinExpandImage + ');}';
+		document.head.appendChild(style);
+		EditorUi.pageGroupTabStyles = style;
+	}
+};
+
+/**
+ * Returns a new tab for the given page group, which starts with the page at
+ * the given index. A click on the tab collapses or expands the group and its
+ * button or a right click shows the menu of the group (see
+ * createPageGroupMenu).
+ */
+EditorUi.prototype.createTabForPageGroup = function(group, index)
+{
+	var run = this.getPageGroupRun(group, index);
+	var collapsed = this.isPageGroupCollapsed(group);
+	var tab = this.createTab();
+	tab.className = 'geTab gePageGroupTab';
+	tab.setAttribute('title', group + ' (' + (run.end - run.start + 1) + ')');
+	mxEvent.disableContextMenu(tab);
+	EditorUi.addPageGroupTabStyles();
+
+	var icon = document.createElement('div');
+	icon.className = 'geButton ' + ((collapsed) ?
+		'gePageGroupCollapsedIcon' : 'gePageGroupExpandedIcon');
+	tab.appendChild(icon);
+
+	var label = document.createElement('span');
+	label.style.maxWidth = '160px';
+	label.style.textOverflow = 'ellipsis';
+	label.style.overflow = 'hidden';
+	label.setAttribute('role', 'button');
+	label.setAttribute('tabindex', '0');
+	label.setAttribute('aria-expanded', (collapsed) ? 'false' : 'true');
+	label.tabKey = 'group:' + group;
+	mxUtils.write(label, group);
+	Editor.addFocusRing(label, tab);
+	tab.appendChild(label);
+
+	var elt = document.createElement('div');
+	elt.className = 'geButton gePageGroupMenuIcon';
+	elt.setAttribute('role', 'button');
+	elt.setAttribute('tabindex', '0');
+	elt.setAttribute('aria-haspopup', 'menu');
+	elt.setAttribute('aria-label', mxResources.get('options'));
+	elt.tabKey = 'groupMenu:' + group;
+	tab.appendChild(elt);
+
+	this.addTabMouseFocusListeners(tab);
+
+	var showMenu = mxUtils.bind(this, function(evt)
+	{
+		this.editor.graph.popupMenuHandler.hideMenu();
+		this.hideCurrentMenu();
+
+		var menu = new mxPopupMenu(this.createPageGroupMenu(group, index));
+		menu.smartSeparators = true;
+		menu.showDisabled = true;
+		menu.autoExpand = true;
+
+		// Disables autoexpand and destroys menu when hidden
+		menu.hideMenu = mxUtils.bind(this, function()
+		{
+			mxPopupMenu.prototype.hideMenu.apply(menu, arguments);
+			this.resetCurrentMenu();
+			menu.destroy();
+		});
+
+		this.popupTabMenu(menu, elt, evt);
+		this.setCurrentMenu(menu, tab);
+	});
+
+	mxEvent.addListener(tab, 'click', mxUtils.bind(this, function(evt)
+	{
+		if (mxEvent.getSource(evt) == elt)
+		{
+			showMenu(evt);
+		}
+		else
+		{
+			this.setPageGroupCollapsed(group, !collapsed);
+		}
+
+		mxEvent.consume(evt);
+	}));
+
+	mxEvent.addListener(tab, 'contextmenu', function(evt)
+	{
+		showMenu(evt);
+		mxEvent.consume(evt);
+	});
+
+	// Enter and Space click the name or the button. Editor.initKeyboardButton
+	// would prevent the mousedown and thereby the drag of the tab.
+	mxEvent.addListener(tab, 'keydown', function(evt)
+	{
+		if ((evt.keyCode == 13 /* Enter */ || evt.keyCode == 32 /* Space */) &&
+			!mxEvent.isAltDown(evt) && !mxEvent.isControlDown(evt) &&
+			!mxEvent.isMetaDown(evt))
+		{
+			Editor.clickWithKeyboard(mxEvent.getSource(evt), evt);
+			mxEvent.consume(evt);
+		}
+	});
+
+	return tab;
+};
+
+/**
+ * Returns a function that adds the menu items for the given page group,
+ * which starts with the page at the given index, to a menu.
+ */
+EditorUi.prototype.createPageGroupMenu = function(group, index)
+{
+	return mxUtils.bind(this, function(menu, parent)
+	{
+		var collapsed = this.isPageGroupCollapsed(group);
+
+		menu.addItem(mxResources.get((collapsed) ? 'expand' : 'collapse'), null,
+			mxUtils.bind(this, function()
+		{
+			this.setPageGroupCollapsed(group, !collapsed);
+		}), parent);
+
+		if (this.editor.graph.isEnabled())
+		{
+			menu.addSeparator(parent);
+
+			menu.addItem(mxResources.get('insertPage'), null, mxUtils.bind(this, function()
+			{
+				this.insertPageInGroup(group, index);
+			}), parent);
+
+			menu.addItem(mxResources.get('rename') + '...', null, mxUtils.bind(this, function()
+			{
+				this.renamePageGroup(group);
+			}), parent);
+
+			menu.addItem(mxResources.get('ungroup'), null, mxUtils.bind(this, function()
+			{
+				this.changePageGroup(group, null);
+			}), parent);
+		}
+	});
+};
+
+/**
+ * Leaves the focus where it was after a click or a drag with the mouse on
+ * the given tab, which focuses the tab or one of its buttons as the
+ * mousedown cannot prevent it without preventing the drag (see
+ * Editor.initKeyboardButton).
+ */
+EditorUi.prototype.addTabMouseFocusListeners = function(tab)
+{
+	var mouseFocus = false;
+
+	tab.addEventListener((mxClient.IS_POINTER) ? 'pointerdown' : 'mousedown', function()
+	{
+		mouseFocus = !mxUtils.isAncestorNode(tab, document.activeElement);
+	}, true);
+
+	var restoreFocus = function()
+	{
+		if (mouseFocus && mxUtils.isAncestorNode(tab, document.activeElement))
+		{
+			document.activeElement.blur();
+		}
+
+		mouseFocus = false;
+	};
+
+	tab.addEventListener((mxClient.IS_POINTER) ? 'pointerup' : 'mouseup', restoreFocus, true);
+	tab.addEventListener('dragend', restoreFocus, true);
+};
+
+/**
+ * Adds the listeners to the given tab for selecting the given page, renaming
+ * it on double click and showing its menu. Enter and Space select the page
+ * on its name, which is the first child of the tab, or show the menu from
+ * its button. The tab contains both, so it is no control itself as screen
+ * readers do not announce controls inside of controls.
  */
 EditorUi.prototype.addTabListeners = function(page, tab)
 {
@@ -1949,8 +4148,60 @@ EditorUi.prototype.addTabListeners = function(page, tab)
 	elt.className = 'geButton';
 	tab.appendChild(elt);
 
+	var label = tab.firstChild;
+	label.setAttribute('role', 'button');
+	label.setAttribute('tabindex', '0');
+	label.tabKey = 'page:' + page.getId();
+	Editor.addFocusRing(label, tab);
+	elt.setAttribute('role', 'button');
+	elt.setAttribute('tabindex', '0');
+	elt.setAttribute('aria-haspopup', 'menu');
+	elt.setAttribute('aria-label', mxResources.get('options'));
+	elt.tabKey = 'menu:' + page.getId();
+	this.addTabMouseFocusListeners(tab);
+
 	var menuWasVisible = false;
 	var pageWasActive = false;
+
+	var showMenu = mxUtils.bind(this, function(evt)
+	{
+		var menu = new mxPopupMenu(this.createPageMenu(page));
+		menu.smartSeparators = true;
+		menu.showDisabled = true;
+		menu.autoExpand = true;
+
+		// Disables autoexpand and destroys menu when hidden
+		menu.hideMenu = mxUtils.bind(this, function()
+		{
+			mxPopupMenu.prototype.hideMenu.apply(menu, arguments);
+			this.resetCurrentMenu();
+			menu.destroy();
+		});
+
+		this.popupTabMenu(menu, elt, evt);
+		this.setCurrentMenu(menu, tab);
+	});
+
+	mxEvent.addListener(tab, 'keydown', mxUtils.bind(this, function(evt)
+	{
+		if ((evt.keyCode == 13 /* Enter */ || evt.keyCode == 32 /* Space */) &&
+			!mxEvent.isAltDown(evt) && !mxEvent.isControlDown(evt) &&
+			!mxEvent.isMetaDown(evt))
+		{
+			if (mxEvent.getSource(evt) == elt)
+			{
+				graph.popupMenuHandler.hideMenu();
+				this.hideCurrentMenu();
+				showMenu(evt);
+			}
+			else if (page != this.currentPage)
+			{
+				this.selectPage(page);
+			}
+
+			mxEvent.consume(evt);
+		}
+	}));
 
 	var onMouseDown = mxUtils.bind(this, function(evt)
 	{
@@ -1977,23 +4228,7 @@ EditorUi.prototype.addTabListeners = function(page, tab)
 
 			if (!mxEvent.isTouchEvent(evt) || !menuWasVisible)
 			{
-				var menu = new mxPopupMenu(this.createPageMenu(page));
-				menu.smartSeparators = true;
-				menu.showDisabled = true;
-				menu.autoExpand = true;
-				
-				// Disables autoexpand and destroys menu when hidden
-				menu.hideMenu = mxUtils.bind(this, function()
-				{
-					mxPopupMenu.prototype.hideMenu.apply(menu, arguments);
-					this.resetCurrentMenu();
-					menu.destroy();
-				});
-		
-				var x = mxEvent.getClientX(evt);
-				var y = mxEvent.getClientY(evt);
-				menu.popup(x, y, null, evt);
-				this.setCurrentMenu(menu, tab);
+				showMenu(evt);
 			}
 		}
 
@@ -2005,7 +4240,7 @@ EditorUi.prototype.addTabListeners = function(page, tab)
 };
 
 /**
- * Returns true if the given string contains an mxfile.
+ * Returns a function that adds the menu items for the given page to a menu.
  */
 EditorUi.prototype.createPageMenu = function(page, label)
 {
@@ -2025,27 +4260,19 @@ EditorUi.prototype.createPageMenu = function(page, label)
 
 		if (this.editor.graph.isEnabled())
 		{
-			menu.addItem(mxResources.get('duplicate'), null, mxUtils.bind(this, function()
-			{
-				this.duplicatePage(page, mxResources.get('copyOf', [page.getName()]));
-			}), parent);
+			this.menus.addMenuItems(menu, ['duplicatePage', '-'], parent);
 
-			menu.addSeparator(parent);
-			
 			if (this.currentPage == page && this.pages.length > 1)
 			{
 				this.menus.addSubmenu('movePage', menu, parent, mxResources.get('move'));
 			}
 
-			menu.addItem(mxResources.get('delete'), null, mxUtils.bind(this, function()
+			if (this.currentPage == page && this.isPageGroupsEnabled())
 			{
-				this.removePage(page);
-			}), parent);
-			
-			menu.addItem(mxResources.get('rename') + '...', null, mxUtils.bind(this, function()
-			{
-				this.renamePage(page, label);
-			}), parent);
+				this.menus.addSubmenu('pageGroup', menu, parent, mxResources.get('group'));
+			}
+
+			this.menus.addMenuItems(menu, ['removePage', 'renamePage'], parent);
 		}
 	});
 };

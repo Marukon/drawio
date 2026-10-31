@@ -87,8 +87,16 @@ function mxSvgCanvas2D(root, styleEnabled)
 	this.fillPatterns = [];
 
 	/**
+	 * Variable: viewTranslate
+	 *
+	 * Optional view translate used to anchor fill patterns to diagram
+	 * coordinates. Set from the shape's view translate.
+	 */
+	this.viewTranslate = null;
+
+	/**
 	 * Variable: defs
-	 * 
+	 *
 	 * Reference to the defs section of the SVG document. Only for export.
 	 */
 	this.defs = null;
@@ -169,7 +177,7 @@ mxUtils.extend(mxSvgCanvas2D, mxAbstractCanvas2D);
  */
 (function()
 {
-	mxSvgCanvas2D.prototype.useDomParser = !mxClient.IS_IE && typeof DOMParser === 'function' && typeof XMLSerializer === 'function';
+	mxSvgCanvas2D.prototype.useDomParser = typeof DOMParser === 'function' && typeof XMLSerializer === 'function';
 	
 	if (mxSvgCanvas2D.prototype.useDomParser)
 	{
@@ -187,7 +195,7 @@ mxUtils.extend(mxSvgCanvas2D, mxAbstractCanvas2D);
 	}
 	
 	// Activates workaround for gradient ID resolution if base tag is used.
-	mxSvgCanvas2D.prototype.useAbsoluteIds = !mxClient.IS_CHROMEAPP && !mxClient.IS_IE && !mxClient.IS_IE11 &&
+	mxSvgCanvas2D.prototype.useAbsoluteIds = !mxClient.IS_CHROMEAPP &&
 		!mxClient.IS_EDGE && document.getElementsByTagName('base').length > 0;
 })();
 
@@ -237,6 +245,24 @@ mxSvgCanvas2D.prototype.foAltText = '[Object]';
 mxSvgCanvas2D.prototype.foOffset = 0;
 
 /**
+ * Variable: placeForeignObjects
+ *
+ * Specifies if the foreignObjects of HTML labels are placed at the labels
+ * with <foreignObjectMargin> on all sides instead of at the origin. This is
+ * used for painting in model units, where labels may have negative
+ * coordinates, as WebKit clips the content of foreignObjects outside of
+ * their bounds. Default is false.
+ */
+mxSvgCanvas2D.prototype.placeForeignObjects = false;
+
+/**
+ * Variable: foreignObjectMargin
+ *
+ * Margin around the labels for <placeForeignObjects>. Default is 10000.
+ */
+mxSvgCanvas2D.prototype.foreignObjectMargin = 10000;
+
+/**
  * Variable: textOffset
  * 
  * Offset to be used for text elements.
@@ -256,6 +282,32 @@ mxSvgCanvas2D.prototype.imageOffset = 0;
  * Adds transparent paths for strokes.
  */
 mxSvgCanvas2D.prototype.strokeTolerance = 0;
+
+/**
+ * Variable: nonScalingTolerance
+ * 
+ * Specifies if the <strokeTolerance> of the transparent paths for strokes
+ * stays in screen pixels if the canvas is transformed, ie. if the canvas
+ * paints in model units. Default is false.
+ */
+mxSvgCanvas2D.prototype.nonScalingTolerance = false;
+
+/**
+ * Variable: toleranceScaleVariable
+ * 
+ * Name of the CSS variable with the scale that the <strokeTolerance> of the
+ * transparent paths for strokes is divided by if <nonScalingTolerance> is
+ * true, so that the paths are as wide as the stroke plus the tolerance in
+ * screen pixels for any scale, or null to use vector-effect:
+ * non-scaling-stroke, which keeps the stroke width in screen pixels too.
+ * Changing the variable restyles all cells (see
+ * <mxGraphView.scheduleToleranceScaleUpdate>). Default is --mx-scale in
+ * WebKit, which hit-tests non-scaling strokes with the transform at the time
+ * of the layout and does not update it if the transform of an ancestor
+ * changes, and null in all other browsers. The variable is set in
+ * <mxGraphView.updateDrawPaneTransform>.
+ */
+mxSvgCanvas2D.prototype.toleranceScaleVariable = (mxClient.IS_SF) ? '--mx-scale' : null;
 
 /**
  * Variable: minStrokeWidth
@@ -301,14 +353,6 @@ mxSvgCanvas2D.prototype.fontMetricsPadding = 10;
 mxSvgCanvas2D.prototype.foreignObjectPadding = 2;
 
 /**
- * Variable: cacheOffsetSize
- * 
- * Specifies if offsetWidth and offsetHeight should be cached. Default is true.
- * This is used to speed up repaint of text in <updateText>.
- */
-mxSvgCanvas2D.prototype.cacheOffsetSize = true;
-
-/**
  * Variable: allowConvertHtmlToSvg
  * 
  * Specifies if convertHtmlToSvg should be allowed. Default is false.
@@ -322,7 +366,7 @@ mxSvgCanvas2D.prototype.allowConvertHtmlToSvg = false;
  */
 mxSvgCanvas2D.prototype.setCssText = function(elt, css)
 {
-	if (elt != null)
+	if (elt != null && typeof elt.setAttribute === 'function')
 	{
 		elt.setAttribute('style', css);
 	}
@@ -434,8 +478,125 @@ mxSvgCanvas2D.prototype.getAlternateText = function(fo, x, y, w, h, str, align, 
 };
 
 /**
+ * Function: getAlternateTextLines
+ *
+ * Returns the alternate text for the given foreignObject as an array of
+ * lines. Splits the text at linefeeds, applies word wrapping at the given
+ * width if wrap is enabled and truncates the lines to the visible box if
+ * the label is clipped, so that the fallback approximates the layout of
+ * the foreignObject in viewers with no support for foreignObjects.
+ */
+mxSvgCanvas2D.prototype.getAlternateTextLines = function(text, w, h, wrap, overflow, clip)
+{
+	var s = this.state;
+	var lines = text.split(/\r\n|\r|\n/);
+	var doWrap = (wrap || overflow == 'fill' || overflow == 'width') && w > 0;
+	var maxWidth = w + this.foreignObjectPadding;
+	var ctx = null;
+
+	if (doWrap || (clip && w > 0))
+	{
+		// Uses canvas text measuring with the current font. This is an
+		// approximation as the fonts in the target viewer may differ.
+		ctx = document.createElement('canvas').getContext('2d');
+		ctx.font = (((s.fontStyle & mxConstants.FONT_ITALIC) ==
+				mxConstants.FONT_ITALIC) ? 'italic ' : '') +
+			(((s.fontStyle & mxConstants.FONT_BOLD) ==
+				mxConstants.FONT_BOLD) ? 'bold ' : '') +
+			s.fontSize + 'px ' + mxUtils.parseCssFontFamily(s.fontFamily);
+	}
+
+	// Applies word wrapping at the wrapping width of the foreignObject
+	if (doWrap && ctx != null)
+	{
+		var wrapped = [];
+
+		for (var i = 0; i < lines.length; i++)
+		{
+			var words = lines[i].split(/\s+/);
+			var line = '';
+
+			for (var j = 0; j < words.length; j++)
+			{
+				if (words[j].length > 0)
+				{
+					var next = (line.length > 0) ? line + ' ' + words[j] : words[j];
+
+					if (line.length > 0 && ctx.measureText(next).width > maxWidth)
+					{
+						wrapped.push(line);
+						line = words[j];
+					}
+					else
+					{
+						line = next;
+					}
+
+					// Breaks CJK text that is wider than the wrapping width
+					// at character level like the browser as it contains no
+					// word boundaries (other overflowing content is left to
+					// overflow like HTML with word-wrap normal)
+					while (line.length > 1 && ctx.measureText(line).width > maxWidth &&
+						/[\u2E80-\uFAFF\uFE30-\uFE4F\uFF00-\uFFEF]/.test(line))
+					{
+						var index = line.length - 1;
+
+						while (index > 1 && ctx.measureText(line.substring(0, index)).width > maxWidth)
+						{
+							index--;
+						}
+
+						wrapped.push(line.substring(0, index));
+						line = line.substring(index);
+					}
+				}
+			}
+
+			wrapped.push(line);
+		}
+
+		lines = wrapped;
+	}
+
+	// Removes lines that are not visible if the label is clipped
+	if ((clip || overflow == 'fill') && h > 0)
+	{
+		var visibleLines = Math.max(1, Math.floor(h / Math.round(
+			mxConstants.LINE_HEIGHT * s.fontSize)));
+
+		if (lines.length > visibleLines)
+		{
+			lines = lines.slice(0, visibleLines);
+			lines[lines.length - 1] += '...';
+		}
+	}
+
+	// Truncates the lines at the width if the label is clipped without wrapping
+	if (clip && !doWrap && ctx != null)
+	{
+		for (var i = 0; i < lines.length; i++)
+		{
+			if (ctx.measureText(lines[i]).width > maxWidth)
+			{
+				var index = lines[i].length - 1;
+
+				while (index > 1 && ctx.measureText(
+					lines[i].substring(0, index) + '...').width > maxWidth)
+				{
+					index--;
+				}
+
+				lines[i] = mxUtils.trim(lines[i].substring(0, index)) + '...';
+			}
+		}
+	}
+
+	return lines;
+};
+
+/**
  * Function: getAlternateContent
- * 
+ *
  * Returns the alternate content for the given foreignObject.
  */
 mxSvgCanvas2D.prototype.createAlternateContent = function(fo, x, y, w, h, str, align, valign, wrap, format, overflow, clip, rotation)
@@ -450,11 +611,38 @@ mxSvgCanvas2D.prototype.createAlternateContent = function(fo, x, y, w, h, str, a
 		var anchor = (align == mxConstants.ALIGN_RIGHT) ? 'end' :
 			(align == mxConstants.ALIGN_LEFT) ? 'start' :
 			'middle';
-	
+
+		var lines = this.getAlternateTextLines(text, w, h, wrap, overflow, clip);
+		var lh = Math.round(mxConstants.LINE_HEIGHT * s.fontSize);
+		var x0 = Math.round(x + s.dx);
+
+		// Aligns the block of lines vertically at the anchor point like the
+		// flex layout of the foreignObject: hanging below the anchor for top,
+		// centered for middle and above the anchor for bottom alignment
+		var y0 = y + s.dy + dy * s.fontSize -
+			((valign == mxConstants.ALIGN_TOP) ? 0 :
+			((valign == mxConstants.ALIGN_BOTTOM) ? (lines.length - 1) * lh :
+			(lines.length - 1) * lh / 2));
+
+		var cssFontColor = this.getLightDarkColor(s.fontColor || 'black');
 		var alt = this.createElement('text');
-		alt.setAttribute('x', Math.round(x + s.dx));
-		alt.setAttribute('y', Math.round(y + s.dy + dy * s.fontSize));
-		alt.setAttribute('fill', s.fontColor || 'black');
+		alt.setAttribute('x', x0);
+		alt.setAttribute('y', Math.round(y0));
+
+		// Alternate content is rendered in viewers with no support for
+		// light-dark colors so the fill attribute must be a plain color,
+		// using none for transparent as it is not a valid paint value
+		// in SVG 1.1 and renders black in Inkscape and PowerPoint
+		if (cssFontColor.light == 'transparent')
+		{
+			alt.setAttribute('fill', 'none');
+		}
+		else
+		{
+			alt.setAttribute('fill', cssFontColor.light);
+			alt.style.fill = cssFontColor.cssText;
+		}
+
 		alt.setAttribute('font-family', mxUtils.parseCssFontFamily(s.fontFamily));
 		alt.setAttribute('font-size', Math.round(s.fontSize) + 'px');
 
@@ -485,14 +673,33 @@ mxSvgCanvas2D.prototype.createAlternateContent = function(fo, x, y, w, h, str, a
 		{
 			txtDecor.push('line-through');
 		}
-		
+
 		if (txtDecor.length > 0)
 		{
 			alt.setAttribute('text-decoration', txtDecor.join(' '));
+
+			if ((s.fontStyle & mxConstants.FONT_UNDERLINE_DOTTED) == mxConstants.FONT_UNDERLINE_DOTTED)
+			{
+				alt.style.textDecorationStyle = 'dotted';
+			}
 		}
-		
-		mxUtils.write(alt, text);
-		
+
+		if (lines.length > 1)
+		{
+			for (var i = 0; i < lines.length; i++)
+			{
+				var tspan = this.createElement('tspan');
+				tspan.setAttribute('x', x0);
+				tspan.setAttribute('y', Math.round(y0 + i * lh));
+				mxUtils.write(tspan, lines[i]);
+				alt.appendChild(tspan);
+			}
+		}
+		else
+		{
+			mxUtils.write(alt, lines[0]);
+		}
+
 		return alt;
 	}
 	else
@@ -657,27 +864,68 @@ mxSvgCanvas2D.prototype.createSvgGradient = function(start, end, alpha1, alpha2,
 
 /**
  * Function: createFillPatternId
- * 
- * Private helper function to create fillPattern Id
+ *
+ * Private helper function to create fillPattern Id. The id must encode every
+ * input that affects the resulting pattern element (type, dimensions, stroke
+ * width, both light and dark color components, scale, gap, weight and angle
+ * overrides) so that two patterns that differ in any of those attributes get
+ * distinct ids and are never shared via getElementById lookups across shapes.
  */
-mxSvgCanvas2D.prototype.createFillPatternId = function(type, strokeSize, color)
+mxSvgCanvas2D.prototype.createFillPatternId = function(type, strokeSize, color, scale, gap, weight, angle)
 {
+	var parts = ['mx-pattern', type,
+		Math.round(strokeSize * 100),
+		color.light, color.dark,
+		Math.round(scale * 100)];
+
+	// Appended only if set so that ids for default patterns are stable
+	if (gap != null || weight != null || angle != null)
+	{
+		parts.push((gap != null) ? Math.round(gap * 100) : 'a',
+			(weight != null) ? Math.round(weight * 100) : 'a',
+			(angle != null) ? Math.round(angle * 100) : 'a');
+	}
+
 	// Removes illegal characters from gradient ID
-	return ('mx-pattern-' + type + '-' + strokeSize + '-' + color).
-		toLowerCase().replace(/^[^a-z]+|[^\w:.-]+/gi, '_');
+	return parts.join('-').toLowerCase().replace(/^[^a-z]+|[^\w:.-]+/gi, '_');
 };
 
 /**
  * Function: getFillPattern
- * 
- * Private helper function to create FillPattern SVG elements
+ *
+ * Private helper function to create FillPattern SVG elements. The optional
+ * hachureGap, fillWeight and hachureAngle styles override the stroke
+ * distance, stroke width and angle of the pattern, which are otherwise
+ * derived from the shape's stroke width.
  */
-mxSvgCanvas2D.prototype.getFillPattern = function(type, strokeSize, color, scale)
+mxSvgCanvas2D.prototype.getFillPattern = function(type, strokeSize, color, scale, hachureGap, fillWeight, hachureAngle)
 {
 	color = this.getLightDarkColor(color);
-	var id = this.createFillPatternId(type, strokeSize, color.cssText);
+
+	// Validates overrides from untrusted styles where -1, auto and
+	// non-numeric values mean unset. The gap is clamped to a minimum
+	// of 1 to avoid degenerate patterns.
+	var gap = parseFloat(hachureGap);
+	gap = (!isFinite(gap) || gap <= 0) ? null : Math.max(1, gap);
+	var weight = parseFloat(fillWeight);
+	weight = (!isFinite(weight) || weight <= 0) ? null : weight;
+	var angle = parseFloat(hachureAngle);
+	angle = (!isFinite(angle)) ? null : angle;
+
+	// If any pattern property is set then the unset properties use the
+	// rough.js automatic values so that the same style looks similar in
+	// sketch and normal mode. If no property is set, the legacy pattern
+	// geometry derived from the stroke width is used unchanged.
+	if (gap != null || weight != null || angle != null)
+	{
+		gap = (gap != null) ? gap : Math.max(1, strokeSize * 4);
+		weight = (weight != null) ? weight : strokeSize / 2;
+		angle = (angle != null) ? angle : -41;
+	}
+
+	var id = this.createFillPatternId(type, strokeSize, color, scale, gap, weight, angle);
 	var fillPattern = this.fillPatterns[id];
-	
+
 	if (fillPattern == null)
 	{
 		var svg = this.root.ownerSVGElement;
@@ -688,7 +936,7 @@ mxSvgCanvas2D.prototype.getFillPattern = function(type, strokeSize, color, scale
 		if (svg != null)
 		{
 			fillPattern = svg.ownerDocument.getElementById(tmpId);
-			
+
 			while (fillPattern != null && fillPattern.ownerSVGElement != svg)
 			{
 				tmpId = id + '-' + counter++;
@@ -700,33 +948,33 @@ mxSvgCanvas2D.prototype.getFillPattern = function(type, strokeSize, color, scale
 			 // Uses shorter IDs for export
 			tmpId = 'id' + (++this.refCount);
 		}
-		
+
 		if (fillPattern == null)
 		{
 			switch(type)
 			{
 				case 'hatch':
-					fillPattern = this.createHatchPattern(strokeSize, color, scale);
+					fillPattern = this.createHatchPattern(strokeSize, color, scale, gap, weight);
 					break;
 				case 'dots':
-					fillPattern = this.createDotsPattern(strokeSize, color, scale);
+					fillPattern = this.createDotsPattern(strokeSize, color, scale, gap, weight);
 					break;
 				case 'cross-hatch':
-					fillPattern = this.createCrossHatchPattern(strokeSize, color, scale);
+					fillPattern = this.createCrossHatchPattern(strokeSize, color, scale, gap, weight);
 					break;
 				case 'dashed':
-					fillPattern = this.createDashedPattern(strokeSize, color, scale);
+					fillPattern = this.createDashedPattern(strokeSize, color, scale, gap, weight);
 					break;
 				case 'zigzag': //TODO Add this pattern
 				case 'zigzag-line':
-					fillPattern = this.createZigZagLinePattern(strokeSize, color, scale);
+					fillPattern = this.createZigZagLinePattern(strokeSize, color, scale, gap, weight);
 					break;
 				default:
 					return null;
 			}
-			
+
 			fillPattern.setAttribute('id', tmpId);
-			
+
 			if (this.defs != null)
 			{
 				this.defs.appendChild(fillPattern);
@@ -740,99 +988,123 @@ mxSvgCanvas2D.prototype.getFillPattern = function(type, strokeSize, color, scale
 		this.fillPatterns[id] = fillPattern;
 	}
 
+	// Updates patternTransform to anchor pattern to diagram coordinates.
+	// The view translate is baked into shape SVG positions. By including
+	// it in the pattern transform, the pattern phase depends only on the
+	// shape's diagram position, not the view translate or zoom level.
+	var vt = this.viewTranslate;
+	var tx = (vt != null) ? this.format(vt.x * scale) : 0;
+	var ty = (vt != null) ? this.format(vt.y * scale) : 0;
+	var hasRotate = (type !== 'dots');
+
+	// Rotates the vertical base strokes of the pattern so they run at the
+	// given hachure angle (rough.js convention, 0 means horizontal)
+	var rotation = (angle != null) ? 90 + angle : 45;
+
+	fillPattern.setAttribute('patternTransform',
+		'translate(' + tx + ',' + ty + ')' +
+		(hasRotate ? ' rotate(' + rotation + ')' : '') +
+		' scale(' + scale + ')');
+
 	return fillPattern.getAttribute('id');
 };
 
-mxSvgCanvas2D.prototype.createHatchPattern = function(strokeSize, color, scale)
+mxSvgCanvas2D.prototype.createHatchPattern = function(strokeSize, color, scale, gap, weight)
 {
-	var sw = strokeSize * 1.5 * scale;
-	var size = this.format((10 + sw) * scale);
+	var baseSW = (weight != null) ? weight : strokeSize * 1.5;
+	var size = this.format((gap != null) ? gap : 10 + baseSW);
+
+	// A weight is set if any pattern property is used and is the visible
+	// stripe width so the stroke is drawn centered in the tile. The default
+	// stroke keeps the legacy geometry centered on the tile edge where the
+	// implicit clipping of pattern content to the tile halves its visible
+	// width.
+	var x = (weight != null) ? size / 2 : 0;
 
 	var fillPattern = this.createElement('pattern');
 	fillPattern.setAttribute('patternUnits', 'userSpaceOnUse');
 	fillPattern.setAttribute('width', size);
 	fillPattern.setAttribute('height', size);
 	fillPattern.setAttribute('x', '0');
-	fillPattern.setAttribute('y', '0');	 
-	fillPattern.setAttribute('patternTransform', 'rotate(45)');
-	
+	fillPattern.setAttribute('y', '0');
+
 	var line = this.createElement('line');
-	line.setAttribute('x1', '0');
+	line.setAttribute('x1', x);
 	line.setAttribute('y1', '0');
-	line.setAttribute('x2', '0');
+	line.setAttribute('x2', x);
 	line.setAttribute('y2', size);
 	line.setAttribute('stroke', color.light); // TODO Is Gradient Color possible?
 	line.style.stroke = color.cssText;
-	line.setAttribute('stroke-width', sw);
+	line.setAttribute('stroke-width', baseSW);
 
 	fillPattern.appendChild(line);
 	return fillPattern;
 };
 
-mxSvgCanvas2D.prototype.createDashedPattern = function(strokeSize, color, scale)
+mxSvgCanvas2D.prototype.createDashedPattern = function(strokeSize, color, scale, gap, weight)
 {
-	var sw = strokeSize * 1.5 * scale;
-	var size = this.format((10 + sw) * scale);
+	var baseSW = (weight != null) ? weight : strokeSize * 1.5;
+	var size = this.format((gap != null) ? gap : 10 + baseSW);
+
+	// See createHatchPattern for the explicit weight geometry
+	var x = (weight != null) ? size / 2 : 0;
 
 	var fillPattern = this.createElement('pattern');
 	fillPattern.setAttribute('patternUnits', 'userSpaceOnUse');
 	fillPattern.setAttribute('width', size);
 	fillPattern.setAttribute('height', size);
 	fillPattern.setAttribute('x', '0');
-	fillPattern.setAttribute('y', '0');	 
-	fillPattern.setAttribute('patternTransform', 'rotate(45)');
-	
+	fillPattern.setAttribute('y', '0');
+
 	var line = this.createElement('line');
-	line.setAttribute('x1', '0');
+	line.setAttribute('x1', x);
 	line.setAttribute('y1', size / 4);
-	line.setAttribute('x2', '0');
+	line.setAttribute('x2', x);
 	line.setAttribute('y2', 3 * size / 4);
 	line.setAttribute('stroke', color.light); // TODO Is Gradient Color possible?
 	line.style.stroke = color.cssText;
-	line.setAttribute('stroke-width', sw);
-	
+	line.setAttribute('stroke-width', baseSW);
+
 	fillPattern.appendChild(line);
 	return fillPattern;
 };
 
-mxSvgCanvas2D.prototype.createZigZagLinePattern = function(strokeSize, color, scale)
+mxSvgCanvas2D.prototype.createZigZagLinePattern = function(strokeSize, color, scale, gap, weight)
 {
-	var sw = strokeSize * 1.5 * scale;
-	var size = this.format((10 + sw) * scale);
+	var baseSW = (weight != null) ? weight : strokeSize * 1.5;
+	var size = this.format((gap != null) ? gap : 10 + baseSW);
 
 	var fillPattern = this.createElement('pattern');
 	fillPattern.setAttribute('patternUnits', 'userSpaceOnUse');
 	fillPattern.setAttribute('width', size);
 	fillPattern.setAttribute('height', size);
 	fillPattern.setAttribute('x', '0');
-	fillPattern.setAttribute('y', '0');	 
-	fillPattern.setAttribute('patternTransform', 'rotate(45)');
-	
+	fillPattern.setAttribute('y', '0');
+
 	var path = this.createElement('path');
 	var s1_4 = size / 4, s3_4 = 3 * size / 4;
 	path.setAttribute('d', 'M ' + s1_4 + ' 0 L ' + s3_4 + ' 0 L ' + s1_4 + ' ' + size + ' L ' + s3_4 + ' ' + size);
 	path.setAttribute('stroke', color.light); // TODO Is Gradient Color possible?
 	path.style.stroke = color.cssText;
-	path.setAttribute('stroke-width', sw);
+	path.setAttribute('stroke-width', baseSW);
 	path.setAttribute('fill', 'none');
 
 	fillPattern.appendChild(path);
 	return fillPattern;
 };
 
-mxSvgCanvas2D.prototype.createCrossHatchPattern = function(strokeSize, color, scale)
+mxSvgCanvas2D.prototype.createCrossHatchPattern = function(strokeSize, color, scale, gap, weight)
 {
-	var sw = strokeSize * 0.5 * scale;
-	var size = this.format(1.5 * (10 + sw) * scale);
+	var baseSW = (weight != null) ? weight : strokeSize * 0.5;
+	var size = this.format((gap != null) ? gap : 1.5 * (10 + baseSW));
 
 	var fillPattern = this.createElement('pattern');
 	fillPattern.setAttribute('patternUnits', 'userSpaceOnUse');
 	fillPattern.setAttribute('width', size);
 	fillPattern.setAttribute('height', size);
 	fillPattern.setAttribute('x', '0');
-	fillPattern.setAttribute('y', '0');	 
-	fillPattern.setAttribute('patternTransform', 'rotate(45)');
-	
+	fillPattern.setAttribute('y', '0');
+
 	var rect = this.createElement('rect');
 	rect.setAttribute('x', 0);
 	rect.setAttribute('y', 0);
@@ -840,32 +1112,37 @@ mxSvgCanvas2D.prototype.createCrossHatchPattern = function(strokeSize, color, sc
 	rect.setAttribute('height', size);
 	rect.setAttribute('stroke', color.light); // TODO Is Gradient Color possible?
 	rect.style.stroke = color.cssText;
-	rect.setAttribute('stroke-width', sw);
+	rect.setAttribute('stroke-width', baseSW);
 	rect.setAttribute('fill', 'none');
-	
+
 	fillPattern.appendChild(rect);
 	return fillPattern;
 };
 
-mxSvgCanvas2D.prototype.createDotsPattern = function(strokeSize, color, scale)
+mxSvgCanvas2D.prototype.createDotsPattern = function(strokeSize, color, scale, gap, weight)
 {
-	var size = this.format((10 + strokeSize) * scale);
+	var size = this.format((gap != null) ? gap : 10 + strokeSize);
+
+	// The weight is the dot diameter (rough.js convention). Pattern content
+	// is clipped to the tile so the radius is capped at half the tile size
+	// to keep overlapping dots round.
+	var radius = (weight != null) ? Math.min(weight / 2, size / 2) : size / 4;
 
 	var fillPattern = this.createElement('pattern');
 	fillPattern.setAttribute('patternUnits', 'userSpaceOnUse');
 	fillPattern.setAttribute('width', size);
 	fillPattern.setAttribute('height', size);
 	fillPattern.setAttribute('x', '0');
-	fillPattern.setAttribute('y', '0');	 
-	
+	fillPattern.setAttribute('y', '0');
+
 	var circle = this.createElement('circle');
 	circle.setAttribute('cx', size / 2);
 	circle.setAttribute('cy', size / 2);
-	circle.setAttribute('r', size / 4);
+	circle.setAttribute('r', radius);
 	circle.setAttribute('stroke', 'none');
 	circle.setAttribute('fill', color.light); // TODO Is Gradient Color possible?
 	circle.style.fill = color.cssText;
-	
+
 	fillPattern.appendChild(circle);
 	return fillPattern;
 }; 
@@ -1061,6 +1338,14 @@ mxSvgCanvas2D.prototype.updateFill = function()
 
 			lightFill = fill;
 		}
+		else if (String(s.fillColor).toLowerCase() == mxConstants.NONE)
+		{
+			// NONE reaches this point via setGradient. Uses none as
+			// transparent is not a valid paint value in SVG 1.1 and
+			// renders black in Inkscape and PowerPoint
+			lightFill = 'none';
+			fill = 'none';
+		}
 		else
 		{
 			var cssFill = this.getLightDarkColor(String(s.fillColor).toLowerCase());
@@ -1069,8 +1354,11 @@ mxSvgCanvas2D.prototype.updateFill = function()
 		}
 	}
 
+	var baseStrokeWidth = Math.max(this.minStrokeWidth, Math.max(0.01,
+		this.format(s.strokeWidth)));
 	var pId = (s.fillStyle == null || s.fillStyle == 'auto' || s.fillStyle == 'solid') ? null :
-		this.getFillPattern(s.fillStyle, this.getCurrentStrokeWidth(), fill, s.scale);
+		this.getFillPattern(s.fillStyle, baseStrokeWidth, fill, s.scale,
+			s.hachureGap, s.fillWeight, s.hachureAngle);
 
 	if (isGradient || pId == null)
 	{
@@ -1131,8 +1419,13 @@ mxSvgCanvas2D.prototype.updateStroke = function()
 	
 	if (s.dashed)
 	{
-		this.node.setAttribute('stroke-dasharray', this.createDashPattern(
-			((s.fixDash) ? 1 : s.strokeWidth) * s.scale));
+		var pattern = this.createDashPattern(((s.fixDash) ? 1 : s.strokeWidth) * s.scale);
+
+		// Solid line for patterns without numbers
+		if (pattern.length > 0)
+		{
+			this.node.setAttribute('stroke-dasharray', pattern);
+		}
 	}
 };
 
@@ -1192,7 +1485,13 @@ mxSvgCanvas2D.prototype.createDashPattern = function(scale)
 		{
 			for (var i = 0; i < dash.length; i++)
 			{
-				pat[i] = Math.round(Number(dash[i]) * scale * 100) / 100;
+				var value = Number(dash[i]);
+
+				// Ignores values that are not numbers, eg. none in stencils
+				if (isFinite(value))
+				{
+					pat.push(Math.round(value * scale * 100) / 100);
+				}
 			}
 		}
 	}
@@ -1208,12 +1507,26 @@ mxSvgCanvas2D.prototype.createDashPattern = function(scale)
 mxSvgCanvas2D.prototype.createTolerance = function(node)
 {
 	var tol = node.cloneNode(true);
-	var sw = parseFloat(tol.getAttribute('stroke-width') || 1) + this.strokeTolerance;
+	var width = parseFloat(tol.getAttribute('stroke-width') || 1);
+	var sw = width + this.strokeTolerance;
 	tol.setAttribute('pointer-events', 'stroke');
 	tol.setAttribute('visibility', 'hidden');
 	tol.removeAttribute('stroke-dasharray');
 	tol.setAttribute('stroke-width', sw);
 	tol.setAttribute('fill', 'none');
+
+	if (this.nonScalingTolerance)
+	{
+		if (this.toleranceScaleVariable != null)
+		{
+			tol.style.strokeWidth = 'calc(' + width + 'px + ' + this.strokeTolerance +
+				'px / var(' + this.toleranceScaleVariable + ', 1))';
+		}
+		else
+		{
+			tol.setAttribute('vector-effect', 'non-scaling-stroke');
+		}
+	}
 	
 	// Workaround for Opera ignoring the visiblity attribute above while
 	// other browsers need a stroke color to perform the hit-detection but
@@ -1413,49 +1726,113 @@ mxSvgCanvas2D.prototype.ellipse = function(x, y, w, h)
 	// No rounding for consistent output with 1.x
 	n.setAttribute('cx', this.format((x + w / 2 + s.dx) * s.scale));
 	n.setAttribute('cy', this.format((y + h / 2 + s.dy) * s.scale));
-	n.setAttribute('rx', w / 2 * s.scale);
-	n.setAttribute('ry', h / 2 * s.scale);
+	n.setAttribute('rx', this.format(w / 2 * s.scale));
+	n.setAttribute('ry', this.format(h / 2 * s.scale));
 	this.node = n;
 };
 
 /**
  * Function: image
- * 
- * Private helper function to create SVG elements
+ *
+ * Private helper function to create SVG elements. The optional cssVars
+ * renders the image as a use tag with the given CSS declarations in its
+ * style attribute, so that CSS variables apply to the referenced SVG
+ * content. Note that external references are not loaded where SVG is
+ * rendered as an image, eg. in PNG export.
  */
-mxSvgCanvas2D.prototype.image = function(x, y, w, h, src, aspect, flipH, flipV, clipPath)
+mxSvgCanvas2D.prototype.image = function(x, y, w, h, src, aspect, flipH, flipV, clipPath, cssVars)
 {
 	src = this.converter.convert(src);
-	
+
+	// Image sources come from cell styles, which are untrusted content
+	// (a diagram from a collaborator, an import or an embed): a script
+	// scheme must never reach an href attribute, in the editor or in
+	// an exported file where nothing checks it at display time. Links
+	// are sanitized already (Graph.sanitizeLink); only the script
+	// schemes are rejected here so data, blob and relative sources
+	// keep working.
+	if (src != null && /^\s*(javascript|vbscript|livescript)\s*:/i.test(
+		String(src).replace(/[\x00-\x1F\x7F]/g, '')))
+	{
+		src = '';
+	}
+
 	// LATER: Add option for embedding images as base64.
 	aspect = (aspect != null) ? aspect : true;
 	flipH = (flipH != null) ? flipH : false;
 	flipV = (flipV != null) ? flipV : false;
-	
+
 	var s = this.state;
 	x += s.dx;
 	y += s.dy;
-	
-	var node = this.createElement('image');
+
+	var node = null;
+
+	if (cssVars != null)
+	{
+		// Inlines themed SVG images as shared symbols via the
+		// createImageSymbol hook where available
+		var ref = (this.createImageSymbol != null) ?
+			this.createImageSymbol(src, aspect) : null;
+
+		// Data URIs are not supported in use tags so the theming
+		// is ignored if no symbol was created for the image
+		if (ref != null || src.substring(0, 5) != 'data:')
+		{
+			var href = (ref != null) ? '#' + ref : src;
+			node = this.createElement('use');
+
+			// Empty declarations share the image without theming
+			if (cssVars != '')
+			{
+				node.setAttribute('style', cssVars);
+			}
+
+			node.setAttribute('href', href);
+
+			if (node.setAttributeNS != null)
+			{
+				node.setAttributeNS(mxConstants.NS_XLINK, 'xlink:href', href);
+			}
+		}
+	}
+
+	if (node == null && this.dedupImages && this.defs != null)
+	{
+		// Shares repeated images via a definition and use tags
+		var def = '#' + this.getImageDef(src, w * s.scale, h * s.scale, aspect);
+		node = this.createElement('use');
+		node.setAttribute('href', def);
+
+		if (node.setAttributeNS != null)
+		{
+			node.setAttributeNS(mxConstants.NS_XLINK, 'xlink:href', def);
+		}
+	}
+	else if (node == null)
+	{
+		node = this.createElement('image');
+
+		// Workaround for missing namespace support
+		if (node.setAttributeNS == null)
+		{
+			node.setAttribute('xlink:href', src);
+		}
+		else
+		{
+			node.setAttributeNS(mxConstants.NS_XLINK, 'xlink:href', src);
+		}
+
+		if (!aspect)
+		{
+			node.setAttribute('preserveAspectRatio', 'none');
+		}
+	}
+
 	node.setAttribute('x', this.format(x * s.scale) + this.imageOffset);
 	node.setAttribute('y', this.format(y * s.scale) + this.imageOffset);
 	node.setAttribute('width', this.format(w * s.scale));
 	node.setAttribute('height', this.format(h * s.scale));
-	
-	// Workaround for missing namespace support
-	if (node.setAttributeNS == null)
-	{
-		node.setAttribute('xlink:href', src);
-	}
-	else
-	{
-		node.setAttributeNS(mxConstants.NS_XLINK, 'xlink:href', src);
-	}
-	
-	if (!aspect)
-	{
-		node.setAttribute('preserveAspectRatio', 'none');
-	}
 
 	if (s.alpha < 1 || s.fillAlpha < 1)
 	{
@@ -1501,8 +1878,85 @@ mxSvgCanvas2D.prototype.image = function(x, y, w, h, src, aspect, flipH, flipV, 
 	{
 		this.processClipPath(node, clipPath, new mxRectangle(x, y, w, h));
 	}
-	
-	this.root.appendChild(node);
+
+	// Adds the title in a group like for labels, which keeps it if the image
+	// is replaced later, eg. with the SVG of the image
+	if (this.title != null)
+	{
+		var group = this.addTitle(this.createElement('g'));
+		group.appendChild(node);
+		this.root.appendChild(group);
+	}
+	else
+	{
+		this.root.appendChild(node);
+	}
+};
+
+/**
+ * Function: getImageDef
+ *
+ * Returns the ID of the definition for the given image with the given
+ * size, adding the definition to <defs> if it does not yet exist. The
+ * image is wrapped in a symbol so that all sizes with the same aspect
+ * ratio share one definition, as the use tags scale the symbol via its
+ * viewBox. Used if <dedupImages> is enabled.
+ */
+mxSvgCanvas2D.prototype.getImageDef = function(src, w, h, aspect)
+{
+	if (this.imageDefs == null)
+	{
+		this.imageDefs = {};
+		this.imageDefIds = {};
+	}
+
+	// All aspect ratios are equivalent if the aspect is not preserved
+	var key = src + '|' + aspect + '|' +
+		((aspect && h != 0) ? (w / h).toFixed(4) : '');
+	var id = this.imageDefs[key];
+
+	if (id == null)
+	{
+		id = 'mx-image-' + mxUtils.hashCode(key);
+
+		// Resolves hash collisions between different keys
+		while (this.imageDefIds[id] != null)
+		{
+			id += '-1';
+		}
+
+		var symbol = this.createElement('symbol');
+		symbol.setAttribute('id', id);
+		symbol.setAttribute('viewBox', '0 0 ' + this.format(w) +
+			' ' + this.format(h));
+
+		var img = this.createElement('image');
+		img.setAttribute('width', this.format(w));
+		img.setAttribute('height', this.format(h));
+
+		// Workaround for missing namespace support
+		if (img.setAttributeNS == null)
+		{
+			img.setAttribute('xlink:href', src);
+		}
+		else
+		{
+			img.setAttributeNS(mxConstants.NS_XLINK, 'xlink:href', src);
+		}
+
+		if (!aspect)
+		{
+			symbol.setAttribute('preserveAspectRatio', 'none');
+			img.setAttribute('preserveAspectRatio', 'none');
+		}
+
+		symbol.appendChild(img);
+		this.defs.appendChild(symbol);
+		this.imageDefs[key] = id;
+		this.imageDefIds[id] = key;
+	}
+
+	return id;
 };
 
 /**
@@ -1545,7 +1999,14 @@ mxSvgCanvas2D.prototype.processClipPath = function(node, clipPath, bounds)
  */
 mxSvgCanvas2D.prototype.convertHtml = function(val)
 {
-	if (this.useDomParser)
+	// Plain text is returned unchanged by parsing and serializing unless it
+	// has markup, characters that are escaped or replaced, or leading
+	// whitespace, which the parser drops before the body
+	if (typeof val === 'string' && !/[<>&\r\0]|^[\t\n\f ]/.test(val))
+	{
+		return val;
+	}
+	else if (this.useDomParser)
 	{
 		var doc = new DOMParser().parseFromString(val, 'text/html');
 
@@ -1618,8 +2079,7 @@ mxSvgCanvas2D.prototype.createDiv = function(str)
 		val = '<div><div>' + this.convertHtml(val) + '</div></div>';
 	}
 
-	// IE uses this code for export as it cannot render foreignObjects
-	if (!mxClient.IS_IE && !mxClient.IS_IE11 && document.createElementNS)
+	if (document.createElementNS)
 	{
 		var div = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
 		
@@ -1675,7 +2135,23 @@ mxSvgCanvas2D.prototype.updateText = function(x, y, w, h, align, valign, wrap, o
 		}
 		else if (node.nodeName == 'g')
 		{
-			this.plainText(x, y, w, h, '', align, valign, wrap, overflow, clip, rotation, dir, null, node.firstChild)
+			// Checks for block mode (stored during initial render)
+			var innerG = node.firstChild;
+			var blockTextHeight = innerG.getAttribute('data-blockTextHeight');
+
+			if (blockTextHeight != null)
+			{
+				var storedWidth = innerG.getAttribute('data-htmlContentWidth');
+				var hcw = (storedWidth != null) ? parseFloat(storedWidth) : null;
+
+				this.plainText(x, y, w, h, '', align, valign, wrap, overflow, clip, rotation, dir,
+					null, innerG, parseFloat(blockTextHeight), (hcw != null && !isNaN(hcw)) ? hcw : null);
+			}
+			else
+			{
+				this.plainText(x, y, w, h, '', align, valign, wrap, overflow, clip, rotation, dir,
+					null, innerG);
+			}
 		}
 	}
 };
@@ -1756,9 +2232,10 @@ mxSvgCanvas2D.prototype.updateTextNodes = function(x, y, w, h, align, valign, wr
 		this.getLightDarkColor(this.state.fontBackgroundColor) : null;
 	var cssBorder = (this.state.fontBorderColor != null) ?
 		this.getLightDarkColor(this.state.fontBorderColor) : null;
-	
+	var padding = (cssBg != null || cssBorder != null) ? this.state.labelPadding : null;
+
 	mxSvgCanvas2D.createCss(w + this.foreignObjectPadding, h, align, valign, wrap, overflow, clip, dir,
-		(cssBg != null) ? cssBg.cssText : null, (cssBorder != null) ? cssBorder.cssText : null,
+		(cssBg != null) ? cssBg.cssText : null, (cssBorder != null) ? cssBorder.cssText : null, padding,
 		'display: flex; align-items: unsafe ' + alignItems + '; ' +
 		'justify-content: unsafe ' + justifyContent + '; ' +
 		((dir != null && dir.substring(0, 9) == 'vertical-') ? 'writing-mode: ' + dir + ';' : ''),
@@ -1769,9 +2246,18 @@ mxSvgCanvas2D.prototype.updateTextNodes = function(x, y, w, h, align, valign, wr
 
 		var fo = g.firstChild;
 
-		if (fo.nodeName == 'title')
+		if (fo != null && fo.nodeName == 'title')
 		{
 			fo = fo.nextSibling;
+		}
+
+		var div = (fo != null) ? fo.firstChild : null;
+		var box = (div != null) ? div.firstChild : null;
+
+		// Skips text nodes that were changed outside of the canvas
+		if (box == null)
+		{
+			return;
 		}
 
 		// Fallback text, background and border color in parent block
@@ -1779,8 +2265,6 @@ mxSvgCanvas2D.prototype.updateTextNodes = function(x, y, w, h, align, valign, wr
 		item += (cssBg != null) ? 'background-color: ' + cssBg.light + '; ' : '';
 		item += (cssBorder != null) ? 'border-color: ' + cssBorder.light + '; ' : '';
 		
-		var div = fo.firstChild;
-		var box = div.firstChild;
 		var text = box.firstChild;
 		var r = ((this.rotateHtml) ? this.state.rotation : 0) + ((rotation != null) ? rotation : 0);
 		var t = ((this.foOffset != 0) ? 'translate(' + this.foOffset + ' ' + this.foOffset + ')' : '') +
@@ -1789,32 +2273,55 @@ mxSvgCanvas2D.prototype.updateTextNodes = function(x, y, w, h, align, valign, wr
 		this.setCssText(text, block);
 		this.setCssText(box, item);
 		
-		// Workaround for clipping in Webkit with scrolling and zoom
-		fo.setAttribute('width', Math.ceil(1 / Math.min(1, s) * 100) + '%');
-		fo.setAttribute('height', Math.ceil(1 / Math.min(1, s) * 100) + '%');
+		var xp = Math.round(x + dx);
 		var yp = Math.round(y + dy);
-		
-		// Allows for negative values which are causing problems with
-		// transformed content where the top edge of the foreignObject
-		// limits the text box being moved further up in the diagram.
-		// KNOWN: Possible clipping problems with zoom and scrolling
-		// but this is normally not used with scrollbars as the
-		// coordinates are always positive with scrollbars.
-		// Margin-top is ignored in Safari and no negative values allowed
-		// for padding.
-		if (yp < 0)
+
+		// Unrounded position of the text box for finding the rounding of the
+		// painted text in different canvases
+		g.textPosition = new mxPoint(x + dx, y + dy);
+
+		if (this.placeForeignObjects)
 		{
-			fo.setAttribute('y', yp);
-			flex += 'padding-top: 0; '; // To override padding-top in previous calls
+			// Places the foreignObject at the label so that no content is
+			// outside of its bounds, which WebKit clips
+			var m = this.foreignObjectMargin;
+			fo.setAttribute('x', xp - m);
+			fo.setAttribute('y', yp - m);
+			fo.setAttribute('width', Math.ceil(w) + 2 * m);
+			fo.setAttribute('height', Math.ceil(h) + 2 * m);
+			flex += 'padding-top: ' + m + 'px; ';
+			xp = m;
 		}
 		else
 		{
-			fo.removeAttribute('y');
-			flex += 'padding-top: ' + yp + 'px; ';
+			// Workaround for clipping in Webkit with scrolling and zoom
+			fo.setAttribute('width', Math.ceil(1 / Math.min(1, s) * 100) + '%');
+			fo.setAttribute('height', Math.ceil(1 / Math.min(1, s) * 100) + '%');
+			fo.removeAttribute('x');
+
+			// Allows for negative values which are causing problems with
+			// transformed content where the top edge of the foreignObject
+			// limits the text box being moved further up in the diagram.
+			// KNOWN: Possible clipping problems with zoom and scrolling
+			// but this is normally not used with scrollbars as the
+			// coordinates are always positive with scrollbars.
+			// Margin-top is ignored in Safari and no negative values allowed
+			// for padding.
+			if (yp < 0)
+			{
+				fo.setAttribute('y', yp);
+				flex += 'padding-top: 0; '; // To override padding-top in previous calls
+			}
+			else
+			{
+				fo.removeAttribute('y');
+				flex += 'padding-top: ' + yp + 'px; ';
+			}
 		}
-		
-		this.setCssText(div, flex + 'margin-left: ' + Math.round(x + dx) + 'px;');
-		t += ((r != 0) ? ('rotate(' + r + ' ' + x + ' ' + y + ')') : '');
+
+		this.setCssText(div, flex + 'margin-left: ' + xp + 'px;');
+		t += ((r != 0) ? ('rotate(' + r + ' ' + this.format(x) + ' ' +
+			this.format(y) + ')') : '');
 
 		// Output allows for reflow but Safari cannot use absolute position,
 		// transforms or opacity. https://bugs.webkit.org/show_bug.cgi?id=23113
@@ -1835,13 +2342,13 @@ mxSvgCanvas2D.prototype.updateTextNodes = function(x, y, w, h, align, valign, wr
 		{
 			g.removeAttribute('opacity');
 		}
-	}));
+	}), this.state.fontBorderWidth);
 };
 
 /**
  * Updates existing DOM nodes for text rendering.
  */
-mxSvgCanvas2D.createCss = function(w, h, align, valign, wrap, overflow, clip, dir, bg, border, flex, block, s, callback)
+mxSvgCanvas2D.createCss = function(w, h, align, valign, wrap, overflow, clip, dir, bg, border, padding, flex, block, s, callback, borderWidth)
 {
 	var vertical = dir != null && dir.substring(0, 9) == 'vertical-';
 	var item = 'box-sizing: border-box; font-size: 0; ';
@@ -1925,10 +2432,35 @@ mxSvgCanvas2D.createCss = function(w, h, align, valign, wrap, overflow, clip, di
 		bgc += 'background-color: ' + bg + '; ';
 	}
 	
+	// Border widths other than 1 grow or shrink the box around the text
+	// like the padding (see margin below)
+	var bw = (border != null && borderWidth != null) ? borderWidth : 1;
+	var grow = (border != null) ? bw - 1 : 0;
+
 	if (border != null)
 	{
 		// Duplicates border properties for inherit color fallback over border CSS
-		bgc += 'border-width: 1px; border-style: solid; border-color: inherit; border: 1px solid ' + border + '; ';
+		bgc += 'border-width: ' + bw + 'px; border-style: solid; border-color: inherit; ' +
+			'border: ' + bw + 'px solid ' + border + '; ';
+	}
+
+	if (bgc != '' && (padding != null || grow != 0))
+	{
+		var p = (padding != null) ? padding : {top: 0, right: 0, bottom: 0, left: 0};
+
+		if (padding != null)
+		{
+			bgc += 'padding: ' + p.top + 'px ' + p.right + 'px ' +
+				p.bottom + 'px ' + p.left + 'px; ';
+		}
+
+		if (ofl == '' || clip)
+		{
+			// Grows the painted background box around the text without moving
+			// the text or changing the wrapping width
+			bgc += 'margin: ' + (-p.top - grow) + 'px ' + (-p.right - grow) + 'px ' +
+				(-p.bottom - grow) + 'px ' + (-p.left - grow) + 'px; ';
+		}
 	}
 
 	if (ofl == '' || clip)
@@ -2016,9 +2548,14 @@ mxSvgCanvas2D.prototype.getTextCss = function()
 	{
 		deco.push('line-through');
 	}
-	
+
 	if (deco.length > 0)
 	{
+		if ((s.fontStyle & mxConstants.FONT_UNDERLINE_DOTTED) == mxConstants.FONT_UNDERLINE_DOTTED)
+		{
+			deco.push('dotted');
+		}
+
 		css += 'text-decoration: ' + deco.join(' ') + '; ';
 	}
 
@@ -2028,122 +2565,760 @@ mxSvgCanvas2D.prototype.getTextCss = function()
 /**
  * Function: convertHtmlToSvg
  * 
+ * Converts the child nodes of the given HTML element to SVG text and tspan
+ * elements using <mxUtils.convertHtmlToSvg> and returns true if the
+ * conversion was possible. Returns false if the content cannot be converted
+ * (eg. unsupported HTML or vertical writing-mode), in which case the caller
+ * falls back to foreignObject.
  */
-mxSvgCanvas2D.prototype.convertHtmlToSvg = function(elt, text, offset, fontScale)
+mxSvgCanvas2D.prototype.convertHtmlToSvg = function(elt, text, offset, fontScale, dir)
 {
-	var result = true;
+	return mxUtils.convertHtmlToSvg(elt, text, offset, {dir: dir,
+		fontScale: fontScale, fontSize: this.state.fontSize,
+		createElement: mxUtils.bind(this, this.createElement)});
+};
+/**
+ * Function: wrapSvgTextElement
+ *
+ * Wraps a single SVG <text> element (with tspan children) into multiple
+ * <text> elements if the content exceeds maxWidth. Handles nested tspan
+ * trees by flattening into leaf segments with accumulated styling.
+ * Returns null if no wrapping is needed, otherwise returns
+ * {elements, totalHeight}.
+ */
+mxSvgCanvas2D.prototype.wrapSvgTextElement = function(textEl, maxWidth)
+{
+	var s = this.state;
+	var fontSize = s.fontSize;
+	var fontFamily = s.fontFamily;
+	var fontStyleBits = s.fontStyle;
+	var self = this;
 
-	if (elt != null)
+	// Step 1: Flatten the tspan tree into leaf segments with accumulated styling.
+	// Each leaf has: text, all inherited SVG attributes and CSS, and the
+	// absolute dy offset (for superscript/subscript positioning).
+	var segments = [];
+	var runningDy = 0;
+
+	function collectLeaves(parent, inherited)
 	{
-		fontScale = (fontScale != null) ? fontScale : 1;
-		var currentDy = 0;
-
-		function setCurrentDy(tspan, dy)
+		for (var i = 0; i < parent.childNodes.length; i++)
 		{
-			if (currentDy != 0 || dy != 0)
-			{
-				tspan.setAttribute('dy', (dy - currentDy) + 'em');
-			}
-
-			currentDy = dy;
-		};
-
-		for (var i = 0; i < elt.childNodes.length && result; i++)
-		{
-			var tspan = this.createElement('tspan');
-			var child = elt.childNodes[i];
-			var dy = 0;
+			var child = parent.childNodes[i];
 
 			if (child.nodeType == mxConstants.NODETYPE_TEXT)
 			{
-				mxUtils.write(tspan, child.nodeValue);
+				if (child.nodeValue.length > 0)
+				{
+					segments.push({
+						text: child.nodeValue,
+						attrs: copyObj(inherited.attrs),
+						css: copyObj(inherited.css),
+						absoluteDy: runningDy
+					});
+				}
 			}
-			else if (child.style.backgroundColor == '' &&
-				(child.nodeName == 'SUP' || child.nodeName == 'SUB' ||
-				child.nodeName == 'B' || child.nodeName == 'I' ||
-				child.nodeName == 'SPAN' || child.nodeName == 'FONT' ||
-				child.nodeName == 'STRIKE' || child.nodeName == 'U'))
+			else if (child.nodeType == mxConstants.NODETYPE_ELEMENT)
 			{
-				// Uses original CSS style
-				if (child.style.cssText != '')
+				var newInherited = {
+					attrs: copyObj(inherited.attrs),
+					css: copyObj(inherited.css)
+				};
+
+				// Merge SVG attributes from this element
+				var attrNames = ['font-weight', 'font-style', 'fill', 'text-decoration'];
+
+				for (var a = 0; a < attrNames.length; a++)
 				{
-					tspan.style.cssText = child.style.cssText;
+					var val = child.getAttribute(attrNames[a]);
+
+					if (val != null)
+					{
+						newInherited.attrs[attrNames[a]] = val;
+					}
 				}
 
-				// CSS color is fill in SVG
-				if (child.style.color != '')
+				// Merge CSS styles from this element
+				if (child.style != null)
 				{
-					var cssColor = mxUtils.getLightDarkColor(child.style.color);
-					tspan.setAttribute('fill', cssColor.light);
-					tspan.style.fill = cssColor.cssText;
-					tspan.style.color = '';
-				}
-
-				var fontSize = tspan.style.fontSize || '';
-
-				if (child.nodeName == 'SUP' || child.nodeName == 'SUB')
-				{
-					if (fontSize == '')
+					if (child.style.cssText != '')
 					{
-						tspan.style.fontSize = 'smaller';
-						fontScale = 1.2;
-					}
+						// Parse individual CSS properties from cssText
+						var props = child.style.cssText.split(';');
 
-					if (child.nodeName == 'SUP' && offset.y == 0)
-					{
-						offset.y = -0.25;
-					}
-					else if (child.nodeName == 'SUB')
-					{
-						offset.y = Math.max(offset.y, 0.25);
+						for (var p = 0; p < props.length; p++)
+						{
+							var parts = props[p].split(':');
+
+							if (parts.length == 2)
+							{
+								var key = parts[0].trim();
+								var val = parts[1].trim();
+
+								if (key.length > 0 && val.length > 0)
+								{
+									newInherited.css[key] = val;
+								}
+							}
+						}
 					}
 
-					dy = child.nodeName == 'SUP' ? -0.45 : 0.25;
+					// CSS fill overrides color for SVG
+					if (child.style.fill)
+					{
+						newInherited.css['fill'] = child.style.fill;
+					}
 				}
-				else
+
+				// Track dy for superscript/subscript
+				var dyAttr = child.getAttribute('dy');
+
+				if (dyAttr != null)
 				{
-					if (child.nodeName == 'I')
-					{
-						tspan.setAttribute('font-style', 'italic');
-					}
-					else if (child.nodeName == 'B')
-					{
-						tspan.setAttribute('font-weight', 'bold');
-					}
-					else if (child.nodeName == 'STRIKE')
-					{
-						tspan.setAttribute('text-decoration', 'line-through');
-					}
-					else if (child.nodeName == 'U')
-					{
-						tspan.setAttribute('text-decoration', 'underline');
-					}
+					runningDy += parseFloat(dyAttr);
 				}
-				
-				if (fontSize.slice(-2) == 'px')
-				{
-					tspan.style.fontSize = (parseFloat(fontSize) *
-						fontScale / this.state.fontSize) + 'em';
-				}
-				
-				result = this.convertHtmlToSvg(child, tspan, offset, fontScale);
+
+				collectLeaves(child, newInherited);
 			}
-			else
-			{
-				result = false;
-			}
-			
-			setCurrentDy(tspan, dy);
-			text.appendChild(tspan);
 		}
 	}
 
-	return result;
+	function copyObj(obj)
+	{
+		var result = {};
+
+		for (var key in obj)
+		{
+			if (obj.hasOwnProperty(key))
+			{
+				result[key] = obj[key];
+			}
+		}
+
+		return result;
+	}
+
+	collectLeaves(textEl, {attrs: {}, css: {}});
+
+	if (segments.length == 0)
+	{
+		return null;
+	}
+
+	// Step 2: Split segments into word tokens
+	var tokens = [];
+
+	for (var i = 0; i < segments.length; i++)
+	{
+		var parts = segments[i].text.split(/(\s+)/);
+
+		for (var j = 0; j < parts.length; j++)
+		{
+			if (parts[j].length > 0)
+			{
+				tokens.push({
+					text: parts[j],
+					segIdx: i,
+					isSpace: /^\s+$/.test(parts[j])
+				});
+			}
+		}
+	}
+
+	// Step 3: Measure words using canvas
+	var canvas = document.createElement('canvas');
+	var ctx = canvas.getContext('2d');
+
+	function getFont(segIdx)
+	{
+		var seg = segments[segIdx];
+		var fw = seg.attrs['font-weight'] || '';
+		var fs = seg.attrs['font-style'] || '';
+		var ff = fontFamily;
+		var fz = fontSize;
+
+		// CSS properties override attributes
+		if (seg.css['font-weight'])
+		{
+			fw = seg.css['font-weight'];
+		}
+
+		if (seg.css['font-style'])
+		{
+			fs = seg.css['font-style'];
+		}
+
+		if (seg.css['font-family'])
+		{
+			ff = seg.css['font-family'];
+		}
+
+		if (seg.css['font-size'])
+		{
+			var sz = seg.css['font-size'];
+
+			if (sz == 'smaller')
+			{
+				fz = fontSize / 1.2;
+			}
+			else if (sz.indexOf('em') >= 0)
+			{
+				fz = parseFloat(sz) * fontSize;
+			}
+			else if (sz.indexOf('px') >= 0)
+			{
+				fz = parseFloat(sz);
+			}
+		}
+
+		// Inherit base font style if no explicit style
+		if (!fw && (fontStyleBits & mxConstants.FONT_BOLD) == mxConstants.FONT_BOLD)
+		{
+			fw = 'bold';
+		}
+
+		if (!fs && (fontStyleBits & mxConstants.FONT_ITALIC) == mxConstants.FONT_ITALIC)
+		{
+			fs = 'italic';
+		}
+
+		return fs + ' ' + fw + ' ' + fz + 'px ' + ff;
+	}
+
+	function getFontSize(segIdx)
+	{
+		var seg = segments[segIdx];
+		var fz = fontSize;
+
+		var sz = seg.css['font-size'];
+
+		if (sz != null)
+		{
+			if (sz == 'smaller')
+			{
+				fz = fontSize / 1.2;
+			}
+			else if (sz.indexOf('em') >= 0)
+			{
+				fz = parseFloat(sz) * fontSize;
+			}
+			else if (sz.indexOf('px') >= 0)
+			{
+				fz = parseFloat(sz);
+			}
+		}
+
+		return fz;
+	}
+
+	function measureWord(token)
+	{
+		ctx.font = getFont(token.segIdx);
+
+		return ctx.measureText(token.text).width;
+	}
+
+	// Step 4: Layout tokens into lines. With a text flow (shapeInside) the
+	// available width and horizontal offset are resolved per line from the
+	// flow provider, including a push down when a word does not fit the
+	// current band and a second pass for the vertical alignment (the line
+	// widths depend on the vertical start position within the shape).
+	var flow = this.textFlow;
+	var lineExtras = null;
+	var lines = [[]];
+	var lineWidth = 0;
+
+	if (flow != null)
+	{
+		var lh = fontSize * mxConstants.LINE_HEIGHT;
+
+		var layoutFlow = function(startY)
+		{
+			var res = {lines: [[]], extras: [], height: 0};
+			var cursor = startY;
+			var band = flow.available(cursor, cursor + lh);
+			res.extras.push({x: band.x, width: band.width, shift: 0});
+			var lw = 0;
+
+			function newLine()
+			{
+				var cur = res.lines[res.lines.length - 1];
+
+				if (cur.length > 0 && cur[cur.length - 1].isSpace)
+				{
+					cur.pop();
+				}
+
+				cursor += lh;
+				res.lines.push([]);
+				band = flow.available(cursor, cursor + lh);
+				res.extras.push({x: band.x, width: band.width, shift: 0});
+				lw = 0;
+			};
+
+			for (var i = 0; i < tokens.length; i++)
+			{
+				var token = tokens[i];
+
+				if (token.width == null)
+				{
+					token.width = measureWord(token);
+				}
+
+				if (token.isSpace)
+				{
+					if (lw > 0)
+					{
+						res.lines[res.lines.length - 1].push(token);
+						lw += token.width;
+					}
+
+					continue;
+				}
+
+				var atWordBoundary = i > 0 && tokens[i - 1].isSpace;
+
+				if (lw + token.width > band.width && lw > 0 && atWordBoundary)
+				{
+					newLine();
+				}
+
+				// Pushes empty lines down until the word fits the band
+				var guard = 0;
+
+				while (lw == 0 && token.width > band.width &&
+					cursor - startY < flow.boxHeight && guard++ < 400)
+				{
+					cursor += lh;
+					var extra = res.extras[res.extras.length - 1];
+					extra.shift += lh;
+					band = flow.available(cursor, cursor + lh);
+					extra.x = band.x;
+					extra.width = band.width;
+				}
+
+				res.lines[res.lines.length - 1].push(token);
+				lw += token.width;
+			}
+
+			res.height = (cursor + lh) - startY;
+
+			return res;
+		};
+
+		// Iterates the vertical start position (may be negative when the
+		// text overflows the shape) so that the line widths match where
+		// plainText places the block via totalHeight
+		var flowLayout = layoutFlow(0);
+		var startY = 0;
+
+		for (var p = 0; p < 3; p++)
+		{
+			var nextY = 0;
+
+			if (flow.valign == mxConstants.ALIGN_MIDDLE)
+			{
+				nextY = (flow.boxHeight - flowLayout.height) / 2;
+			}
+			else if (flow.valign == mxConstants.ALIGN_BOTTOM)
+			{
+				nextY = flow.boxHeight - flowLayout.height;
+			}
+			else
+			{
+				break;
+			}
+
+			if (Math.abs(nextY - startY) < 1)
+			{
+				break;
+			}
+
+			startY = nextY;
+			flowLayout = layoutFlow(startY);
+		}
+
+		lines = flowLayout.lines;
+		lineExtras = flowLayout.extras;
+	}
+	else
+	{
+
+	for (var i = 0; i < tokens.length; i++)
+	{
+		var token = tokens[i];
+		var w = measureWord(token);
+		token.width = w;
+
+		if (token.isSpace)
+		{
+			if (lineWidth > 0)
+			{
+				lines[lines.length - 1].push(token);
+				lineWidth += w;
+			}
+
+			continue;
+		}
+
+		// Only wrap at word boundaries (where previous token was whitespace).
+		// Tokens from adjacent segments without whitespace between them
+		// (e.g. "Second" + <sup>"2"</sup> + "line") form a single word.
+		var atWordBoundary = i > 0 && tokens[i - 1].isSpace;
+
+		if (lineWidth + w > maxWidth && lineWidth > 0 && atWordBoundary)
+		{
+			// Remove trailing space from current line
+			var curLine = lines[lines.length - 1];
+
+			if (curLine.length > 0 && curLine[curLine.length - 1].isSpace)
+			{
+				curLine.pop();
+			}
+
+			lines.push([]);
+			lineWidth = 0;
+		}
+
+		lines[lines.length - 1].push(token);
+		lineWidth += w;
+	}
+
+	}
+
+	// Widest rendered line (trailing whitespace trimmed), measured with the
+	// same canvas metrics used for the wrap decision. adjustBlockTextOverflow
+	// uses this as the content width to start-anchor overflowing clipped text,
+	// so the overflow shift works without getBBox (which returns nothing when
+	// the group is not in the live document, e.g. during SVG export).
+	var maxLineWidth = 0;
+
+	for (var li = 0; li < lines.length; li++)
+	{
+		var measuredLine = lines[li];
+		var lineEnd = measuredLine.length;
+
+		while (lineEnd > 0 && measuredLine[lineEnd - 1].isSpace)
+		{
+			lineEnd--;
+		}
+
+		var measuredWidth = 0;
+
+		for (var lk = 0; lk < lineEnd; lk++)
+		{
+			measuredWidth += measuredLine[lk].width;
+		}
+
+		if (measuredWidth > maxLineWidth)
+		{
+			maxLineWidth = measuredWidth;
+		}
+	}
+
+	if (flow == null && lines.length <= 1)
+	{
+		// No wrapping needed, but expose the single-line width so block-mode
+		// overflow anchoring still works for unbreakable content wider than
+		// the cell. With a text flow all lines carry offsets, so even a
+		// single line is emitted below.
+		return {elements: null, totalHeight: 0, maxLineWidth: maxLineWidth};
+	}
+
+	// Step 5: Build SVG text elements for each line with proper styling.
+	// Uses per-line max font size for line height to match HTML line box
+	// behavior (same as getMaxInlineFontSize in convertHtmlBlocksToSvg).
+	var result = [];
+	var cursorY = 0;
+
+	for (var i = 0; i < lines.length; i++)
+	{
+		var line = lines[i];
+
+		if (line.length == 0)
+		{
+			continue;
+		}
+
+		// Finds the maximum font size on this line
+		var lineFontSize = fontSize;
+
+		for (var k = 0; k < line.length; k++)
+		{
+			if (!line[k].isSpace)
+			{
+				lineFontSize = Math.max(lineFontSize,
+					getFontSize(line[k].segIdx));
+			}
+		}
+
+		// Adds the push down of the text flow for this line
+		if (lineExtras != null && lineExtras[i] != null)
+		{
+			cursorY += lineExtras[i].shift;
+		}
+
+		// Adds baseline (ascent) for this line
+		cursorY += lineFontSize;
+
+		var newText = self.createElement('text');
+		newText.setAttribute('y', self.format(cursorY));
+
+		// Offsets the line to the available interval of the text flow,
+		// relative to the anchor of the alignment
+		if (lineExtras != null && lineExtras[i] != null)
+		{
+			var extra = lineExtras[i];
+			var lineX = (flow.align == mxConstants.ALIGN_LEFT) ? extra.x :
+				((flow.align == mxConstants.ALIGN_RIGHT) ?
+					extra.x + extra.width - flow.boxWidth :
+					extra.x + extra.width / 2 - flow.boxWidth / 2);
+			newText.setAttribute('x', self.format(lineX));
+		}
+
+		// Group consecutive tokens from the same segment and build tspans
+		var j = 0;
+		var prevAbsDy = 0;
+
+		while (j < line.length)
+		{
+			var segIdx = line[j].segIdx;
+			var combined = '';
+
+			while (j < line.length && line[j].segIdx == segIdx)
+			{
+				combined += line[j].text;
+				j++;
+			}
+
+			// Trim trailing whitespace from last group on the line
+			if (j == line.length)
+			{
+				combined = combined.replace(/\s+$/, '');
+			}
+
+			if (combined.length > 0)
+			{
+				var seg = segments[segIdx];
+				var tspan = self.createElement('tspan');
+
+				// Apply SVG attributes
+				for (var key in seg.attrs)
+				{
+					if (seg.attrs.hasOwnProperty(key))
+					{
+						tspan.setAttribute(key, seg.attrs[key]);
+					}
+				}
+
+				// Apply CSS properties
+				var cssText = '';
+
+				for (var key in seg.css)
+				{
+					if (seg.css.hasOwnProperty(key) && key != 'color' &&
+						key != 'fill')
+					{
+						cssText += key + ': ' + seg.css[key] + '; ';
+					}
+				}
+
+				if (cssText.length > 0)
+				{
+					tspan.style.cssText = cssText;
+				}
+
+				// Apply CSS fill separately (mapped from color)
+				if (seg.css['fill'])
+				{
+					tspan.style.fill = seg.css['fill'];
+				}
+
+				// Handle dy for superscript/subscript within this line
+				// absoluteDy is set by convertHtmlInlineToSvg
+				var targetDy = seg.absoluteDy;
+
+				if (targetDy != prevAbsDy)
+				{
+					tspan.setAttribute('dy', Math.round((targetDy - prevAbsDy) * 100) / 100);
+					prevAbsDy = targetDy;
+				}
+
+				tspan.textContent = combined;
+				newText.appendChild(tspan);
+			}
+		}
+
+		result.push(newText);
+
+		// Adds descender to match HTML line box height
+		var lineDescender = lineFontSize * (mxConstants.LINE_HEIGHT - 1);
+
+		// Checks for sup/sub segments on this line and expands line box
+		var minDy = 0;
+		var maxDy = 0;
+
+		var minDyFontSize = null;
+		var maxDyFontSize = null;
+
+		for (var k = 0; k < line.length; k++)
+		{
+			if (!line[k].isSpace)
+			{
+				var seg = segments[line[k].segIdx];
+				var segDy = seg.absoluteDy;
+
+				if (segDy < minDy)
+				{
+					minDy = segDy;
+					minDyFontSize = getFontSize(line[k].segIdx);
+				}
+
+				if (segDy > maxDy)
+				{
+					maxDy = segDy;
+					maxDyFontSize = getFontSize(line[k].segIdx);
+				}
+			}
+		}
+
+		if (minDy < 0)
+		{
+			lineDescender += mxUtils.getSupSubLineExpansion(
+				lineFontSize, minDy, null, minDyFontSize, null);
+		}
+
+		if (maxDy > 0)
+		{
+			lineDescender += mxUtils.getSupSubLineExpansion(
+				lineFontSize, null, maxDy, null, maxDyFontSize);
+		}
+
+		cursorY += lineDescender;
+	}
+
+	return {
+		elements: result,
+		totalHeight: cursorY,
+		maxLineWidth: maxLineWidth
+	};
+};
+
+/**
+ * Function: wrapSvgBlockElements
+ *
+ * Wraps text within each <text> element of a block-mode group. Replaces
+ * wide text elements with multiple wrapped lines and adjusts y positions.
+ * Modifies the group and offset.textHeight in place, and sets
+ * offset.maxLineWidth to the widest rendered line across all blocks.
+ */
+mxSvgCanvas2D.prototype.wrapSvgBlockElements = function(group, maxWidth, offset)
+{
+	var fontSize = this.state.fontSize;
+	var lh = Math.round(fontSize * mxConstants.LINE_HEIGHT);
+	var children = [];
+
+	for (var i = 0; i < group.childNodes.length; i++)
+	{
+		if (group.childNodes[i].nodeName == 'text')
+		{
+			children.push(group.childNodes[i]);
+		}
+	}
+
+	var heightDelta = 0;
+	var maxLineWidth = 0;
+
+	for (var i = 0; i < children.length; i++)
+	{
+		var textEl = children[i];
+		var blockFontSize = parseFloat(textEl.getAttribute('font-size')) || fontSize;
+		var wrapped = this.wrapSvgTextElement(textEl, maxWidth);
+
+		// Tracks the widest line across all blocks (set whether or not the
+		// block itself wrapped) for the overflow anchoring in plainText.
+		if (wrapped != null && wrapped.maxLineWidth > maxLineWidth)
+		{
+			maxLineWidth = wrapped.maxLineWidth;
+		}
+
+		// A block with only whitespace has no lines in a text flow and keeps
+		// its single line like an unwrapped block
+		if (wrapped != null && wrapped.elements != null &&
+			wrapped.elements.length > 0)
+		{
+			var origY = parseFloat(textEl.getAttribute('y')) || 0;
+			origY += heightDelta;
+
+			// Uses y positions from wrapSvgTextElement which account for
+			// per-line font size variations (mixed font sizes within text)
+			var firstWrappedY = parseFloat(wrapped.elements[0].getAttribute('y')) || 0;
+			var lineFontSize = parseFloat(textEl.getAttribute('data-line-font-size')) || blockFontSize;
+
+			// Adjusts origin when the first wrapped line has a smaller max
+			// font than the original unwrapped line. In HTML, the line box
+			// height is determined by the tallest element on that specific
+			// line, not across all lines. When wrapping moves the tall
+			// element to a later line, the first line's ascent shrinks.
+			var ascentAdjustment = lineFontSize - firstWrappedY;
+			origY -= ascentAdjustment;
+
+			for (var j = 0; j < wrapped.elements.length; j++)
+			{
+				var newEl = wrapped.elements[j];
+				var wrappedY = parseFloat(newEl.getAttribute('y')) || 0;
+				newEl.setAttribute('y', this.format(origY + (wrappedY - firstWrappedY)));
+
+				// Copy block-level attributes from original
+				if (textEl.getAttribute('font-size'))
+				{
+					newEl.setAttribute('font-size', textEl.getAttribute('font-size'));
+				}
+
+				if (textEl.getAttribute('font-weight'))
+				{
+					newEl.setAttribute('font-weight', textEl.getAttribute('font-weight'));
+				}
+
+				if (textEl.getAttribute('font-family'))
+				{
+					newEl.setAttribute('font-family', textEl.getAttribute('font-family'));
+				}
+
+				if (textEl.getAttribute('fill'))
+				{
+					newEl.setAttribute('fill', textEl.getAttribute('fill'));
+					newEl.style.fill = textEl.style.fill;
+				}
+
+				group.insertBefore(newEl, textEl);
+			}
+
+			group.removeChild(textEl);
+
+			// Height delta accounts for both the reduced ascent on the first
+			// line and the extra height from additional wrapped lines.
+			heightDelta += wrapped.totalHeight - lineFontSize * mxConstants.LINE_HEIGHT;
+		}
+		else if (heightDelta != 0)
+		{
+			// Shift this element down by the accumulated delta
+			var origY = parseFloat(textEl.getAttribute('y')) || 0;
+			textEl.setAttribute('y', this.format(origY + heightDelta));
+		}
+	}
+
+	if (heightDelta != 0)
+	{
+		offset.textHeight += heightDelta;
+	}
+
+	offset.maxLineWidth = maxLineWidth;
 };
 
 /**
  * Function: text
- * 
+ *
  * Paints the given text. Possible values for format are empty string for plain
  * text and html for HTML markup. Note that HTML markup is only supported if
  * foreignObject is supported and <foEnabled> is true. (This means IE9 and later
@@ -2158,32 +3333,106 @@ mxSvgCanvas2D.prototype.text = function(x, y, w, h, str, align, valign, wrap, fo
 		if (this.foEnabled && format == 'html')
 		{
 			var div = this.createDiv(str);
-			
+
 			// Ignores invalid XHTML labels
 			if (div != null)
 			{
 				// Checks if it can be rendered using native SVG
 				var text = this.createElement('text');
 				var offset = new mxPoint(0, 0);
-				
+
+				// Falls back to foreignObject if the conversion is not possible,
+				// eg. for unsupported HTML or vertical writing-mode (see
+				// mxUtils.convertHtmlToSvg, which contains the checks)
 				if (this.allowConvertHtmlToSvg &&
-					this.convertHtmlToSvg(div.firstChild.firstChild, text, offset))
+					this.convertHtmlToSvg(div.firstChild.firstChild, text, offset, null, dir))
 				{
-					if (offset.y < 0 && valign == mxConstants.ALIGN_TOP)
+					if (offset.textHeight != null)
 					{
-						text.style.transform = 'translateY(' + (-offset.y) + 'em)';
+						// Block mode: text contains multiple <text> elements
+						var group = this.createElement('g');
+
+						while (text.firstChild)
+						{
+							group.appendChild(text.firstChild);
+						}
+
+						// Applies word wrapping within each block element
+						if (wrap && w > 0)
+						{
+							this.wrapSvgBlockElements(group,
+								w + this.foreignObjectPadding, offset);
+						}
+
+						// Measures HTML content width for overflow adjustment so
+						// centered/right clipped content wider than the cell is
+						// start-anchored (matching HTML overflow:hidden). For
+						// wrapped text this is the widest wrapped line, already
+						// measured by wrapSvgBlockElements with the same canvas
+						// metrics used for the wrap decision; for non-wrapped
+						// text it is measured from the live DOM. Both avoid
+						// getBBox, which is unavailable during SVG export.
+						var htmlContentWidth = null;
+
+						if (wrap)
+						{
+							htmlContentWidth = (offset.maxLineWidth != null) ?
+								offset.maxLineWidth : null;
+						}
+						else if (clip && (align == mxConstants.ALIGN_CENTER ||
+							align == mxConstants.ALIGN_RIGHT))
+						{
+							htmlContentWidth = this.measureHtmlContentWidth(
+								div.firstChild.firstChild);
+						}
+
+						this.plainText(x + this.state.dx, y + this.state.dy, w, h, '',
+							align, valign, wrap, overflow, clip, rotation, dir, group,
+							null, offset.textHeight, htmlContentWidth);
 					}
-					else if (offset.y > 0 && valign == mxConstants.ALIGN_BOTTOM)
+					else
 					{
-						text.style.transform = 'translateY(' + (-offset.y) + 'em)';
+						// Applies word wrapping for inline SVG text
+						if (wrap && w > 0)
+						{
+							var wrapped = this.wrapSvgTextElement(text,
+								w + this.foreignObjectPadding);
+
+							if (wrapped != null && wrapped.elements != null)
+							{
+								var group = this.createElement('g');
+
+								for (var i = 0; i < wrapped.elements.length; i++)
+								{
+									group.appendChild(wrapped.elements[i]);
+								}
+
+								// Word wrap applied: pass the widest wrapped line (canvas-measured)
+								// as content width so overflow anchoring works without getBBox.
+								this.plainText(x + this.state.dx, y + this.state.dy, w, h, '',
+									align, valign, wrap, overflow, clip, rotation, dir, group,
+									null, wrapped.totalHeight, wrapped.maxLineWidth);
+
+								return;
+							}
+						}
+
+						if (offset.y < 0 && valign == mxConstants.ALIGN_TOP)
+						{
+							text.style.transform = 'translateY(' + (-offset.y) + 'em)';
+						}
+						else if (offset.y > 0 && valign == mxConstants.ALIGN_BOTTOM)
+						{
+							text.style.transform = 'translateY(' + (-offset.y) + 'em)';
+						}
+						else if (offset.y > 0 && valign == mxConstants.ALIGN_TOP)
+						{
+							text.style.transform = 'translateY(' + offset.y + 'em)';
+						}
+
+						this.plainText(x + this.state.dx, y + this.state.dy, w, h, '',
+							align, valign, wrap, overflow, clip, rotation, dir, text);
 					}
-					else if (offset.y > 0 && valign == mxConstants.ALIGN_TOP)
-					{
-						text.style.transform = 'translateY(' + offset.y + 'em)';
-					}
-					
-					this.plainText(x + this.state.dx, y + this.state.dy, w, h, '',
-						align, valign, wrap, overflow, clip, rotation, dir, text);
 				}
 				else
 				{
@@ -2191,7 +3440,7 @@ mxSvgCanvas2D.prototype.text = function(x, y, w, h, str, align, valign, wrap, fo
 					{
 						div.setAttribute('dir', dir);
 					}
-					
+
 					this.addForeignObject(x, y, w, h, str, align, valign, wrap,
 						format, overflow, clip, rotation, dir, div, this.root);
 				}
@@ -2506,17 +3755,17 @@ mxSvgCanvas2D.prototype.setClip = function(node, c)
  * Paints the given text. Possible values for format are empty string for
  * plain text and html for HTML markup.
  */
-mxSvgCanvas2D.prototype.plainText = function(x, y, w, h, str, align, valign, wrap, overflow, clip, rotation, dir, textElement, node)
+mxSvgCanvas2D.prototype.plainText = function(x, y, w, h, str, align, valign, wrap, overflow, clip, rotation, dir, textElement, node, blockTextHeight, htmlContentWidth)
 {
 	rotation = (rotation != null) ? rotation : 0;
-	
+
 	var s = this.state;
 	var size = s.fontSize;
 	var tr = s.transform || '';
 
 	node = (node != null) ? node : this.addTitle(this.createElement('g'));
 	this.updateFont(node);
-				
+
 	// Ignores pointer events
 	if (!this.pointerEvents && this.originalRoot == null)
 	{
@@ -2526,13 +3775,13 @@ mxSvgCanvas2D.prototype.plainText = function(x, y, w, h, str, align, valign, wra
 	{
 		node.removeAttribute('pointer-events');
 	}
-		
+
 	// Non-rotated text
 	if (rotation != 0)
 	{
 		tr += 'rotate(' + rotation  + ',' + this.format(x * s.scale) + ',' + this.format(y * s.scale) + ')';
 	}
-	
+
 	if (dir != null && dir.substring(0, 9) != 'vertical-')
 	{
 		node.setAttribute('direction', dir);
@@ -2542,27 +3791,27 @@ mxSvgCanvas2D.prototype.plainText = function(x, y, w, h, str, align, valign, wra
 	var anchor = (align == mxConstants.ALIGN_RIGHT) ? 'end' :
 		(align == mxConstants.ALIGN_CENTER) ? 'middle' : 'start';
 
-	// Text-anchor start is default in SVG
-	if (anchor != 'start')
-	{
-		node.setAttribute('text-anchor', anchor);
-	}
-	
+	// Always set text-anchor explicitly to avoid inheriting
+	// a different value from a parent element
+	node.setAttribute('text-anchor', anchor);
+
 	if (tr.length > 0)
 	{
 		node.setAttribute('transform', tr);
 	}
-	
+
 	if (s.alpha < 1)
 	{
 		node.setAttribute('opacity', s.alpha);
 	}
-	
+
 	var lines = str.split('\n');
 	var lh = Math.round(size * mxConstants.LINE_HEIGHT);
-	var textHeight = size + (lines.length - 1) * lh;
+	var textHeight = (blockTextHeight != null) ? blockTextHeight :
+		size + (lines.length - 1) * lh;
 
-	var cy = y + size - 1;
+	// For block mode, y offsets on child elements already include baseline
+	var cy = (blockTextHeight != null) ? y : y + size - 1;
 
 	if (valign == mxConstants.ALIGN_MIDDLE)
 	{
@@ -2592,21 +3841,118 @@ mxSvgCanvas2D.prototype.plainText = function(x, y, w, h, str, align, valign, wra
 
 	if (textElement != null)
 	{
-		textElement.setAttribute('x', this.format(x * s.scale) + this.textOffset);
-		textElement.setAttribute('y', this.format(cy * s.scale) + this.textOffset);
-		node.appendChild(textElement);
-		this.root.appendChild(node);
+		if (blockTextHeight != null)
+		{
+			// Block mode: textElement is a <g> with multiple <text> children
+			// Uses transform with scale to position the group; child y offsets
+			// and font-sizes remain in unscaled coordinates so that only the
+			// group transform needs updating on zoom change
+			var tx = this.format(x * s.scale) + this.textOffset;
+			var ty = this.format(cy * s.scale) + this.textOffset;
+			textElement.setAttribute('transform', 'translate(' + tx + ',' + ty + ') scale(' + s.scale + ')');
 
-		//node.setAttribute('transform', 'scale(' + s.scale + ')');
-		node.setAttribute('font-size', (size * s.scale) + 'px');
+			// Stores block text height for updateText
+			node.setAttribute('data-blockTextHeight', blockTextHeight);
+
+			// Stores HTML content width for updateText overflow adjustment
+			if (htmlContentWidth != null)
+			{
+				node.setAttribute('data-htmlContentWidth', htmlContentWidth);
+			}
+
+			// Sets x on each child <text> for horizontal alignment
+			var children = textElement.childNodes;
+
+			for (var i = 0; i < children.length; i++)
+			{
+				if (children[i].nodeName == 'text')
+				{
+					var existingDx = parseFloat(children[i].getAttribute('dx')) || 0;
+
+					// Adjusts indent based on alignment direction:
+					// start (left): positive x pushes text right
+					// end (right): negative x pulls text end left
+					// middle (center): no indent offset
+					var indentX = (anchor == 'start') ? existingDx :
+						((anchor == 'end') ? -existingDx : 0);
+					children[i].setAttribute('x', indentX);
+					children[i].removeAttribute('dx');
+				}
+			}
+
+			node.appendChild(textElement);
+			this.root.appendChild(node);
+			node.setAttribute('font-size', size + 'px');
+
+			// Adjusts position to match HTML overflow:hidden behavior where
+			// centered/right content wider than the container is left-aligned
+			if (clip && (anchor == 'middle' || anchor == 'end'))
+			{
+				this.adjustBlockTextOverflow(textElement, x, cy, w, s.scale, htmlContentWidth, align);
+			}
+		}
+		else
+		{
+			// Inline mode: wraps text in a <g> with translate+scale transform,
+			// consistent with block mode so that dy values on tspan children
+			// (computed from unscaled font sizes) scale correctly with zoom
+			var inlineGroup = this.createElement('g');
+			var tx = this.format(x * s.scale) + this.textOffset;
+			var ty = this.format(cy * s.scale) + this.textOffset;
+			inlineGroup.setAttribute('transform', 'translate(' + tx + ',' + ty + ') scale(' + s.scale + ')');
+			inlineGroup.appendChild(textElement);
+			node.appendChild(inlineGroup);
+			this.root.appendChild(node);
+
+			node.setAttribute('font-size', size + 'px');
+		}
 	}
 	else if (node.parentNode != null)
 	{
-		node.firstChild.setAttribute('x', this.format(x * s.scale) + this.textOffset);
-		node.firstChild.setAttribute('y', this.format(cy * s.scale) + this.textOffset);
+		if (blockTextHeight != null)
+		{
+			// Block mode update: find the <g> textElement and update its transform
+			var textGroup = node.firstChild;
 
-		//node.setAttribute('transform', 'scale(' + s.scale + ')');
-		node.setAttribute('font-size', (size * s.scale) + 'px');
+			if (textGroup != null && textGroup.nodeName == 'title')
+			{
+				textGroup = textGroup.nextSibling;
+			}
+
+			if (textGroup != null && textGroup.nodeName == 'g')
+			{
+				var tx = this.format(x * s.scale) + this.textOffset;
+				var ty = this.format(cy * s.scale) + this.textOffset;
+				textGroup.setAttribute('transform', 'translate(' + tx + ',' + ty + ') scale(' + s.scale + ')');
+
+				// Adjusts position to match HTML overflow:hidden behavior
+				if (clip && (align == mxConstants.ALIGN_CENTER ||
+					align == mxConstants.ALIGN_RIGHT))
+				{
+					var storedWidth = parseFloat(node.getAttribute('data-htmlContentWidth'));
+					this.adjustBlockTextOverflow(textGroup, x, cy, w, s.scale,
+						isNaN(storedWidth) ? null : storedWidth, align);
+				}
+			}
+
+			node.setAttribute('font-size', size + 'px');
+		}
+		else
+		{
+			// Inline mode update: uses transform with scale, consistent with initial render
+			var textChild = node.firstChild;
+
+			if (textChild != null && textChild.nodeName == 'title')
+			{
+				textChild = textChild.nextSibling;
+			}
+
+			var tx = this.format(x * s.scale) + this.textOffset;
+			var ty = this.format(cy * s.scale) + this.textOffset;
+			textChild.setAttribute('transform', 'translate(' + tx + ',' + ty + ') scale(' + s.scale + ')');
+
+			node.setAttribute('font-size', size + 'px');
+		}
 	}
 	else
 	{
@@ -2614,7 +3960,7 @@ mxSvgCanvas2D.prototype.plainText = function(x, y, w, h, str, align, valign, wra
 		{
 			node.setAttribute('font-size', (size * s.scale) + 'px');
 		}
-		
+
 		for (var i = 0; i < lines.length; i++)
 		{
 			// Workaround for bounding box of empty lines and spaces
@@ -2624,7 +3970,7 @@ mxSvgCanvas2D.prototype.plainText = function(x, y, w, h, str, align, valign, wra
 				// LATER: Match horizontal HTML alignment
 				text.setAttribute('x', this.format(x * s.scale) + this.textOffset);
 				text.setAttribute('y', this.format(cy * s.scale) + this.textOffset);
-		
+
 				mxUtils.write(text, lines[i]);
 				node.appendChild(text);
 			}
@@ -2635,12 +3981,12 @@ mxSvgCanvas2D.prototype.plainText = function(x, y, w, h, str, align, valign, wra
 		this.root.appendChild(node);
 		this.addTextBackground(node, str, x, y, w, (overflow == 'fill') ? h : textHeight, align, valign, overflow);
 	}
-	
+
 	if (clip && w > 0 && h > 0)
 	{
 		var cx = x;
 		var cy = y;
-		
+
 		if (align == mxConstants.ALIGN_CENTER)
 		{
 			cx -= w / 2;
@@ -2649,7 +3995,7 @@ mxSvgCanvas2D.prototype.plainText = function(x, y, w, h, str, align, valign, wra
 		{
 			cx -= w;
 		}
-		
+
 		if (overflow != 'fill')
 		{
 			if (valign == mxConstants.ALIGN_MIDDLE)
@@ -2661,7 +4007,7 @@ mxSvgCanvas2D.prototype.plainText = function(x, y, w, h, str, align, valign, wra
 				cy -= h;
 			}
 		}
-		
+
 		// LATER: Remove spacing from clip rectangle
 		this.setClip(node, this.createClip(
 			cx * s.scale - 2, cy * s.scale - 2,
@@ -2670,8 +4016,86 @@ mxSvgCanvas2D.prototype.plainText = function(x, y, w, h, str, align, valign, wra
 };
 
 /**
+ * Function: measureHtmlContentWidth
+ *
+ * Measures the max-content width of an HTML element by temporarily rendering
+ * it in the document. Returns the width in CSS pixels, or null on failure.
+ */
+mxSvgCanvas2D.prototype.measureHtmlContentWidth = function(contentElt)
+{
+	try
+	{
+		var s = this.state;
+		var container = document.createElement('div');
+		container.style.cssText = 'position:absolute;visibility:hidden;' +
+			'display:inline-block;white-space:nowrap;' +
+			'font-size:' + s.fontSize + 'px;' +
+			'font-family:' + mxUtils.parseCssFontFamily(s.fontFamily, true) + ';' +
+			'line-height:' + (s.fontSize * mxConstants.LINE_HEIGHT) + 'px;';
+
+		if ((s.fontStyle & mxConstants.FONT_BOLD) == mxConstants.FONT_BOLD)
+		{
+			container.style.fontWeight = 'bold';
+		}
+
+		if ((s.fontStyle & mxConstants.FONT_ITALIC) == mxConstants.FONT_ITALIC)
+		{
+			container.style.fontStyle = 'italic';
+		}
+
+		for (var i = 0; i < contentElt.childNodes.length; i++)
+		{
+			container.appendChild(contentElt.childNodes[i].cloneNode(true));
+		}
+
+		document.body.appendChild(container);
+		var width = container.offsetWidth;
+		document.body.removeChild(container);
+
+		return width;
+	}
+	catch (e)
+	{
+		return null;
+	}
+};
+
+/**
+ * Function: adjustBlockTextOverflow
+ *
+ * Adjusts block text group position to match HTML overflow:hidden behavior.
+ * In HTML, when centered content is wider than its overflow:hidden container,
+ * the content is left-aligned (starts at the container's left edge) rather
+ * than centered. This shifts the SVG text group to match that behavior.
+ */
+mxSvgCanvas2D.prototype.adjustBlockTextOverflow = function(textGroup, x, cy, w, scale, contentWidth, align)
+{
+	try
+	{
+		if (contentWidth == null)
+		{
+			contentWidth = textGroup.getBBox().width;
+		}
+
+		if (contentWidth > w)
+		{
+			var shift = (align == mxConstants.ALIGN_CENTER) ?
+				(contentWidth - w) / 2 : (contentWidth - w);
+			var tx = this.format((x + shift) * scale) + this.textOffset;
+			var ty = this.format(cy * scale) + this.textOffset;
+			textGroup.setAttribute('transform',
+				'translate(' + tx + ',' + ty + ') scale(' + scale + ')');
+		}
+	}
+	catch (e)
+	{
+		// getBBox may not be available (e.g. element not in DOM)
+	}
+};
+
+/**
  * Function: updateFont
- * 
+ *
  * Updates the text properties for the given node. (NOTE: For this to work in
  * IE, the given node must be a text or tspan element.)
  */
@@ -2708,12 +4132,28 @@ mxSvgCanvas2D.prototype.updateFont = function(node)
 	{
 		txtDecor.push('line-through');
 	}
-	
+
 	if (txtDecor.length > 0)
 	{
 		node.setAttribute('text-decoration', txtDecor.join(' '));
+
+		if ((s.fontStyle & mxConstants.FONT_UNDERLINE_DOTTED) == mxConstants.FONT_UNDERLINE_DOTTED)
+		{
+			node.style.textDecorationStyle = 'dotted';
+		}
 	}
 };
+
+/**
+ * Variable: textBackgrounds
+ *
+ * Holds the background nodes of plain text labels whose text is measured in
+ * <measureTextBackgrounds>, or null if <addTextBackground> measures the text
+ * when the background is added. Measuring a text after another text was
+ * added to the page lays out the page again, so <mxGraphView.validate>
+ * measures the texts of all labels it paints at once. Default is null.
+ */
+mxSvgCanvas2D.textBackgrounds = null;
 
 /**
  * Function: addTextBackground
@@ -2727,7 +4167,15 @@ mxSvgCanvas2D.prototype.addTextBackground = function(node, str, x, y, w, h, alig
 	if (document.body != null && (s.fontBackgroundColor != null ||
 		s.fontBorderColor != null))
 	{
+		// Text and font for the size of the text if it is not measured
+		var text = {node: node, str: str, x: x, y: y, align: align, valign: valign,
+			fontSize: s.fontSize, fontFamily: s.fontFamily, fontStyle: s.fontStyle,
+			scale: s.scale};
 		var bbox = null;
+
+		// Vertical offset of the bounding box of the text in screen pixels
+		var dy = 0;
+		var deferred = false;
 		
 		if (overflow == 'fill' || overflow == 'width')
 		{
@@ -2754,113 +4202,352 @@ mxSvgCanvas2D.prototype.addTextBackground = function(node, str, x, y, w, h, alig
 		else if (node.getBBox != null && this.root.ownerDocument == document)
 		{
 			// Uses getBBox only if inside document for correct size
-			try
+			if (mxSvgCanvas2D.textBackgrounds != null)
 			{
-				bbox = node.getBBox();
-				var ie = mxClient.IS_IE && mxClient.IS_SVG;
-				bbox = new mxRectangle(bbox.x, bbox.y + ((ie) ? 0 : 1), bbox.width, bbox.height + ((ie) ? 1 : 0));
+				deferred = true;
 			}
-			catch (e)
+			else
 			{
-				// Ignores NS_ERROR_FAILURE in FF if container display is none.
+				bbox = mxSvgCanvas2D.getTextBoundingBox(node);
+				dy = 1;
 			}
 		}
 		
-		if (bbox == null || bbox.width == 0 || bbox.height == 0)
+		if (!deferred && bbox == null)
 		{
 			// Computes size if not in document or no getBBox available
-			var div = document.createElement('div');
-
-			// Wrapping and clipping can be ignored here
-			div.style.lineHeight = (mxConstants.ABSOLUTE_LINE_HEIGHT) ?
-				(s.fontSize * mxConstants.LINE_HEIGHT) + 'px' :
-				mxConstants.LINE_HEIGHT;
-			div.style.fontSize = s.fontSize + 'px';
-			div.style.fontFamily = mxUtils.parseCssFontFamily(s.fontFamily);
-			div.style.whiteSpace = 'nowrap';
-			div.style.position = 'absolute';
-			div.style.visibility = 'hidden';
-			div.style.display = 'inline-block';
-			div.style.zoom = '1';
-			
-			if ((s.fontStyle & mxConstants.FONT_BOLD) == mxConstants.FONT_BOLD)
-			{
-				div.style.fontWeight = 'bold';
-			}
-
-			if ((s.fontStyle & mxConstants.FONT_ITALIC) == mxConstants.FONT_ITALIC)
-			{
-				div.style.fontStyle = 'italic';
-			}
-			
-			str = mxUtils.htmlEntities(str, false);
-			div.innerHTML = str.replace(/\n/g, '<br/>');
-			
-			document.body.appendChild(div);
-			var w = div.offsetWidth;
-			var h = div.offsetHeight;
-			div.parentNode.removeChild(div);
-			
-			if (align == mxConstants.ALIGN_CENTER)
-			{
-				x -= w / 2;
-			}
-			else if (align == mxConstants.ALIGN_RIGHT)
-			{
-				x -= w;
-			}
-			
-			if (valign == mxConstants.ALIGN_MIDDLE)
-			{
-				y -= h / 2;
-			}
-			else if (valign == mxConstants.ALIGN_BOTTOM)
-			{
-				y -= h;
-			}
-			
-			bbox = new mxRectangle((x + 1) * s.scale, (y + 2) * s.scale, w * s.scale, (h + 1) * s.scale);
+			dy = 0;
+			bbox = mxSvgCanvas2D.getStringBoundingBox(text);
 		}
-		
+
+		var n = this.createElement('rect');
+		var cssBg = (s.fontBackgroundColor != null &&
+			s.fontBackgroundColor != mxConstants.NONE) ?
+			this.getLightDarkColor(s.fontBackgroundColor) : null;
+		var cssBorder = (s.fontBorderColor != null &&
+			s.fontBorderColor != mxConstants.NONE) ?
+			this.getLightDarkColor(s.fontBorderColor) : null;
+
+		// Fixed-size boxes cannot reflow the text so padding is ignored there.
+		// The crisp offset is only required if not exporting.
+		n.textBackground = {x: 0, y: 0, width: 0, height: 0, dy: dy, scale: s.scale,
+			padding: (overflow != 'fill' && overflow != 'width') ?
+				s.labelPadding : null,
+			strokeWidth: (s.fontBorderColor != null) ?
+				this.format(s.scale * s.fontBorderWidth) : null,
+			crisp: this.root.ownerDocument == document,
+			pending: (deferred) ? text : null};
+
 		if (bbox != null)
 		{
-			var n = this.createElement('rect');
-			var cssBg = (s.fontBackgroundColor != null &&
-				s.fontBackgroundColor != mxConstants.NONE) ?
-				this.getLightDarkColor(s.fontBackgroundColor) : null;
-			var cssBorder = (s.fontBorderColor != null &&
-				s.fontBorderColor != mxConstants.NONE) ?
-				this.getLightDarkColor(s.fontBorderColor) : null;
+			mxSvgCanvas2D.setTextBackgroundBounds(n, bbox);
+		}
 
-			n.setAttribute('fill', (cssBg != null) ? cssBg.light : 'none');
-			n.setAttribute('stroke', (cssBorder != null) ? cssBorder.light : 'none');
-			n.setAttribute('x', Math.floor(bbox.x - 1));
-			n.setAttribute('y', Math.floor(bbox.y - 1));
-			n.setAttribute('width', Math.ceil(bbox.width + 2));
-			n.setAttribute('height', Math.ceil(bbox.height));
+		// Keeps the order of the attributes in the output
+		n.setAttribute('fill', (cssBg != null) ? cssBg.light : 'none');
+		n.setAttribute('stroke', (cssBorder != null) ? cssBorder.light : 'none');
+		n.setAttribute('x', 0);
+		n.setAttribute('y', 0);
+		n.setAttribute('width', 0);
+		n.setAttribute('height', 0);
 
-			if (cssBg != null)
-			{
-				n.style.fill = cssBg.cssText;
-			}
+		if (cssBg != null)
+		{
+			n.style.fill = cssBg.cssText;
+		}
 
-			if (cssBorder)
-			{
-				n.style.stroke = cssBorder.cssText;
-			}
+		if (cssBorder)
+		{
+			n.style.stroke = cssBorder.cssText;
+		}
 
-			var sw = (s.fontBorderColor != null) ? Math.max(1, this.format(s.scale)) : 0;
-			n.setAttribute('stroke-width', sw);
-			
-			// Workaround for crisp rendering - only required if not exporting
-			if (this.root.ownerDocument == document && mxUtils.mod(sw, 2) == 1)
-			{
-				n.setAttribute('transform', 'translate(0.5, 0.5)');
-			}
-			
-			node.insertBefore(n, node.firstChild);
+		n.setAttribute('stroke-width', 0);
+
+		// Hidden so that the text is measured without the background
+		if (deferred)
+		{
+			n.setAttribute('display', 'none');
+			mxSvgCanvas2D.textBackgrounds.push(n);
+		}
+
+		mxSvgCanvas2D.updateTextBackground(n, 1, 0, 0);
+		node.insertBefore(n, node.firstChild);
+	}
+};
+
+/**
+ * Function: getTextBoundingBox
+ *
+ * Returns the bounding box of the given text node in its units, or null if
+ * it is empty or cannot be measured.
+ *
+ * Parameters:
+ *
+ * node - SVG element that contains the text.
+ */
+mxSvgCanvas2D.getTextBoundingBox = function(node)
+{
+	try
+	{
+		var bbox = node.getBBox();
+
+		return (bbox.width > 0 && bbox.height > 0) ?
+			new mxRectangle(bbox.x, bbox.y, bbox.width, bbox.height) : null;
+	}
+	catch (e)
+	{
+		// Ignores NS_ERROR_FAILURE in FF if container display is none.
+		return null;
+	}
+};
+
+/**
+ * Function: getStringBoundingBox
+ *
+ * Returns the bounding box of the text of a background with the size of
+ * the given string (see <mxUtils.getSizeForString>).
+ *
+ * Parameters:
+ *
+ * text - Object with the string, position, alignment, font and scale of
+ * the text (see <addTextBackground>).
+ */
+mxSvgCanvas2D.getStringBoundingBox = function(text)
+{
+	var size = mxUtils.getSizeForString(
+		mxUtils.htmlEntities(text.str, false).replace(/\n/g, '<br/>'),
+		text.fontSize, text.fontFamily, null, text.fontStyle);
+	var x = text.x;
+	var y = text.y;
+	var w = size.width;
+	var h = size.height;
+
+	if (text.align == mxConstants.ALIGN_CENTER)
+	{
+		x -= w / 2;
+	}
+	else if (text.align == mxConstants.ALIGN_RIGHT)
+	{
+		x -= w;
+	}
+
+	if (text.valign == mxConstants.ALIGN_MIDDLE)
+	{
+		y -= h / 2;
+	}
+	else if (text.valign == mxConstants.ALIGN_BOTTOM)
+	{
+		y -= h;
+	}
+
+	return new mxRectangle((x + 1) * text.scale, (y + 2) * text.scale,
+		w * text.scale, (h + 1) * text.scale);
+};
+
+/**
+ * Function: setTextBackgroundBounds
+ *
+ * Sets the bounding box of the text of the given background node.
+ */
+mxSvgCanvas2D.setTextBackgroundBounds = function(node, bbox)
+{
+	var tb = node.textBackground;
+	tb.x = bbox.x;
+	tb.y = bbox.y;
+	tb.width = bbox.width;
+	tb.height = bbox.height;
+};
+
+/**
+ * Function: isTextBackgroundPending
+ *
+ * Returns true if the given node of a label contains a background whose
+ * text is not measured yet (see <measureTextBackgrounds>).
+ *
+ * Parameters:
+ *
+ * node - SVG element of the label.
+ */
+mxSvgCanvas2D.isTextBackgroundPending = function(node)
+{
+	var nodes = (mxSvgCanvas2D.textBackgrounds != null &&
+		mxSvgCanvas2D.textBackgrounds.length > 0) ?
+		node.getElementsByTagName('rect') : [];
+
+	for (var i = 0; i < nodes.length; i++)
+	{
+		if (nodes[i].textBackground != null &&
+			nodes[i].textBackground.pending != null)
+		{
+			return true;
 		}
 	}
+
+	return false;
+};
+
+/**
+ * Function: measureTextBackgrounds
+ *
+ * Measures the texts of the backgrounds in <textBackgrounds> and shows the
+ * backgrounds. All texts are measured before the first background changes,
+ * so that the page is laid out once. Texts that were removed from their
+ * label since are ignored. This is called before the bounding boxes of the
+ * labels are measured (see <mxText.updateBoundingBox>) and at the end of
+ * <mxGraphView.validate>.
+ */
+mxSvgCanvas2D.measureTextBackgrounds = function()
+{
+	var nodes = mxSvgCanvas2D.textBackgrounds;
+
+	if (nodes != null && nodes.length > 0)
+	{
+		mxSvgCanvas2D.textBackgrounds = [];
+		var boxes = [];
+
+		for (var i = 0; i < nodes.length; i++)
+		{
+			var text = nodes[i].textBackground.pending;
+			boxes.push((text.node.parentNode != null) ?
+				mxSvgCanvas2D.getTextBoundingBox(text.node) : null);
+		}
+
+		// Sizes of strings are measured outside of the page before the
+		// backgrounds are changed
+		for (var i = 0; i < nodes.length; i++)
+		{
+			var tb = nodes[i].textBackground;
+
+			if (tb.pending.node.parentNode != null)
+			{
+				if (boxes[i] != null)
+				{
+					tb.dy = 1;
+				}
+				else
+				{
+					boxes[i] = mxSvgCanvas2D.getStringBoundingBox(tb.pending);
+				}
+			}
+		}
+
+		for (var i = 0; i < nodes.length; i++)
+		{
+			var tb = nodes[i].textBackground;
+			var text = tb.pending;
+			tb.pending = null;
+
+			if (boxes[i] != null)
+			{
+				mxSvgCanvas2D.setTextBackgroundBounds(nodes[i], boxes[i]);
+				nodes[i].removeAttribute('display');
+				mxSvgCanvas2D.updateTextBackground(nodes[i], (text.px != null) ? text.px : 1,
+					(text.ox != null) ? text.ox : 0, (text.oy != null) ? text.oy : 0);
+			}
+		}
+	}
+};
+
+/**
+ * Function: updateTextBackground
+ *
+ * Applies the bounds and the border of the given background node of a text
+ * (see <addTextBackground>) for the given size of a screen pixel and origin
+ * of the pixel grid in the units of the node. The box is the bounding box of
+ * the text plus the label padding, one pixel larger on each side and aligned
+ * to pixels, and the border is at least one pixel wide and offset by half a
+ * pixel if its width in pixels is odd. Texts that are painted in model units
+ * apply the pixels of the view after each change of the scale or translate
+ * (see <mxText.updateTextBackground>).
+ *
+ * Parameters:
+ *
+ * node - SVG rectangle that was created in <addTextBackground>.
+ * px - Size of a screen pixel in the units of the node.
+ * ox - Horizontal origin of the pixel grid in the units of the node.
+ * oy - Vertical origin of the pixel grid in the units of the node.
+ */
+mxSvgCanvas2D.updateTextBackground = function(node, px, ox, oy)
+{
+	var tb = node.textBackground;
+
+	// Applied after the text is measured (see measureTextBackgrounds)
+	if (tb.pending != null)
+	{
+		tb.pending.px = px;
+		tb.pending.ox = ox;
+		tb.pending.oy = oy;
+
+		return;
+	}
+
+	var b = mxSvgCanvas2D.getTextBackgroundBounds(node, px, ox, oy);
+	node.setAttribute('x', b.x);
+	node.setAttribute('y', b.y);
+	node.setAttribute('width', b.width);
+	node.setAttribute('height', b.height);
+	node.setAttribute('stroke-width', b.strokeWidth);
+
+	// Workaround for crisp rendering
+	if (b.offset != 0)
+	{
+		node.setAttribute('transform', 'translate(' + b.offset +
+			', ' + b.offset + ')');
+	}
+	else
+	{
+		node.removeAttribute('transform');
+	}
+};
+
+/**
+ * Function: getTextBackgroundBounds
+ *
+ * Returns the bounds of the given background node of a text in the units of
+ * the node for the given size of a screen pixel and origin of the pixel grid
+ * as an object with x, y, width and height, the width of the border in
+ * strokeWidth and the offset of the node for crisp rendering in offset (see
+ * <updateTextBackground>).
+ *
+ * Parameters:
+ *
+ * node - SVG rectangle that was created in <addTextBackground>.
+ * px - Size of a screen pixel in the units of the node.
+ * ox - Horizontal origin of the pixel grid in the units of the node.
+ * oy - Vertical origin of the pixel grid in the units of the node.
+ * box - Optional bounding box of the text measured with getBBox in the units
+ * of the node. Default is the box of the background.
+ */
+mxSvgCanvas2D.getTextBackgroundBounds = function(node, px, ox, oy, box)
+{
+	var tb = node.textBackground;
+	var x = (box != null) ? box.x : tb.x;
+	var y = (box != null) ? box.y + px : tb.y + tb.dy * px;
+	var w = (box != null) ? box.width : tb.width;
+	var h = (box != null) ? box.height : tb.height;
+
+	if (tb.padding != null)
+	{
+		x -= tb.padding.left * tb.scale;
+		y -= tb.padding.top * tb.scale;
+		w += (tb.padding.left + tb.padding.right) * tb.scale;
+		h += (tb.padding.top + tb.padding.bottom) * tb.scale;
+	}
+
+	// Borders wider than 1 grow outward so that they do not cover the text
+	var grow = (tb.strokeWidth != null) ? Math.max(0, tb.strokeWidth - tb.scale) / 2 : 0;
+	x -= grow;
+	y -= grow;
+	w += 2 * grow;
+	h += 2 * grow;
+
+	var sw = (tb.strokeWidth != null) ? Math.max(px, tb.strokeWidth) : 0;
+
+	return {x: Math.floor((x + ox) / px - 1) * px - ox,
+		y: Math.floor((y + oy) / px - 1) * px - oy,
+		width: Math.ceil(w / px + 2) * px,
+		height: Math.ceil(h / px) * px, strokeWidth: sw,
+		offset: (tb.crisp && mxUtils.mod(sw / px, 2) == 1) ? 0.5 * px : 0};
 };
 
 /**

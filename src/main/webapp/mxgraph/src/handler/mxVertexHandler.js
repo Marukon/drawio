@@ -360,6 +360,28 @@ mxVertexHandler.prototype.createParentHighlightShape = function(bounds)
 };
 
 /**
+ * Function: createEdgeParentHighlightShape
+ *
+ * Creates the shape used to highlight the given edge state if the parent
+ * of the cell is an edge. This implementation returns an outline of the
+ * edge shape that looks like the selection of the edge.
+ */
+mxVertexHandler.prototype.createEdgeParentHighlightShape = function(state)
+{
+	var shape = new state.shape.constructor();
+	shape.outline = true;
+	shape.apply(state);
+	shape.points = state.absolutePoints.slice();
+	shape.scale = state.view.scale;
+	shape.isDashed = mxConstants.EDGE_SELECTION_DASHED;
+	shape.stroke = mxConstants.EDGE_SELECTION_COLOR;
+	shape.strokewidth = mxConstants.EDGE_SELECTION_STROKEWIDTH / shape.scale / shape.scale;
+	shape.isShadow = false;
+
+	return shape;
+};
+
+/**
  * Function: createSelectionShape
  * 
  * Creates the shape used to draw the selection border.
@@ -520,7 +542,7 @@ mxVertexHandler.prototype.getHandleForEvent = function(me)
 {
 	// Connection highlight may consume events before they reach sizer handle
 	var tol = (!mxEvent.isMouseEvent(me.getEvent())) ? this.tolerance : 1;
-	var hit = (this.allowHandleBoundsCheck && (mxClient.IS_IE || tol > 0)) ?
+	var hit = (this.allowHandleBoundsCheck && tol > 0) ?
 		new mxRectangle(me.getGraphX() - tol, me.getGraphY() - tol, 2 * tol, 2 * tol) : null;
 
 	var checkShape = mxUtils.bind(this, function(shape)
@@ -592,7 +614,9 @@ mxVertexHandler.prototype.mouseDown = function(sender, me)
 {
 	if (!me.isConsumed() && this.graph.isEnabled() &&
 		(!mxEvent.isAltDown(me.getEvent()) ||
-		!mxEvent.isShiftDown(me.getEvent())))
+		!mxEvent.isShiftDown(me.getEvent())) &&
+		(!mxEvent.isMouseEvent(me.getEvent()) ||
+		mxEvent.isLeftMouseButton(me.getEvent())))
 	{
 		var handle = this.getHandleForEvent(me);
 
@@ -687,11 +711,17 @@ mxVertexHandler.prototype.start = function(x, y, index)
 				
 				if (index == mxEvent.ROTATION_HANDLE)
 				{
-					this.rotationShape.node.style.display = '';
+					if (this.rotationShape != null)
+					{
+						this.rotationShape.node.style.display = '';
+					}
 				}
 				else if (index == mxEvent.LABEL_HANDLE)
 				{
-					this.labelShape.node.style.display = '';
+					if (this.labelShape != null)
+					{
+						this.labelShape.node.style.display = '';
+					}
 				}
 				else if (this.sizers != null && this.sizers[index] != null)
 				{
@@ -933,8 +963,7 @@ mxVertexHandler.prototype.moveLabel = function(me)
 		point.y = (this.graph.snap(point.y / scale - tr.y) + tr.y) * scale;
 	}
 
-	var index = (this.rotationShape != null) ? this.sizers.length - 2 : this.sizers.length - 1;
-	this.moveSizerTo(this.sizers[index], point.x, point.y);
+	this.moveSizerTo(this.labelShape, point.x, point.y);
 };
 
 /**
@@ -965,7 +994,7 @@ mxVertexHandler.prototype.rotateVertex = function(me)
 		
 		if (dist - this.startDist < 2)
 		{
-			raster = 15;
+			var raster = 15;
 		}
 		else if (dist - this.startDist < 25)
 		{
@@ -1688,17 +1717,26 @@ mxVertexHandler.prototype.union = function(bounds, dx, dy, index, gridEnabled, s
 		var right = left + w0;
 		var top = bounds.y - tr.y * scale;
 		var bottom = top + h0;
-		
+
 		var cx = left + w0 / 2;
 		var cy = top + h0 / 2;
-		
+
+		// Snaps the size instead of the absolute position for rotated cells,
+		// as resizeVertex moves the unrotated bounds to keep the fixed
+		// corner of the rotated bounds in place, so the absolute positions
+		// of the unrotated bounds are not on the grid in general
+		var rot = (gridEnabled && this.state != null) ? mxUtils.mod(mxUtils.getNumber(
+			this.state.style, mxConstants.STYLE_ROTATION, 0), 360) : 0;
+		var relative = rot != 0 && !isNaN(rot);
+
 		if (index > 4 /* Bottom Row */)
 		{
 			bottom = bottom + dy;
-			
+
 			if (gridEnabled)
 			{
-				bottom = this.graph.snap(bottom / scale) * scale;
+				bottom = (relative) ? top + this.graph.snap((bottom - top) / scale) * scale :
+					this.graph.snap(bottom / scale) * scale;
 			}
 			else
 			{
@@ -1708,24 +1746,26 @@ mxVertexHandler.prototype.union = function(bounds, dx, dy, index, gridEnabled, s
 		else if (index < 3 /* Top Row */)
 		{
 			top = top + dy;
-			
+
 			if (gridEnabled)
 			{
-				top = this.graph.snap(top / scale) * scale;
+				top = (relative) ? bottom - this.graph.snap((bottom - top) / scale) * scale :
+					this.graph.snap(top / scale) * scale;
 			}
 			else
 			{
 				top = Math.round(top / scale) * scale;
 			}
 		}
-		
+
 		if (index == 0 || index == 3 || index == 5 /* Left */)
 		{
 			left += dx;
-			
+
 			if (gridEnabled)
 			{
-				left = this.graph.snap(left / scale) * scale;
+				left = (relative) ? right - this.graph.snap((right - left) / scale) * scale :
+					this.graph.snap(left / scale) * scale;
 			}
 			else
 			{
@@ -1735,10 +1775,11 @@ mxVertexHandler.prototype.union = function(bounds, dx, dy, index, gridEnabled, s
 		else if (index == 2 || index == 4 || index == 7 /* Right */)
 		{
 			right += dx;
-			
+
 			if (gridEnabled)
 			{
-				right = this.graph.snap(right / scale) * scale;
+				right = (relative) ? left + this.graph.snap((right - left) / scale) * scale :
+					this.graph.snap(right / scale) * scale;
 			}
 			else
 			{
@@ -1778,7 +1819,26 @@ mxVertexHandler.prototype.union = function(bounds, dx, dy, index, gridEnabled, s
 		{
 			width += (width - w0);
 			height += (height - h0);
-			
+
+			// Keeps the size on the grid for rotated cells. Only the extents
+			// that the dragged handle changes are snapped, using the same
+			// index tests as the edges above, as snapping the other extent
+			// would resize the cell along an axis that is not being dragged
+			// [jgraph/drawio#5723]
+			if (relative)
+			{
+				if (index == 0 || index == 3 || index == 5 /* Left */ ||
+					index == 2 || index == 4 || index == 7 /* Right */)
+				{
+					width = this.graph.snap(width / scale) * scale;
+				}
+
+				if (index < 3 /* Top Row */ || index > 4 /* Bottom Row */)
+				{
+					height = this.graph.snap(height / scale) * scale;
+				}
+			}
+
 			var cdx = cx - (left + width / 2);
 			var cdy = cy - (top + height / 2);
 
@@ -2164,17 +2224,24 @@ mxVertexHandler.prototype.updateParentHighlight = function()
 					this.parentHighlight.redraw();
 				}
 			}
-			else
+			// Edge highlights are created again if the edge changes
+			else if (!this.graph.model.isEdge(parent) || !visible || (pstate != null &&
+				(this.parentHighlight.scale != pstate.view.scale ||
+				!mxUtils.equalPoints(this.parentHighlight.points, pstate.absolutePoints))))
 			{
 				this.destroyParentHighlight();
 			}
 		}
-		else if (this.parentHighlightEnabled && visible)
+
+		if (this.parentHighlight == null && this.parentHighlightEnabled && visible)
 		{
-			if (this.graph.model.isVertex(parent) && pstate != null &&
+			var edge = this.graph.model.isEdge(parent);
+
+			if ((edge || this.graph.model.isVertex(parent)) && pstate != null &&
 				pstate.parentHighlight == null)
 			{
-				this.parentHighlight = this.createParentHighlightShape(pstate);
+				this.parentHighlight = (edge) ? this.createEdgeParentHighlightShape(pstate) :
+					this.createParentHighlightShape(pstate);
 				this.parentHighlight.dialect = mxConstants.DIALECT_SVG;
 				this.parentHighlight.svgStrokeTolerance = 0;
 				this.parentHighlight.pointerEvents = false;

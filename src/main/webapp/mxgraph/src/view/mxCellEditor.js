@@ -298,7 +298,7 @@ mxCellEditor.prototype.setAlign = function (align)
 		var dir = mxUtils.getValue(state.style, mxConstants.STYLE_TEXT_DIRECTION,
 			mxConstants.DEFAULT_TEXT_DIRECTION);
 
-		if (dir == null || dir.substring(0, 9) != 'vertical-')
+		if (!mxUtils.isVerticalTextDirection(dir))
 		{
 			this.textarea.style.textAlign = align;
 		}
@@ -410,6 +410,19 @@ mxCellEditor.prototype.installListeners = function(elt)
 
 	mxEvent.addListener(elt, 'keypress', keypressHandler);
 	mxEvent.addListener(elt, 'paste', keypressHandler);
+
+	// Clears the empty label placeholder when IME composition starts.
+	// keypress does not fire during IME composition so the placeholder
+	// must be cleared here to avoid composing into the placeholder text.
+	mxEvent.addListener(elt, 'compositionstart', mxUtils.bind(this, function(evt)
+	{
+		if (this.editingCell != null && this.clearOnChange &&
+			elt.innerHTML == this.getEmptyLabelText())
+		{
+			this.clearOnChange = false;
+			elt.innerText = '';
+		}
+	}));
 	
 	// Handler for updating the empty label text value after a change
 	// Keyup event is delayed and input doesn't fire for cursor up so
@@ -440,12 +453,12 @@ mxCellEditor.prototype.installListeners = function(elt)
 		}
 	});
 
-	mxEvent.addListener(elt, (!mxClient.IS_IE11 && !mxClient.IS_IE) ? 'input' : 'keyup', keyupHandler);
+	mxEvent.addListener(elt, 'input', keyupHandler);
 	mxEvent.addListener(elt, 'cut', keyupHandler);
 	mxEvent.addListener(elt, 'paste', keyupHandler);
 	
 	// Adds automatic resizing of the textbox while typing using input, keyup and/or DOM change events
-	var evtName = (!mxClient.IS_IE11 && !mxClient.IS_IE) ? 'input' : 'keydown';
+	var evtName = 'input';
 	
 	var resizeHandler = mxUtils.bind(this, function(evt)
 	{
@@ -461,7 +474,11 @@ mxCellEditor.prototype.installListeners = function(elt)
 			this.resizeThread = window.setTimeout(mxUtils.bind(this, function()
 			{
 				this.resizeThread = null;
-				this.resize();
+
+				if (document.body != null)
+				{
+					this.resize();
+				}
 			}), 0);
 		}
 	});
@@ -556,14 +573,17 @@ mxCellEditor.prototype.resize = function()
 	 	{
 			// Needed for word wrap inside text blocks with oversize lines to match the final result where
 	 		// the width of the longest line is used as the reference for text alignment in the cell
+			var svgWrap = mxUtils.getValue(state.style, 'convertToSvg', '0') == '1' &&
+				state.style['svgWhiteSpace'] == 'wrap';
+
 			if (this.graph.isWrapping(state.cell) &&
 				(this.bounds.width >= 2 || this.bounds.height >= 2) &&
-				(state.text == null || state.text.node == null ||
+				(svgWrap || state.text == null || state.text.node == null ||
 				state.text.node.getElementsByTagName('text').length == 0))
 			{
 				var dir = mxUtils.getValue(state.style, mxConstants.STYLE_TEXT_DIRECTION,
 					mxConstants.DEFAULT_TEXT_DIRECTION);
-				var vertical = dir != null && dir.substring(0, 9) == 'vertical-';
+				var vertical = mxUtils.isVerticalTextDirection(dir);
 				this.textarea.style.wordWrap = mxConstants.WORD_WRAP;
 				this.textarea.style.whiteSpace = 'normal';
 				
@@ -699,7 +719,13 @@ mxCellEditor.prototype.updateTextAreaStyle = function(state)
 	{
 		txtDecor.push('line-through');
 	}
-	
+
+	if (txtDecor.length > 0 && (mxUtils.getValue(state.style, mxConstants.STYLE_FONTSTYLE, 0) &
+		mxConstants.FONT_UNDERLINE_DOTTED) == mxConstants.FONT_UNDERLINE_DOTTED)
+	{
+		txtDecor.push('dotted');
+	}
+
 	this.textarea.style.lineHeight = (mxConstants.ABSOLUTE_LINE_HEIGHT) ?
 		Math.round(size * mxConstants.LINE_HEIGHT) + 'px' : mxConstants.LINE_HEIGHT;
 	this.textarea.style.textDecoration = txtDecor.join(' ');
@@ -790,7 +816,7 @@ mxCellEditor.prototype.setEditingValue = function(state, value)
  * 
  * cell - <mxCell> to start editing.
  * trigger - Optional mouse event that triggered the editor.
- * initialText - Optional string that specifies the initial editing value.
+ * initialText - Optional plain text that replaces the initial editing value.
  */
 mxCellEditor.prototype.startEditing = function(cell, trigger, initialText)
 {
@@ -868,7 +894,10 @@ mxCellEditor.prototype.startEditing = function(cell, trigger, initialText)
 				
 				if (initialText != null)
 				{
-					this.textarea.innerHTML = initialText;
+					// Initial text is plain text (eg. from an input method,
+					// dictation or a menu paste) and is never parsed as HTML
+					this.textarea.innerHTML = mxUtils.htmlEntities(
+						initialText, false).replace(/\n/g, '<br>');
 
 					// Moves cursor after initial text
 					var range = document.createRange();
@@ -887,9 +916,14 @@ mxCellEditor.prototype.startEditing = function(cell, trigger, initialText)
 			}
 		});
 		
-		// Asynchronous does not show on-screen keyboard on iOS
-		if (mxClient.IS_IOS)
+		// Synchronous when editing was initiated by typing on a selected
+		// cell so that the textarea has focus before the browser delivers
+		// keypress, input and IME composition events for the triggering
+		// keystroke. Also synchronous on iOS where async prevents the
+		// on-screen keyboard from showing.
+		if (mxClient.IS_IOS || this.editByTyping)
 		{
+			this.editByTyping = false;
 			fn();
 		}
 		else

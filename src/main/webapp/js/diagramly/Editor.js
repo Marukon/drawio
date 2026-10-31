@@ -37,12 +37,12 @@
 	Editor.thinRedoImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTE5Ljc1IDM3LjVxLTQuNTUgMC03Ljg1LTMuMDVUOC42IDI2LjlxMC00LjQ1IDMuMy03LjV0Ny44NS0zLjA1aDE1LjNMMjkgMTAuM2wxLjYtMS42IDguOCA4LjgtOC44IDguOC0xLjYtMS42IDYuMDUtNi4wNUgxOS43cS0zLjYgMC02LjIyNSAyLjM1LTIuNjI1IDIuMzUtMi42MjUgNS45IDAgMy42IDIuNjI1IDUuOTc1UTE2LjEgMzUuMjUgMTkuNyAzNS4yNWgxMy45djIuMjVaIi8+PC9zdmc+';
 	Editor.thinDoubleArrowRightImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0ibTEzIDM1LjMtMS42LTEuNiA5Ljc1LTkuNzUtOS43NS05LjcgMS42LTEuNiAxMS4zNSAxMS4zWm0xMi4zIDAtMS42LTEuNiA5Ljc1LTkuNzUtOS43NS05LjcgMS42LTEuNiAxMS4zIDExLjNaIi8+PC9zdmc+';
 	Editor.thinNoteImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgOTYgOTYwIDk2MCIgd2lkdGg9IjQ4Ij48cGF0aCBkPSJNMjM3LjY5NCA5NTUuOTk5cS0yMy41MjkgMC00MC42MTEtMTcuMDgyLTE3LjA4Mi0xNy4wODItMTcuMDgyLTQwLjYxMVYyNTMuNjk0cTAtMjMuNTI5IDE3LjA4Mi00MC42MTEgMTcuMDgyLTE3LjA4MiA0MC42MTEtMTcuMDgyaDM0Ny41MzdsMTk0Ljc2OCAxOTQuNzY4djUwNy41MzdxMCAyMy41MjktMTcuMDgyIDQwLjYxMS0xNy4wODIgMTcuMDgyLTQwLjYxMSAxNy4wODJIMjM3LjY5NFpNNTYyLjUzOSA0MTEuMjNWMjQxLjM4NUgyMzcuNjk0cS00LjYxNiAwLTguNDYzIDMuODQ2LTMuODQ2IDMuODQ3LTMuODQ2IDguNDYzdjY0NC42MTJxMCA0LjYxNiAzLjg0NiA4LjQ2MyAzLjg0NyAzLjg0NiA4LjQ2MyAzLjg0Nmg0ODQuNjEycTQuNjE2IDAgOC40NjMtMy44NDYgMy44NDYtMy44NDcgMy44NDYtOC40NjNWNDExLjIzSDU2Mi41MzlaTTIyNS4zODUgMjQxLjM4NVY0MTEuMjMgMjQxLjM4NXY2NjkuMjNWMjQxLjM4NVoiLz48L3N2Zz4=';
-	Editor.thinTableImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTcgNDFWN2gzNHYzNFptMi4yNS0yMy42aDI5LjVWOS4yNUg5LjI1Wm0xMC42IDEwLjdoOC4zdi04LjRoLTguM1ptMCAxMC42NWg4LjN2LTguNGgtOC4zWk05LjI1IDI4LjFoOC4zNXYtOC40SDkuMjVabTIxLjE1IDBoOC4zNXYtOC40SDMwLjRaTTkuMjUgMzguNzVoOC4zNXYtOC40SDkuMjVabTIxLjE1IDBoOC4zNXYtOC40SDMwLjRaIi8+PC9zdmc+';
 	Editor.thinAddCircleImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTIzIDMzLjVoMi4yNXYtOC4yaDguMjVWMjNoLTguMjV2LTguNUgyM1YyM2gtOC41djIuM0gyM1ptMSA5LjVxLTMuOTUgMC03LjQtMS41dC02LjAyNS00LjA3NVE4IDM0Ljg1IDYuNSAzMS40VDUgMjRxMC0zLjk1IDEuNS03LjQyNVE4IDEzLjEgMTAuNTc1IDEwLjU1IDEzLjE1IDggMTYuNiA2LjVUMjQgNXEzLjk1IDAgNy40MjUgMS41UTM0LjkgOCAzNy40NSAxMC41NSA0MCAxMy4xIDQxLjUgMTYuNTc1IDQzIDIwLjA1IDQzIDI0cTAgMy45NS0xLjUgNy40dC00LjA1IDYuMDI1UTM0LjkgNDAgMzEuNDI1IDQxLjUgMjcuOTUgNDMgMjQgNDNabS4wNS0yLjI1cTYuOTUgMCAxMS44MjUtNC45IDQuODc1LTQuOSA0Ljg3NS0xMS45IDAtNi45NS00Ljg3NS0xMS44MjVRMzEgNy4yNSAyNCA3LjI1cS02Ljk1IDAtMTEuODUgNC44NzVRNy4yNSAxNyA3LjI1IDI0cTAgNi45NSA0LjkgMTEuODUgNC45IDQuOSAxMS45IDQuOVpNMjQgMjRaIi8+PC9zdmc+';
 	Editor.thinDeleteImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTEzLjkgNDFxLTEuMTUgMC0yLS44NS0uODUtLjg1LS44NS0yLjA1VjEwLjlIOVY4LjY1aDguNTV2LTEuNGgxMi45djEuNEgzOXYyLjI1aC0yLjA1djI3LjJxMCAxLjItLjg1IDIuMDUtLjg1Ljg1LTIgLjg1Wm0yMC44LTMwLjFIMTMuM3YyNy4ycTAgLjMuMTc1LjQ3NXQuNDI1LjE3NWgyMC4ycS4yIDAgLjQtLjJ0LjItLjQ1Wk0xOS4wNSAzNC41aDIuM1YxNS4xaC0yLjNabTcuNiAwaDIuM1YxNS4xaC0yLjNaTTEzLjMgMTAuOXYyNy44NVYzOC4xWiIvPjwvc3ZnPg==';
 	Editor.thinLightImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTI0IDMwLjc1cTIuOCAwIDQuNzc1LTEuOTc1UTMwLjc1IDI2LjggMzAuNzUgMjRxMC0yLjgtMS45NzUtNC43NzVRMjYuOCAxNy4yNSAyNCAxNy4yNXEtMi44IDAtNC43NzUgMS45NzVRMTcuMjUgMjEuMiAxNy4yNSAyNHEwIDIuOCAxLjk3NSA0Ljc3NVEyMS4yIDMwLjc1IDI0IDMwLjc1Wk0yNCAzM3EtMy43NSAwLTYuMzc1LTIuNjI1VDE1IDI0cTAtMy43NSAyLjYyNS02LjM3NVQyNCAxNXEzLjc1IDAgNi4zNzUgMi42MjVUMzMgMjRxMCAzLjc1LTIuNjI1IDYuMzc1VDI0IDMzWk0zLjY1IDI1LjE1cS0uNSAwLS44MjUtLjMyNVEyLjUgMjQuNSAyLjUgMjRxMC0uNS4zMjUtLjgyNS4zMjUtLjMyNS44MjUtLjMyNWg1LjJxLjUgMCAuODI1LjMyNVExMCAyMy41IDEwIDI0cTAgLjUtLjMyNS44MjUtLjMyNS4zMjUtLjgyNS4zMjVabTM1LjUgMHEtLjUgMC0uODI1LS4zMjVRMzggMjQuNSAzOCAyNHEwLS41LjMyNS0uODI1LjMyNS0uMzI1LjgyNS0uMzI1aDUuMnEuNSAwIC44MjUuMzI1LjMyNS4zMjUuMzI1LjgyNSAwIC41LS4zMjUuODI1LS4zMjUuMzI1LS44MjUuMzI1Wk0yNCAxMHEtLjUgMC0uODI1LS4zMjUtLjMyNS0uMzI1LS4zMjUtLjgyNXYtNS4ycTAtLjUuMzI1LS44MjVRMjMuNSAyLjUgMjQgMi41cS41IDAgLjgyNS4zMjUuMzI1LjMyNS4zMjUuODI1djUuMnEwIC41LS4zMjUuODI1UTI0LjUgMTAgMjQgMTBabTAgMzUuNXEtLjUgMC0uODI1LS4zMjUtLjMyNS0uMzI1LS4zMjUtLjgyNXYtNS4ycTAtLjUuMzI1LS44MjVRMjMuNSAzOCAyNCAzOHEuNSAwIC44MjUuMzI1LjMyNS4zMjUuMzI1LjgyNXY1LjJxMCAuNS0uMzI1LjgyNS0uMzI1LjMyNS0uODI1LjMyNVpNMTIuNSAxNC4xbC0zLTIuOTVxLS4zNS0uMzUtLjMyNS0uODI1UTkuMiA5Ljg1IDkuNSA5LjVxLjM1LS4zNS44LS4zNS40NSAwIC44NS4zNWwyLjk1IDNxLjMuMzUuMy44IDAgLjQ1LS4zLjgtLjMuMy0uNzc1LjMtLjQ3NSAwLS44MjUtLjNabTI0LjM1IDI0LjQtMi45NS0zcS0uMy0uMzUtLjMtLjggMC0uNDUuMzUtLjguMjUtLjM1LjcyNS0uMzV0LjgyNS4zNWwzIDIuOTVxLjM1LjM1LjMyNS44MjUtLjAyNS40NzUtLjMyNS44MjUtLjM1LjM1LS44LjM1LS40NSAwLS44NS0uMzVaTTMzLjkgMTQuMXEtLjM1LS4zNS0uMzUtLjggMC0uNDUuMzUtLjhsMi45NS0zcS4zNS0uMzUuODI1LS4zMjUuNDc1LjAyNS44MjUuMzI1LjM1LjM1LjM1LjggMCAuNDUtLjM1Ljg1bC0zIDIuOTVxLS4zLjMtLjc3NS4zLS40NzUgMC0uODI1LS4zWk05LjUgMzguNXEtLjM1LS4zNS0uMzUtLjggMC0uNDUuMzUtLjg1bDMtMi45NXEuMzUtLjM1LjgtLjM1LjQ1IDAgLjguMzUuMzUuMy4zMjUuNzc1LS4wMjUuNDc1LS4zMjUuODI1bC0yLjk1IDNxLS40LjM1LS44NS4zNS0uNDUgMC0uOC0uMzVaTTI0IDI0WiIvPjwvc3ZnPg==';
 	Editor.thinDarkImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTI0LjA1IDQxcS03LjEgMC0xMi4wNS00Ljk1UTcuMDUgMzEuMSA3LjA1IDI0cTAtNi44IDQuNi0xMS42NSA0LjYtNC44NSAxMS4zLTUuMjUuMiAwIC40NS4wMjV0LjcuMDI1UTIyLjc1IDguNyAyMiAxMC43MjVxLS43NSAyLjAyNS0uNzUgNC4yNzUgMCA0LjkgMy40NSA4LjM1IDMuNDUgMy40NSA4LjM1IDMuNDUgMi4yIDAgNC4yNzUtLjY3NVQ0MC45IDI0LjJxMCAuMzUuMDI1LjU1LjAyNS4yLjAyNS4zNS0uNCA2LjctNS4yNSAxMS4zUTMwLjg1IDQxIDI0LjA1IDQxWm0wLTIuMjVxNS4xNSAwIDkuMDc1LTMuMTI1UTM3LjA1IDMyLjUgMzguMiAyOC4xcS0xLjIuNS0yLjUuNzI1LTEuMy4yMjUtMi42NS4yMjUtNS44NSAwLTkuOTUtNC4xVDE5IDE1cTAtMS4xNS4yMjUtMi40MjVUMjAgOS43NXEtNC42NSAxLjQtNy42NSA1LjM3NVQ5LjM1IDI0cTAgNi4xNSA0LjI3NSAxMC40NSA0LjI3NSA0LjMgMTAuNDI1IDQuM1ptLS4yNS0xNC41WiIvPjwvc3ZnPg==';
 	Editor.thinCommentImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTEyLjUgMjcuNWgyM3YtMi4yNWgtMjNabTAtNi4zNWgyM3YtMi4zaC0yM1ptMC02LjRoMjNWMTIuNWgtMjNaTTQzIDQyLjEgMzUuOSAzNWgtMjhxLTEuMTUgMC0yLjAyNS0uODc1VDUgMzIuMVY3LjlxMC0xLjE1Ljg3NS0yLjAyNVQ3LjkgNWgzMi4ycTEuMiAwIDIuMDUuODc1UTQzIDYuNzUgNDMgNy45Wk03LjI1IDcuOXYyNC44NUgzNi45bDMuODUgMy44NVY3LjlxMC0uMy0uMTc1LS40NzVUNDAuMSA3LjI1SDcuOXEtLjMgMC0uNDc1LjE3NVQ3LjI1IDcuOVptMCAwdjI4LjdWNy4yNSA3LjlaIi8+PC9zdmc+';
+	Editor.lightDarkCommentImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjRweCIgdmlld0JveD0iMCAtOTYwIDk2MCA5NjAiIHdpZHRoPSIyNHB4IiBzdHlsZT0iY29sb3Itc2NoZW1lOmxpZ2h0IGRhcms7IiBmaWxsPSJsaWdodC1kYXJrKCMwMDAwMDAsI2ZmZmZmZikiPjxwYXRoIGQ9Ik0yNDAtNDAwaDQ4MHYtODBIMjQwdjgwWm0wLTEyMGg0ODB2LTgwSDI0MHY4MFptMC0xMjBoNDgwdi04MEgyNDB2ODBaTTgwLTgwdi03MjBxMC0zMyAyMy41LTU2LjVUMTYwLTg4MGg2NDBxMzMgMCA1Ni41IDIzLjVUODgwLTgwMHY0ODBxMCAzMy0yMy41IDU2LjVUODAwLTI0MEgyNDBMODAtODBabTEyNi0yNDBoNTk0di00ODBIMTYwdjUyNWw0Ni00NVptLTQ2IDB2LTQ4MCA0ODBaIi8+PC9zdmc+';
 	Editor.thinMenuImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTEzLjUgMjYuMTVxLjkgMCAxLjUyNS0uNjI1LjYyNS0uNjI1LjYyNS0xLjUyNSAwLS45LS42MjUtMS41MjUtLjYyNS0uNjI1LTEuNTI1LS42MjUtLjkgMC0xLjUyNS42MjUtLjYyNS42MjUtLjYyNSAxLjUyNSAwIC45LjYyNSAxLjUyNS42MjUuNjI1IDEuNTI1LjYyNVptMTAuNSAwcS45IDAgMS41MjUtLjYyNS42MjUtLjYyNS42MjUtMS41MjUgMC0uOS0uNjI1LTEuNTI1UTI0LjkgMjEuODUgMjQgMjEuODVxLS45IDAtMS41MjUuNjI1LS42MjUuNjI1LS42MjUgMS41MjUgMCAuOS42MjUgMS41MjUuNjI1LjYyNSAxLjUyNS42MjVabTEwLjUgMHEuODUgMCAxLjQ3NS0uNjI1UTM2LjYgMjQuOSAzNi42IDI0cTAtLjktLjYyNS0xLjUyNS0uNjI1LS42MjUtMS41MjUtLjYyNS0uODUgMC0xLjQ3NS42MjUtLjYyNS42MjUtLjYyNSAxLjUyNSAwIC45LjYyNSAxLjUyNS42MjUuNjI1IDEuNTI1LjYyNVpNMjQgNDNxLTMuOTUgMC03LjQtMS41dC02LjAyNS00LjA3NVE4IDM0Ljg1IDYuNSAzMS40VDUgMjRxMC0zLjk1IDEuNS03LjQyNVE4IDEzLjEgMTAuNTc1IDEwLjU1IDEzLjE1IDggMTYuNiA2LjVUMjQgNXEzLjk1IDAgNy40MjUgMS41UTM0LjkgOCAzNy40NSAxMC41NSA0MCAxMy4xIDQxLjUgMTYuNTc1IDQzIDIwLjA1IDQzIDI0cTAgMy45NS0xLjUgNy40dC00LjA1IDYuMDI1UTM0LjkgNDAgMzEuNDI1IDQxLjUgMjcuOTUgNDMgMjQgNDNabTAtMi4yNXE3IDAgMTEuODc1LTQuOVQ0MC43NSAyNHEwLTctNC44NzUtMTEuODc1VDI0IDcuMjVxLTYuOTUgMC0xMS44NSA0Ljg3NVE3LjI1IDE3IDcuMjUgMjRxMCA2Ljk1IDQuOSAxMS44NSA0LjkgNC45IDExLjg1IDQuOVpNMjQgMjRaIi8+PC9zdmc+';
 	Editor.thinViewImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTUgMzlWOWgzOHYzMFptMjguNTUtMjAuNmg3LjJ2LTcuMTVoLTcuMlptMCA4Ljk1aDcuMnYtNi43aC03LjJabS0yNi4zIDkuNEgzMS4zdi0yNS41SDcuMjVabTI2LjMgMGg3LjJWMjkuNmgtNy4yWiIvPjwvc3ZnPg==';
 	Editor.thinUserAddImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTM2LjYgMjcuNXYtNi4zNWgtNi4zNXYtMi4zaDYuMzVWMTIuNWgyLjN2Ni4zNWg2LjM1djIuM0gzOC45djYuMzVaTTE4IDIzLjM1cS0yLjkgMC00Ljc3NS0xLjg3NVExMS4zNSAxOS42IDExLjM1IDE2LjdxMC0yLjkgMS44NzUtNC43NVQxOCAxMC4xcTIuOSAwIDQuNzc1IDEuODUgMS44NzUgMS44NSAxLjg3NSA0Ljc1dC0xLjg3NSA0Ljc3NVEyMC45IDIzLjM1IDE4IDIzLjM1Wk0zIDM4LjZ2LTMuOHEwLTEuNS44LTIuNzV0Mi4yNS0xLjlxMy40NS0xLjUgNi4yNzUtMi4xNSAyLjgyNS0uNjUgNS42NzUtLjY1IDIuODUgMCA1LjY1LjY1IDIuOC42NSA2LjI1IDIuMTUgMS40NS43IDIuMjc1IDEuOTI1VDMzIDM0Ljh2My44Wm0yLjI1LTIuMjVoMjUuNVYzNC44cTAtLjc1LS41LTEuNDc1LS41LS43MjUtMS4zLTEuMTI1LTMuMi0xLjUtNS42NzUtMi4wNVEyMC44IDI5LjYgMTggMjkuNnEtMi44IDAtNS4zLjU1VDcgMzIuMnEtLjguNC0xLjI3NSAxLjEyNS0uNDc1LjcyNS0uNDc1IDEuNDc1Wk0xOCAyMS4xcTEuODUgMCAzLjEtMS4yNXQxLjI1LTMuMTVxMC0xLjg1LTEuMjUtMy4xVDE4IDEyLjM1cS0xLjg1IDAtMy4xIDEuMjV0LTEuMjUgMy4xcTAgMS45IDEuMjUgMy4xNVQxOCAyMS4xWm0wLTQuNFptMCAxOS42NVoiLz48L3N2Zz4=';
@@ -166,6 +166,13 @@
 	 * Default value for custom libraries in mxSettings.
 	 */
 	Editor.enableCustomLibraries = true;
+
+	/**
+	 * Requests data URIs from the icon search service so inserted icons
+	 * are self-contained (no remote image references in the file). Off by
+	 * default online to keep files small.
+	 */
+	Editor.inlineExtIcons = false;
 	
 	/**
 	 * Not yet implemented. Reading uncompressed supported.
@@ -216,9 +223,26 @@
 	}
 
 	/**
+	 * Language bundles installed for offline use on startup (array of
+	 * language codes, see the defaultLanguages configuration key). The
+	 * service worker validates each code against its lazy manifest.
+	 */
+	Editor.defaultLanguages = null;
+
+	/**
 	 * Specifies if web fonts are enabled.
 	 */
 	Editor.enableWebFonts = !window.mxIsElectron;
+
+	/**
+	 * Specifies if local font scanning is enabled.
+	 */
+	Editor.enableLocalFonts = false;
+
+	/**
+	 * Holds the list of detected local font names.
+	 */
+	Editor.localFonts = null;
 
 	/**
 	 * Disables the shadow option in the format panel.
@@ -236,13 +260,18 @@
 	Editor.enableRealtime = true;
 
 	/**
-	 * Enables cache for patches and Pusher for messages. Default is true.
+	 * Enables the realtime cache for the patches of saves, which sends their
+	 * notifications on to the other clients' sockets. Default is true.
+	 * The cache is a draw.io server, so lockdown never uses it: saves used to
+	 * send it the channel ID, the cache secret and a notification. Sync works
+	 * without the cache (catchup reloads the file).
 	 */
-	Editor.enableRealtimeCache = true;
-	
+	Editor.enableRealtimeCache = urlParams['lockdown'] != '1';
+
 	/**
-	 * Enables P2P instead of Pusher for messages. (Ignored if enableRealtimeCache is false.)
-	 * Default is false.
+	 * Sends the notification of a save over the socket after the cache
+	 * response instead of having the cache send it on with the patch.
+	 * (Ignored if enableRealtimeCache is false.) Default is false.
 	 */
 	Editor.p2pSyncNotify = false;
 	
@@ -277,9 +306,48 @@
 	Editor.addSvgMetadata = false;
 
 	/**
+	 * If true, label autosize, view bounds and the post-load fit-to-window use
+	 * the MathJax-rendered math size rather than the raw formula text size,
+	 * and the canvas is hidden during typesetting to avoid showing the source.
+	 * Default is true. See [jgraph/drawio#3311].
+	 */
+	Editor.mathOutputSize = true;
+
+	/**
 	 * Specifies animations should be enabled. Default is true.
 	 */
 	Editor.enableAnimations = true;
+
+	/**
+	 * Specifies if Explore, custom link actions and plugins open the
+	 * force-directed explorer (see ForceExplorer). Default is true. false
+	 * restores the classic Explore view.
+	 */
+	Editor.forceExplore = true;
+
+	/**
+	 * Specifies if selected shapes with connections show a handle that moves
+	 * them with their connected shapes on springs (see SpringMove). Default
+	 * is false.
+	 */
+	Editor.springMove = false;
+
+	/**
+	 * Specifies if insert animations should be shown. Default is true.
+	 */
+	Editor.insertAnimations = true;
+
+	/**
+	 * Specifies if window docking should be enabled. Default is true.
+	 */
+	Editor.enableWindowDocking = urlParams['embedInline'] != '1';
+
+	/**
+	 * Specifies if the windows that were visible when the page was last
+	 * closed, eg. Layers, Outline and Tags, should be shown again on
+	 * startup. Default is true.
+	 */
+	Editor.restoreVisibleWindows = true;
 
 	/**
 	 * Specifies paste should be at the mouse pointer location. Default is true.
@@ -292,15 +360,54 @@
 	Editor.fitDiagramOnLoad = true;
 
 	/**
+	 * Specifies if the diagram should be fit to the page on load. Default is true.
+	 */
+	Editor.fitDiagramOnPage = true;
+
+	/**
 	 * Specifies if link icons should be shown on shapes. Default is false.
 	 */
 	Editor.showLinkIcons = false;
+
+	/**
+	 * Specifies if tooltip icons should be shown on shapes. Default is false.
+	 */
+	Editor.showTooltipIcons = false;
+
+	/**
+	 * Specifies if icons should be shown on cells with a note.
+	 * Default is true.
+	 */
+	Editor.showNoteIcons = true;
+
+	/**
+	 * Specifies the tooltip font size in pixels. Default is null (uses CSS default of 11px).
+	 */
+	Editor.tooltipFontSize = null;
+
+	/**
+	 * Specifies the tooltip max-width in pixels. Default is 360. 0 means no limit.
+	 */
+	Editor.tooltipMaxWidth = 360;
+
+	/**
+	 * Specifies if fill patterns should be expanded to inline geometry for
+	 * print and PDF export to avoid rasterization. Default is true.
+	 */
+	Editor.expandPatternsForPrint = true;
 
 	/**
 	 * Specifies the default text style.
 	 */
 	Editor.defaultTextStyle = 'text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;' +
 		'align=center;verticalAlign=middle;rounded=0;';
+	
+	/**
+	 * Specifies the default style for sticky notes.
+	 */
+	Editor.defaultNoteStyle = 'shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;' +
+		'fontColor=#000000;darkOpacity=0.05;fillColor=#FFF9B2;strokeColor=none;fillStyle=solid;' +
+		'direction=west;gradientDirection=north;gradientColor=#FFF2A1;shadow=1;size=20;autosizeText=1;'
 	
 	/**
 	 * Specifies if ChatGPT should be enabled. Default is true only
@@ -316,36 +423,30 @@
 	Editor.aiActions = ['createPublic', 'create', 'update', 'assist'];
 
 	/**
-	 * Specifies the ChatGPT API key. Default is null.
+	 * Specifies the ChatGPT API key. Default is null. The API keys and the
+	 * endpoint below are configuration-only (see Editor.configure) and must
+	 * never be taken from URL parameters: a link could then point a request
+	 * that carries the user's stored key, prompt and diagram at an endpoint
+	 * of the sender's choosing, or make the user's prompts and diagrams go
+	 * to the sender's own account via an injected key.
 	 */
-	Editor.gptApiKey = (urlParams['gpt-api-key'] != null) ?
-		decodeURIComponent(urlParams['gpt-api-key']) : null;
+	Editor.gptApiKey = null;
 
 	/**
 	 * Specifies the Gemini API key. Default is null.
 	 */
-	Editor.geminiApiKey = (urlParams['gemini-api-key'] != null) ?
-		decodeURIComponent(urlParams['gemini-api-key']) : null;
+	Editor.geminiApiKey = null;
 
 	/**
-	 * Specifies the Gemini API key. Default is null.
+	 * Specifies the Claude API key. Default is null.
 	 */
-	Editor.claudeApiKey = (urlParams['claude-api-key'] != null) ?
-		decodeURIComponent(urlParams['claude-api-key']) : null;
+	Editor.claudeApiKey = null;
 
-	/**
-	 * Specifies the ChatGPT API key. Default is null.
-	 */
-	Editor.gptApiKey = (urlParams['gpt-api-key'] != null) ?
-		decodeURIComponent(urlParams['gpt-api-key']) : null;
-	
 	/**
 	 * Specifies the ChatGPT endpoint URL. Default is
 	 * 'https://api.openai.com/v1/chat/completions'.
 	 */
-	Editor.gptUrl = (urlParams['gpt-url'] != null) ?
-		decodeURIComponent(urlParams['gpt-url']) :
-		'https://api.openai.com/v1/chat/completions';
+	Editor.gptUrl = 'https://api.openai.com/v1/chat/completions';
 	
 	/**
 	 * Available AI configurations.
@@ -358,12 +459,19 @@
 			'format based on the given prompt. Begin with a concise checklist (3-7 bullets) of what you will ' +
 			'do; keep items conceptual, not implementation-level. Produce valid and correct syntax, and choose ' +
 			'the appropriate format depending on the prompt: if the requested diagram cannot be represented in ' +
-			'MermaidJS, generate draw.io XML instead but do not use indentation and newlines. After producing the ' +
+			'MermaidJS, generate draw.io XML instead but do not use indentation and newlines. When asked to ' +
+			'modify a diagram that is given in the conversation as draw.io XML, return the complete updated ' +
+			'diagram as draw.io XML, not MermaidJS, and keep the existing id attribute of every cell that is ' +
+			'kept so it can be matched to the diagram on the canvas. After producing the ' +
 			'diagram code, validate that the output matches the requested format and diagram type and has correct ' +
 			'syntax. Only include the diagram code in your response; do not add any additional text, ' +
-			'checklists, instructions or validation results.',
+			'checklists, instructions or validation results. If the prompt is a question or does not ask ' +
+			'for a diagram, answer it as plain text without any diagram code instead.',
 		'update': 'You are a helpful assistant that helps with ' +
-			'the following draw.io diagram and returns an updated draw.io diagram if needed. If the ' +
+			'the following draw.io diagram and returns an updated draw.io diagram if needed. When ' +
+			'asked to modify the diagram, return the complete updated diagram as draw.io XML without ' +
+			'indentation and newlines - never as MermaidJS or any other format - and keep the existing id ' +
+			'attribute of every cell that is kept so it can be matched to the diagram on the canvas. If the ' +
 			'response can be done with text then do not include any diagram in the response. Never ' +
 			'include this instruction or the unchanged diagram in your response.\n{data}',
 		'assist': 'You are a helpful assistant that creates XML for draw.io diagrams or helps ' +
@@ -416,8 +524,8 @@
 			request: {
 				max_tokens: 8192,
 				model: '{model}',
+				system: '{action}',
 				messages: [
-					{role: 'assistant', content: '{action}'},
 					{role: 'user', content: '{prompt}'}
 				],
 			},
@@ -429,13 +537,59 @@
 	 * Adds a list of available AI models.
 	 */
 	Editor.aiModels = [
+		{name: 'Claude 4.8 Opus', model: 'claude-opus-4-8', config: 'claude'},
 		{name: 'Claude 4.6 Opus', model: 'claude-opus-4-6', config: 'claude'},
-		{name: 'Claude 4.6 Sonnet', model: 'claude-sonnet-4-6', config: 'claude'},
 		{name: 'Gemini 3 Pro Preview', model: 'gemini-3-pro-preview', config: 'gemini'},
 		{name: 'Gemini 2.5 Pro', model: 'gemini-2.5-pro', config: 'gemini'},
 		{name: 'GPT-5.1', model: 'gpt-5.1-2025-11-13', config: 'gpt'},
 		{name: 'GPT-4.1', model: 'gpt-4.1-2025-04-14', config: 'gpt'},
 	];
+
+	/**
+	 * Returns false for AI endpoints on draw.io and diagrams.net hosts. The
+	 * hosted AI service has its own request path, so a configured endpoint
+	 * there, which an embedding host can set, would only send requests with
+	 * any body and headers to our own servers, with the user's cookies on
+	 * the same origin.
+	 */
+	Editor.isAllowedAiEndpoint = function(url)
+	{
+		try
+		{
+			var host = new URL(url, window.location.href).hostname;
+
+			return !/(^|\.)(draw\.io|diagrams\.net)\.?$/.test(host);
+		}
+		catch (e)
+		{
+			return false;
+		}
+	};
+
+	/**
+	 * Maximum number of characters (prompt, attached context and conversation
+	 * history combined) sent to the hosted AI service, which is free for the
+	 * user and paid for by draw.io. The conversation is truncated to the
+	 * newest turns that fit; a prompt/attachment that alone exceeds the limit
+	 * is rejected with the promptTooLarge error. 0 disables the limit.
+	 * BYO-key models are not limited.
+	 */
+	Editor.maxPublicPromptLength = 10000;
+
+	/**
+	 * The Atlassian deployments (ac.draw.io / aj.draw.io Connect apps and the
+	 * Forge CDN) get a larger prompt budget, configured via the
+	 * DRAWIO_ATLASSIAN_PROMPT_LENGTH global (Init.js). The value must not
+	 * exceed the per-origin limit enforced by the generate/v3 worker
+	 * (MAX_PROMPT_LENGTH_ATLASSIAN in cf-workers/generate3/lib/security.js).
+	 */
+	if (window.location.hostname == 'ac.draw.io' ||
+		window.location.hostname == 'aj.draw.io' ||
+		/\.cdn\.prod\.atlassian-dev\.net$/.test(window.location.hostname) ||
+		/\.cdn\.prod\.atlassian-dev-us-gov-mod\.net$/.test(window.location.hostname))
+	{
+		Editor.maxPublicPromptLength = window.DRAWIO_ATLASSIAN_PROMPT_LENGTH;
+	}
 
 	/**
 	 * Specifies if data URIs should be replaced with SVG sub-trees in SVG export.
@@ -449,6 +603,13 @@
 	 */
 	Editor.foreignObjectImages = true;
 		
+	/**
+	 * Specifies if fonts should be embedded as data URIs in exported and saved
+	 * SVG files. If disabled, external font references are added instead.
+	 * Default is true.
+	 */
+	Editor.embedSvgFonts = true;
+
 	/**
 	 * Specifies the theme to use for SVG files. Possible values are 'light',
 	 * 'dark' and 'auto'. Default is 'auto'.
@@ -500,6 +661,18 @@
 				}
 			}, getValue: function(state, format)
 			{
+				var graph = format.editorUi.editor.graph;
+				var cell = state.vertices[0];
+
+				// Text styles of labels of edges are resolved from the edge in the
+				// style of the state (see Graph.resolveInheritedLabelStyles)
+				if (cell != null && graph.model.isEdge(graph.model.getParent(cell)) &&
+					mxUtils.indexOf(Graph.inheritedLabelStyles, key) >= 0)
+				{
+					return mxUtils.indexOf(graph.getInheritedLabelKeys(
+						graph.getCellStyle(cell, false)), key) >= 0;
+				}
+
 				return mxUtils.getValue(state.style, key) == 'inherit';
 			}, valueChanged: function(newVal, input, state, format)
 			{
@@ -515,6 +688,17 @@
 				}
 			}
 		};
+	};
+
+	/**
+	 * Returns true if the given style defines a pattern fill style that is
+	 * rendered as an SVG fill pattern when sketch mode is disabled.
+	 */
+	Editor.isPatternFillStyle = function(style)
+	{
+		var fillStyle = mxUtils.getValue(style, 'fillStyle', 'auto');
+
+		return fillStyle != 'auto' && fillStyle != 'solid';
 	};
 
 	/**
@@ -540,17 +724,20 @@
         }},
         {name: 'fillWeight', dispName: 'Fill Weight', type: 'int', defVal: -1, isVisible: function(state, format)
         {
-        	return mxUtils.getValue(state.style, 'sketch', (urlParams['rough'] == '1') ? '1' : '0') == '1' &&
-				state.vertices.length > 0;
+        	return (mxUtils.getValue(state.style, 'sketch', (urlParams['rough'] == '1') ? '1' : '0') == '1' ||
+				Editor.isPatternFillStyle(state.style)) && state.vertices.length > 0;
         }},
         {name: 'hachureGap', dispName: 'Hachure Gap', type: 'int', defVal: -1, isVisible: function(state, format)
         {
-        	return mxUtils.getValue(state.style, 'sketch', (urlParams['rough'] == '1') ? '1' : '0') == '1' &&
-				state.vertices.length > 0;
+        	return (mxUtils.getValue(state.style, 'sketch', (urlParams['rough'] == '1') ? '1' : '0') == '1' ||
+				Editor.isPatternFillStyle(state.style)) && state.vertices.length > 0;
         }},
         {name: 'hachureAngle', dispName: 'Hachure Angle', type: 'int', defVal: -41, isVisible: function(state, format)
         {
-        	return mxUtils.getValue(state.style, 'sketch', (urlParams['rough'] == '1') ? '1' : '0') == '1' &&
+        	// The dots pattern ignores the hachure angle in normal mode
+        	return (mxUtils.getValue(state.style, 'sketch', (urlParams['rough'] == '1') ? '1' : '0') == '1' ||
+				(Editor.isPatternFillStyle(state.style) &&
+				mxUtils.getValue(state.style, 'fillStyle', 'auto') != 'dots')) &&
 				state.vertices.length > 0;
         }},
         {name: 'curveFitting', dispName: 'Curve Fitting', type: 'float', defVal: 0.95, isVisible: function(state, format)
@@ -580,7 +767,7 @@
         	return mxUtils.getValue(state.style, 'sketch', (urlParams['rough'] == '1') ? '1' : '0') == '1' &&
 				state.vertices.length > 0;
         }},
-        {name: 'zigzagOffset', dispName: 'ZigZag Offset', type: 'int', defVal: -1, isVisible: function(state, format)
+        {name: 'zigzagOffset', dispName: 'Zigzag Offset', type: 'int', defVal: -1, isVisible: function(state, format)
         {
         	return mxUtils.getValue(state.style, 'sketch', (urlParams['rough'] == '1') ? '1' : '0') == '1' &&
 				state.vertices.length > 0;
@@ -656,11 +843,22 @@
         {
     		return mxUtils.getValue(state.style, 'curved', '0') == '1';
         }},
+        {name: 'trimCurve', dispName: 'Trim Curve', type: 'bool', defVal: false, isVisible: function(state)
+        {
+			// Shapes that paint curves with mxConnector.paintCutCurve
+			var shape = mxUtils.getValue(state.style, mxConstants.STYLE_SHAPE, 'connector');
+
+			return (mxUtils.getValue(state.style, 'curved', '0') == '1' ||
+				mxUtils.getValue(state.style, 'bezier', '0') == '1') &&
+				(shape == 'connector' || shape == 'filledEdge' || shape == 'wire' || shape == 'pipe');
+        }},
         {name: 'sourcePortConstraint', dispName: 'Source Constraint', type: 'enum', defVal: 'none',
-        	enumList: [{val: 'none', dispName: 'None'}, {val: 'north', dispName: 'North'}, {val: 'east', dispName: 'East'}, {val: 'south', dispName: 'South'}, {val: 'west', dispName: 'West'}]
+        	enumList: [{val: 'none', dispName: 'None'}, {val: 'north', dispName: 'North'}, {val: 'east', dispName: 'East'}, {val: 'south', dispName: 'South'}, {val: 'west', dispName: 'West'},
+        		{val: 'northsouth', dispName: 'North + South'}, {val: 'eastwest', dispName: 'East + West'}]
         },
         {name: 'targetPortConstraint', dispName: 'Target Constraint', type: 'enum', defVal: 'none',
-        	enumList: [{val: 'none', dispName: 'None'}, {val: 'north', dispName: 'North'}, {val: 'east', dispName: 'East'}, {val: 'south', dispName: 'South'}, {val: 'west', dispName: 'West'}]
+        	enumList: [{val: 'none', dispName: 'None'}, {val: 'north', dispName: 'North'}, {val: 'east', dispName: 'East'}, {val: 'south', dispName: 'South'}, {val: 'west', dispName: 'West'},
+        		{val: 'northsouth', dispName: 'North + South'}, {val: 'eastwest', dispName: 'East + West'}]
         },
         {name: 'jettySize', dispName: 'Jetty Size', type: 'int', min: 0, defVal: 'auto', allowAuto: true, isVisible: function(state)
         {
@@ -674,11 +872,14 @@
         {name: 'strokeOpacity', dispName: 'Stroke Opacity', type: 'int', min: 0, max: 100, defVal: 100},
         {name: 'startFill', dispName: 'Start Fill', type: 'bool', defVal: true},
 		{name: 'startFillColor', dispName: 'Start Fill Color', type: 'color', defVal: null},
+		{name: 'startStrokeColor', dispName: 'Start Stroke Color', type: 'color', defVal: null},
         {name: 'endFill', dispName: 'End Fill', type: 'bool', defVal: true},
 		{name: 'endFillColor', dispName: 'End Fill Color', type: 'color', defVal: null},
+		{name: 'endStrokeColor', dispName: 'End Stroke Color', type: 'color', defVal: null},
         {name: 'perimeterSpacing', dispName: 'Terminal Spacing', type: 'float', defVal: 0},
         {name: 'anchorPointDirection', dispName: 'Anchor Direction', type: 'bool', defVal: true},
         {name: 'snapToPoint', dispName: 'Snap to Point', type: 'bool', defVal: false},
+        {name: 'fixedPointSpacing', dispName: 'Fixed Point Spacing', type: 'bool', defVal: false},
         {name: 'dashPattern', dispName: 'Dash Pattern', type: 'numbers', defVal: ''},
         {name: 'fixDash', dispName: 'Fixed Dash', type: 'bool', defVal: false},
 		{name: 'flowAnimationDuration', dispName: 'Flow Duration', type: 'int', defVal: 500, isVisible: function(state)
@@ -704,14 +905,50 @@
         {name: 'metaEdit', dispName: 'Edit Dialog', type: 'bool', defVal: false},
         {name: 'backgroundOutline', dispName: 'Background Outline', type: 'bool', defVal: false},
         {name: 'bendable', dispName: 'Bendable', type: 'bool', defVal: true},
+        {name: 'collapsedPoints', dispName: 'Collapsed Waypoints', type: 'bool', defVal: true},
         {name: 'movable', dispName: 'Movable', type: 'bool', defVal: true},
         {name: 'cloneable', dispName: 'Cloneable', type: 'bool', defVal: true},
         {name: 'deletable', dispName: 'Deletable', type: 'bool', defVal: true},
         {name: 'noJump', dispName: 'No Jumps', type: 'bool', defVal: false},
+        {name: 'jumpLayers', dispName: 'Jump Other Layers', type: 'bool', defVal: true},
 		{name: 'ignoreEdge', dispName: 'Ignore Edge', type: 'bool', defVal: false},
         {name: 'orthogonalLoop', dispName: 'Loop Routing', type: 'bool', defVal: false},
-		{name: 'orthogonal', dispName: 'Orthogonal', type: 'bool', defVal: false}
+		{name: 'orthogonal', dispName: 'Orthogonal Ends', type: 'bool', defVal: false, isVisible: function(state, format)
+		{
+			// Orthogonal routings already imply orthogonal ends and isometric routings
+			// ignore them (see Graph.isOrthogonal and the Orthogonal Ends option in
+			// StyleFormatPanel.addEffects)
+			var graph = format.editorUi.editor.graph;
+
+			for (var i = 0; i < state.edges.length; i++)
+			{
+				var edgeState = graph.view.getState(state.edges[i]);
+
+				if (edgeState != null)
+				{
+					var edgeStyle = graph.view.getEdgeStyle(edgeState);
+
+					if (graph.isOrthogonalEdgeStyle(edgeStyle) ||
+						edgeStyle == mxEdgeStyle.IsometricConnector)
+					{
+						return false;
+					}
+				}
+			}
+
+			return true;
+		}}
 	].concat(Editor.commonProperties);
+
+	/**
+	 * Property for the rounded outline of rectangles and labels (connection points
+	 * and floating edges, see Graph.isRoundedPerimeter).
+	 */
+	Editor.roundedPerimeterProperty = {name: 'roundedPerimeter', dispName: 'Rounded Perimeter',
+		type: 'bool', defVal: false, isVisible: function(state, format)
+		{
+			return mxUtils.getValue(state.style, mxConstants.STYLE_ROUNDED, '0') == '1';
+		}};
 
 	/**
 	 * Common properties for all vertices.
@@ -760,17 +997,69 @@
         }},
         {name: 'fillOpacity', dispName: 'Fill Opacity', type: 'int', min: 0, max: 100, defVal: 100},
         {name: 'strokeOpacity', dispName: 'Stroke Opacity', type: 'int', min: 0, max: 100, defVal: 100},
+		{name: 'multipleCount', dispName: 'Multiple Count', type: 'int', min: 1, max: Graph.maxMultipleCount, getDefaultValue: function()
+		{
+			return Graph.defaultMultipleCount;
+		}, isVisible: function(state, format)
+		{
+			return mxUtils.getValue(state.style, 'multiple', '0') == '1';
+		}},
+		{name: 'multipleDx', dispName: 'Multiple Offset X', type: 'float', getDefaultValue: function()
+		{
+			return Graph.defaultMultipleDx;
+		}, isVisible: function(state, format)
+		{
+			return mxUtils.getValue(state.style, 'multiple', '0') == '1';
+		}},
+		{name: 'multipleDy', dispName: 'Multiple Offset Y', type: 'float', getDefaultValue: function()
+		{
+			return Graph.defaultMultipleDy;
+		}, isVisible: function(state, format)
+		{
+			return mxUtils.getValue(state.style, 'multiple', '0') == '1';
+		}},
         {name: 'overflow', dispName: 'Text Overflow', defVal: 'visible', type: 'enum',
         	enumList: [{val: 'visible', dispName: 'Visible'}, {val: 'hidden', dispName: 'Hidden'}, {val: 'block', dispName: 'Block'},
         		{val: 'fill', dispName: 'Fill'}, {val: 'width', dispName: 'Width'}]
         },
+		{name: 'shapeInsideShape', dispName: 'Text Flow Shape', type: 'enum', defVal: null,
+			enumList: [{val: null, dispName: 'Automatic'}, {val: 'dataStorage', dispName: 'Data Storage'},
+				{val: 'ellipse', dispName: 'Ellipse'}, {val: 'hexagon', dispName: 'Hexagon'},
+				{val: 'or', dispName: 'Or'}, {val: 'parallelogram', dispName: 'Parallelogram'},
+				{val: 'rhombus', dispName: 'Rhombus'}, {val: 'step', dispName: 'Step'},
+				{val: 'trapezoid', dispName: 'Trapezoid'}, {val: 'triangle', dispName: 'Triangle'},
+				{val: 'xor', dispName: 'Xor'}],
+			onChange: function(graph, newValue)
+			{
+				// Enables the text flow with an explicit flow shape so
+				// that the effect is immediately visible
+				if (newValue != null && newValue != '')
+				{
+					var cells = graph.getSelectionCells();
+					var vertices = [];
+
+					for (var i = 0; i < cells.length; i++)
+					{
+						if (graph.model.isVertex(cells[i]))
+						{
+							vertices.push(cells[i]);
+						}
+					}
+
+					if (vertices.length > 0)
+					{
+						graph.setCellStyles('shapeInside', '1', vertices);
+					}
+				}
+			}},
+		{name: 'shapeInsidePadding', dispName: 'Text Flow Padding', type: 'float', min: 0, defVal: 2},
         {name: 'noLabel', dispName: 'Hide Label', type: 'bool', defVal: false},
-        {name: 'labelPadding', dispName: 'Label Padding', type: 'float', defVal: 0},
         {name: 'direction', dispName: 'Direction', type: 'enum', defVal: 'east',
         	enumList: [{val: 'north', dispName: 'North'}, {val: 'east', dispName: 'East'}, {val: 'south', dispName: 'South'}, {val: 'west', dispName: 'West'}]
         },
         {name: 'portConstraint', dispName: 'Constraint', type: 'enum', defVal: 'none',
-        	enumList: [{val: 'none', dispName: 'None'}, {val: 'north', dispName: 'North'}, {val: 'east', dispName: 'East'}, {val: 'south', dispName: 'South'}, {val: 'west', dispName: 'West'}]
+        	enumList: [{val: 'none', dispName: 'None'}, {val: 'north', dispName: 'North'}, {val: 'east', dispName: 'East'}, {val: 'south', dispName: 'South'}, {val: 'west', dispName: 'West'},
+        		{val: 'northsouth', dispName: 'North + South'}, {val: 'eastwest', dispName: 'East + West'}]
         },
         {name: 'portConstraintRotation', dispName: 'Rotate Constraint', type: 'bool', defVal: false},
         {name: 'connectable', dispName: 'Connectable', type: 'bool', getDefaultValue: function(state, format)
@@ -785,6 +1074,10 @@
         }},
         {name: 'allowArrows', dispName: 'Allow Arrows', type: 'bool', defVal: true},
         {name: 'snapToPoint', dispName: 'Snap to Point', type: 'bool', defVal: false},
+        {name: 'outlineConnect', dispName: 'Outline Connect', defVal: '1', type: 'enum',
+        	enumList: [{val: '1', dispName: 'Default'}, {val: '0', dispName: 'Delayed'},
+        		{val: '2', dispName: 'Always'}, {val: '3', dispName: 'Never'}]
+        },
         {name: 'perimeter', dispName: 'Perimeter', defVal: 'none', type: 'enum',
         	enumList: [{val: 'none', dispName: 'None'},
         			{val: 'rectanglePerimeter', dispName: 'Rectangle'}, {val: 'ellipsePerimeter', dispName: 'Ellipse'},
@@ -793,8 +1086,18 @@
         			{val: 'orthogonalPerimeter', dispName: 'Orthogonal'}, {val: 'backbonePerimeter', dispName: 'Backbone'},
         			{val: 'calloutPerimeter', dispName: 'Callout'}, {val: 'parallelogramPerimeter', dispName: 'Parallelogram'},
         			{val: 'trapezoidPerimeter', dispName: 'Trapezoid'}, {val: 'stepPerimeter', dispName: 'Step'},
-        			{val: 'centerPerimeter', dispName: 'Center'}]
+        			{val: 'centerPerimeter', dispName: 'Center'}, {val: 'cloudPerimeter', dispName: 'Cloud'},
+        			{val: 'outlinePerimeter', dispName: 'Outline'}]
         },
+        {name: 'labelPerimeter', dispName: 'Label Perimeter', type: 'bool', defVal: false,
+        	isVisible: function(state, format)
+        	{
+        		// Edges end at a label outside the shape on one side (mxGraphView.getLabelPerimeterSide)
+        		var graph = format.editorUi.editor.graph;
+
+        		return state.vertices.length > 0 && state.edges.length == 0 &&
+        			Graph.isLabelOutsideOnSide(graph.getCellStyle(state.vertices[0]));
+        	}},
         {name: 'fixDash', dispName: 'Fixed Dash', type: 'bool', defVal: false},
         {name: 'container', dispName: 'Container', type: 'bool', getDefaultValue: function(state, format)
         {
@@ -805,6 +1108,16 @@
 		}, isVisible: function(state, format)
         {
     		return state.vertices.length > 0 && state.edges.length == 0;
+        }},
+        {name: 'containerType', dispName: 'Container Type', type: 'enum', defVal: null,
+        	enumList: [{val: null, dispName: 'Default'}, {val: 'tree', dispName: 'Tree'}],
+        	isVisible: function(state, format)
+        {
+        	var cell = (state.vertices.length == 1 && state.edges.length == 0) ? state.vertices[0] : null;
+        	var graph = format.editorUi.editor.graph;
+
+        	return cell != null && (graph.isSwimlane(cell) || graph.isContainer(cell) ||
+        		graph.model.getChildCount(cell) > 0 || state.style['containerType'] != null);
         }},
         {name: 'dropTarget', dispName: 'Drop Target', type: 'bool', getDefaultValue: function(state, format)
         {
@@ -827,6 +1140,16 @@
         {
     		return state.vertices.length == 1 && state.edges.length == 0;
         }},
+        {name: 'foldingIconSize', dispName: 'Folding Icon Size', type: 'int', min: 1, getDefaultValue: function(state, format)
+        {
+        	return format.editorUi.editor.graph.expandedImage.width;
+        }, isVisible: function(state, format)
+        {
+        	var graph = format.editorUi.editor.graph;
+
+    		return state.vertices.length == 1 && state.edges.length == 0 &&
+    			graph.isCellFoldable(state.vertices[0]);
+        }},
         {name: 'recursiveResize', dispName: 'Resize Children', type: 'bool', defVal: true, isVisible: function(state, format)
         {
     		return state.vertices.length == 1 && state.edges.length == 0 &&
@@ -834,6 +1157,21 @@
     			mxUtils.getValue(state.style, 'childLayout', null) == null;
         }},
         {name: 'expand', dispName: 'Expand', type: 'bool', defVal: true},
+		{name: 'contract', dispName: 'Contract', type: 'bool', defVal: false},
+		{name: 'selectParentFirst', dispName: 'Select Parent First', type: 'bool',
+			defVal: false, isVisible: function(state, format)
+			{
+				if (state.vertices.length != 1 || state.edges.length > 0)
+				{
+					return false;
+				}
+
+				var cell = state.vertices[0];
+				var graph = format.editorUi.editor.graph;
+
+				return graph.isSwimlane(cell) ||
+					graph.model.getChildCount(cell) > 0;
+			}},
         {name: 'part', dispName: 'Part', type: 'bool', defVal: false, isVisible: function(state, format)
         {
         	var model = format.editorUi.editor.graph.model;
@@ -841,6 +1179,34 @@
         	return (state.vertices.length > 0) ? model.isVertex(model.getParent(state.vertices[0])) : false;
         }},
         {name: 'editable', dispName: 'Editable', type: 'bool', defVal: true},
+        {name: 'editIcon', dispName: 'Edit Icon', type: 'bool', defVal: false},
+        {name: 'moveIcon', dispName: 'Move Icon', type: 'bool', defVal: false,
+        	getDefaultValue: function(state, format)
+        	{
+        		var cell = (state.vertices.length == 1 && state.edges.length == 0) ?
+        			state.vertices[0] : null;
+        		var graph = format.editorUi.editor.graph;
+
+        		return cell != null && graph.isTransparentBounds != null &&
+        			graph.isTransparentBounds(cell);
+        	}},
+        {name: 'connectIcon', dispName: 'Connect Icon', type: 'bool',
+        	getDefaultValue: function(state, format)
+        	{
+        		return Editor.showConnectHandle === true;
+        	}},
+        {name: 'lockedGroup', dispName: 'Locked Group', type: 'enum', defVal: null,
+        	enumList: [{val: null, dispName: 'Default'}, {val: '0', dispName: 'Unlocked'}, {val: '1', dispName: 'Locked'}], isVisible: function(state, format)
+			{
+				return state.vertices.length > 0 && state.edges.length == 0;
+			}
+        },
+        {name: 'lockedGroupIcon', dispName: 'Lock Icon', type: 'enum', defVal: null,
+        	enumList: [{val: null, dispName: 'Default'}, {val: '0', dispName: 'Disabled'}, {val: '1', dispName: 'Visible'}], isVisible: function(state, format)
+			{
+				return state.vertices.length > 0 && state.edges.length == 0;
+			}
+        },
         {name: 'metaEdit', dispName: 'Edit Dialog', type: 'bool', defVal: false},
         {name: 'backgroundOutline', dispName: 'Background Outline', type: 'bool', defVal: false},
         {name: 'movable', dispName: 'Movable', type: 'bool', defVal: true},
@@ -861,6 +1227,7 @@
         {name: 'resizable', dispName: 'Resizable', type: 'bool', defVal: true},
         {name: 'resizeWidth', dispName: 'Resize Width', type: 'bool', defVal: false},
         {name: 'resizeHeight', dispName: 'Resize Height', type: 'bool', defVal: false},
+        {name: 'resizeCentered', dispName: 'Resize Centered', type: 'bool', defVal: false},
         {name: 'rotatable', dispName: 'Rotatable', type: 'bool', defVal: true},
         {name: 'cloneable', dispName: 'Cloneable', type: 'bool', defVal: true},
         {name: 'deletable', dispName: 'Deletable', type: 'bool', defVal: true},
@@ -983,6 +1350,15 @@
 		'#          "style": "curved=1;endArrow=blockThin;endFill=1;fontSize=11;"}\n' +
 		'# connect: {"from": "refs", "to": "id", "style": "curved=1;fontSize=11;"}\n' +
 		'#\n' +
+		'## Lists: makes each node a list (like a UML class or an ER table) with one row for each\n' +
+		'## value of the given column. Possible values are a column name, - (no list) or JSON with\n' +
+		'## the column and an optional separator for the values (default |), style and height for\n' +
+		'## the rows (default 26) and parentstyle for the list (default is a UML class). The style\n' +
+		'## of the node is added to the parentstyle. Multiple list entries are allowed, eg.\n' +
+		'## # list: {"column": "fields", "separator": "|", "height": 26}\n' +
+		'#\n' +
+		'# list: -\n' +
+		'#\n' +
 		'## Node x-coordinate. Possible value is a column name. Default is empty. Layouts will\n' +
 		'## override this value.\n' +
 		'#\n' +
@@ -1033,17 +1409,26 @@
 		'# edgespacing: 40\n' +
 		'#\n' +
 		'## Name or JSON of layout. Possible values are auto, none, verticaltree, horizontaltree,\n' +
-		'## verticalflow, horizontalflow, organic, circle, orgchart or a JSON string as used in\n' +
-		'## Layout, Apply. Default is auto.\n' +
+		'## verticalflow, horizontalflow, organic, circle, orgchart, the ELK shorthands\n' +
+		'## elkRadial, elkOrganic, elkStress, libavoid (orthogonal edge routing), parallels\n' +
+		'## (spread overlapping parallel edges), or a JSON string as used in Layout, Apply.\n' +
+		'## Default is auto.\n' +
 		'#\n' +
 		'# layout: auto\n' +
 		'#\n' +
+		'## Adds the new cells to a layout container that runs the layout again whenever\n' +
+		'## its cells change. Possible values are true, the style of the container or -\n' +
+		'## (no container). Updates add new cells to the container of the updated cells.\n' +
+		'## Not supported for orgchart. Default is -.\n' +
+		'#\n' +
+		'# container: -\n' +
+		'#\n' +
 		'## ---- CSV below this line. First line are column names. ----\n' +
 		'name,position,id,location,manager,email,fill,stroke,refs,url,image\n' +
-		'Tessa Miller,CFO,emi,Office 1,,me@example.com,default,#6c8ebf,,https://app.diagrams.net,https://cdn3.iconfinder.com/data/icons/user-avatars-1/512/users-3-128.png\n' +
-		'Edward Morrison,Brand Manager,emo,Office 2,Tessa Miller,me@example.com,default,#82b366,,https://app.diagrams.net,https://cdn3.iconfinder.com/data/icons/user-avatars-1/512/users-10-3-128.png\n' +
-		'Alison Donovan,System Admin,rdo,Office 3,Tessa Miller,me@example.com,default,#82b366,"emo,tva",https://app.diagrams.net,https://cdn3.iconfinder.com/data/icons/user-avatars-1/512/users-2-128.png\n' +
-		'Evan Valet,HR Director,tva,Office 4,Tessa Miller,me@example.com,default,#82b366,,https://app.diagrams.net,https://cdn3.iconfinder.com/data/icons/user-avatars-1/512/users-9-2-128.png\n';
+		'Tessa Miller,CFO,emi,Office 1,,me@example.com,default,#6c8ebf,,https://app.diagrams.net,https://icons.diagrams.net/icon-cache1/User_Pictures-2256/female1-521.svg\n' +
+		'Edward Morrison,Brand Manager,emo,Office 2,Tessa Miller,me@example.com,default,#82b366,,https://app.diagrams.net,https://icons.diagrams.net/icon-cache1/User_Pictures-2256/matureman1-782.svg\n' +
+		'Alison Donovan,System Admin,rdo,Office 3,Tessa Miller,me@example.com,default,#82b366,"emo,tva",https://app.diagrams.net,https://icons.diagrams.net/icon-cache1/User_Pictures-2256/maturewoman-3-795.svg\n' +
+		'Evan Valet,HR Director,tva,Office 4,Tessa Miller,me@example.com,default,#82b366,,https://app.diagrams.net,https://icons.diagrams.net/icon-cache1/User_Pictures-2256/malecostume-520.svg\n';
 
 	/**
 	 * Capability check for canvas API
@@ -1327,9 +1712,21 @@
 			c.setStrokeColor(o.fill || '');
 			c.setStrokeWidth(fweight);
 			c.setDashed(false);
-			
+
+			var prev = (ctx.root != null) ? ctx.root.lastChild : null;
+
 			this._drawToContext(ctx, drawing, o);
-			
+
+			// Tags the hachure fill path so getFlowAnimationPath skips it:
+			// it is stroked in the FILL color and would otherwise win the
+			// flow animation path selection for filled sketch shapes.
+			if (ctx.root != null && ctx.root.lastChild != null &&
+				ctx.root.lastChild != prev &&
+				ctx.root.lastChild.nodeName == 'path')
+			{
+				ctx.root.lastChild.setAttribute('data-rough-fill', '1');
+			}
+
 			c.setDashed(dashed);
 			c.setStrokeWidth(strokeWidth);
 			c.setStrokeColor(strokeColor);
@@ -1518,26 +1915,138 @@
 			
 			if (fillStyle == 'auto')
 			{
+				// Resolves light-dark colors to the currently rendered value before the
+				// background comparison. Otherwise hex2rgb/color2hex resolves them to the
+				// light value (detached canvas uses color-scheme normal), so any light-dark
+				// fill with a white light value renders solid even in dark mode (where the
+				// dark value applies and differs from the background).
+				var preferDark = mxUtils.lightDarkColorSupported ?
+					Editor.isDarkMode() : mxUtils.preferDarkColor;
+
+				var resolveColor = function(color)
+				{
+					if (mxUtils.isLightDarkColor(color))
+					{
+						var ld = mxUtils.parseLightDarkColor(color);
+						color = preferDark ? ld.dark : ld.light;
+					}
+
+					return mxUtils.hex2rgb(color);
+				};
+
 				// One of the following backgrounds for solid fill
-				var bg = [mxUtils.hex2rgb('#ffffff')];
-				
+				var bg = [resolveColor('#ffffff')];
+
 				if (this.shape.state != null)
 				{
-					bg.push(mxUtils.hex2rgb(this.shape.state.view.graph.shapeBackgroundColor));
+					bg.push(resolveColor(this.shape.state.view.graph.shapeBackgroundColor));
 				}
 
 				if (Editor.isDarkMode())
 				{
-					bg.push(mxUtils.hex2rgb(Editor.darkColor));
+					bg.push(resolveColor(Editor.darkColor));
 				}
 
 				fillStyle = (style.fill != null && (gradient != null || mxUtils.indexOf(
-					bg, mxUtils.hex2rgb(style.fill)) >= 0)) ? 'solid' : defs['fillStyle'];
+					bg, resolveColor(style.fill)) >= 0)) ? 'solid' : defs['fillStyle'];
 			}
 
 			style['fillStyle'] = fillStyle;
+
+			if (fill)
+			{
+				this.limitFill(style);
+			}
 			
 			return style;
+		};
+
+		/**
+		 * Maximum width plus height of shapes with a sketch fill. Larger shapes
+		 * are filled solid. Default is 200000.
+		 */
+		RoughCanvas.prototype.maxFillSize = 200000;
+
+		/**
+		 * Maximum number of lines of a sketch fill (hachure lines, dashes or
+		 * lines of zigzags). Default is 100000.
+		 */
+		RoughCanvas.prototype.maxFillCount = 100000;
+
+		/**
+		 * Limits the fill in the given style, as rough.js loops over the size of
+		 * the shape (scan lines are mostly one unit apart) and over the size
+		 * divided by the gaps (e.g. forever for dashGap=0;dashOffset=0 or
+		 * zigzagOffset=0). Shapes larger than maxFillSize are filled solid, and
+		 * the gaps are widened so that the fill has at most maxFillCount lines.
+		 * Smaller fills are unchanged.
+		 */
+		RoughCanvas.prototype.limitFill = function(style)
+		{
+			var bounds = this.shape.bounds;
+			var scale = this.shape.scale;
+			var fillStyle = style['fillStyle'];
+
+			if (bounds != null && scale > 0 && fillStyle != 'solid')
+			{
+				var w = bounds.width / scale;
+				var h = bounds.height / scale;
+
+				if (w + h > this.maxFillSize)
+				{
+					style['fillStyle'] = 'solid';
+				}
+				else
+				{
+					var gap = parseFloat(style['hachureGap']);
+					gap = (gap < 0) ? 4 * style.strokeWidth : gap;
+
+					if (gap >= 0)
+					{
+						var max = this.maxFillCount;
+
+						// Hachure lines in both directions for cross-hatch
+						// (rough.js uses a gap of at least 0.1)
+						var g = Math.max(gap, 0.1);
+						var minGap = ((fillStyle == 'cross-hatch') ? 2 : 1) * (w + h) / max;
+
+						if (g < minGap)
+						{
+							g = minGap;
+							style['hachureGap'] = g;
+						}
+
+						if (fillStyle == 'dashed')
+						{
+							var offset = parseFloat(style['dashOffset']);
+							var dashGap = parseFloat(style['dashGap']);
+							offset = (offset < 0) ? gap : offset;
+							dashGap = (dashGap < 0) ? gap : dashGap;
+							var dash = (w * h) / (g * max);
+
+							if (offset + dashGap < dash)
+							{
+								var f = (offset + dashGap > 0) ? dash / (offset + dashGap) : 0;
+								style['dashOffset'] = (f > 0) ? offset * f : dash / 2;
+								style['dashGap'] = (f > 0) ? dashGap * f : dash / 2;
+							}
+						}
+						else if (fillStyle == 'zigzag-line')
+						{
+							// Lines of zigzags (w * h / ((g + zigzag) * zigzag)), which
+							// take twice as long to paint
+							var zigzag = parseFloat(style['zigzagOffset']);
+							zigzag = (zigzag < 0) ? gap : zigzag;
+							var minZigzag = (Math.sqrt(g * g + 8 * w * h / max) - g) / 2;
+
+							if (zigzag < minZigzag)
+							{
+								style['zigzagOffset'] = minZigzag;
+							}
+						}
+					}
+				}
+			}
 		};
 		
 		RoughCanvas.prototype.begin = function()
@@ -1572,18 +2081,35 @@
 				
 				if (arguments.length > 2)
 				{
-					var s = this.canvas.state;
-		
+					var tr = this.getViewTranslate();
+
 					for (var i = 2; i < arguments.length; i += 2)
 					{
 						this.lastX = arguments[i - 1];
 						this.lastY = arguments[i];
-						
-						this.path.push(this.canvas.format((this.lastX)));
-						this.path.push(this.canvas.format((this.lastY)));
+
+						this.path.push(this.canvas.format(this.lastX - tr.x));
+						this.path.push(this.canvas.format(this.lastY - tr.y));
 					}
 				}
 			}
+		};
+
+		/**
+		 * Returns the view translate in the coordinates of the shape. Rough.js
+		 * rounds hachure lines to whole units, so the coordinates are passed in
+		 * diagram units to keep fills independent of the view translate.
+		 */
+		RoughCanvas.prototype.getViewTranslate = function()
+		{
+			var tr = this.shape.viewTranslate;
+
+			if (tr == null && this.shape.state != null)
+			{
+				tr = this.shape.state.view.translate;
+			}
+
+			return (tr != null) ? tr : new mxPoint();
 		};
 	
 		RoughCanvas.prototype.lineTo = function(endX, endY)
@@ -1688,8 +2214,10 @@
 			}
 			else
 			{
+				var tr = this.getViewTranslate();
 				this.path = [];
-				this.nextShape = this.rc.generator.rectangle(x, y, w, h, this.getStyle(true, true));
+				this.nextShape = this.rc.generator.rectangle(x - tr.x, y - tr.y,
+					w, h, this.getStyle(true, true));
 			}
 		};
 	
@@ -1701,8 +2229,10 @@
 			}
 			else
 			{
+				var tr = this.getViewTranslate();
 				this.path = [];
-				this.nextShape = this.rc.generator.ellipse(x + w / 2, y + h / 2, w, h, this.getStyle(true, true));
+				this.nextShape = this.rc.generator.ellipse(x + w / 2 - tr.x,
+					y + h / 2 - tr.y, w, h, this.getStyle(true, true));
 			}
 		};
 			
@@ -1729,6 +2259,16 @@
 	
 		RoughCanvas.prototype.drawPath = function(style)
 		{
+			// Paints the output in the coordinates of the shape
+			var tr = this.getViewTranslate();
+			var translate = tr.x != 0 || tr.y != 0;
+
+			if (translate)
+			{
+				this.canvas.save();
+				this.canvas.translate(tr.x, tr.y);
+			}
+
 			if (this.path.length > 0)
 			{
 				this.passThrough = true;
@@ -1748,22 +2288,27 @@
 				{
 					this.nextShape.options[key] = style[key];
 				}
-				
+
 				if (style['stroke'] == mxConstants.NONE ||
 					style['stroke'] == null)
 				{
 					delete this.nextShape.options['stroke'];
 				}
-				
+
 				if (!style.filled)
 				{
 					delete this.nextShape.options['fill'];
 				}
-	
+
 				this.passThrough = true;
 				this.rc.draw(this.nextShape);
 				this.passThrough = false;
-			}	
+			}
+
+			if (translate)
+			{
+				this.canvas.restore();
+			}
 		};
 		
 		RoughCanvas.prototype.stroke = function()
@@ -2188,28 +2733,73 @@
 		// Extracts Subject or Embedded file attachment from PDF 1.7
 		if (f.substring(0, 8) == '%PDF-1.7')
 		{
-			var blockStart = f.indexOf('EmbeddedFile'); 
-			
-			if (blockStart > -1)
+			// Hostile files may contain many tokens without a stream or
+			// many streams to inflate, so the stream keyword is only
+			// searched within the object's dictionary header and the
+			// number of inflate attempts is limited
+			var headerSize = 2048;
+			var maxAttempts = 8;
+
+			// Checks all occurrences as the first may be the /EmbeddedFiles
+			// name tree entry in the document catalog rather than the
+			// /Type /EmbeddedFile stream object with the attached diagram
+			var blockStart = f.indexOf('EmbeddedFile');
+			var attempts = 0;
+
+			while (blockStart > -1 && attempts < maxAttempts)
 			{
-				var streamStart = f.indexOf('stream', blockStart) + 9; //the start of the stream [skipping header check]
-				var fileInfo = f.substring(blockStart, streamStart);
-				
-				if (fileInfo.indexOf('application#2Fvnd.jgraph.mxfile') > 0)
+				var header = f.substring(blockStart, blockStart + headerSize);
+				var rel = header.indexOf('stream');
+				var mime = header.indexOf('application#2Fvnd.jgraph.mxfile');
+
+				if (rel > -1 && mime > 0 && mime < rel + 9)
 				{
+					attempts++;
+					var streamStart = blockStart + rel + 9; //the start of the stream [skipping header check]
 					var streamEnd = f.indexOf('endstream', streamStart - 1);
-				
-					return pako.inflateRaw(Graph.stringToArrayBuffer(
-						f.substring(streamStart, streamEnd)), {to: 'string'});
+
+					try
+					{
+						return pako.inflateRaw(Graph.stringToArrayBuffer(
+							f.substring(streamStart, streamEnd)), {to: 'string'});
+					}
+					catch (e)
+					{
+						// Continue to next occurrence or extraction method
+					}
 				}
+
+				blockStart = f.indexOf('EmbeddedFile', blockStart + 1);
 			}
 
+			// Counts all inflate attempts as object streams that inflate
+			// without a Subject cost as much as failing ones, and the Info
+			// dictionary with the Subject is in the first object stream of
+			// draw.io exports
 			var last = f.indexOf('/ObjStm');
+			attempts = 0;
 
-			while (last > 0)
+			while (last > 0 && attempts < maxAttempts)
 			{
-				var streamStart = f.indexOf('stream', last) + 9; //the start of the stream [skipping header check]
+				var rel = f.substring(last, last + headerSize).indexOf('stream');
+
+				if (rel < 0)
+				{
+					last = f.indexOf('/ObjStm', last + 1);
+
+					continue;
+				}
+
+				var streamStart = last + rel + 9; //the start of the stream [skipping header check]
 				var streamEnd = f.indexOf('endstream', streamStart - 1);
+
+				// Later object streams have no endstream either
+				if (streamEnd < 0)
+				{
+					break;
+				}
+
+				attempts++;
 				
 				function hex_to_ascii(hex)
 				{
@@ -2229,31 +2819,43 @@
 					return str.join('');
 				};
 
-				var text = pako.inflateRaw(Graph.stringToArrayBuffer(
-					f.substring(streamStart, streamEnd)), {to: 'string'});
-				var subj = text.indexOf('/Subject <');
-
-				// Extracts Subject from PDF 1.4
-				if (subj > 0)
+				try
 				{
-					var temp = text.substring(subj + 14, text.indexOf('>', subj));
+					var text = pako.inflateRaw(Graph.stringToArrayBuffer(
+						f.substring(streamStart, streamEnd)), {to: 'string'});
+					var subj = text.indexOf('/Subject <');
 
-					if (temp != null)
+					// Extracts Subject from PDF 1.4
+					if (subj > 0)
 					{
-						result = hex_to_ascii(temp);
-					}
+						var temp = text.substring(subj + 14, text.indexOf('>', subj));
 
-					break;
+						if (temp != null)
+						{
+							result = hex_to_ascii(temp);
+						}
+
+						break;
+					}
+				}
+				catch (e)
+				{
+					// Continue to next object stream
 				}
 
-				last = f.indexOf('/ObjStm', last + 1);
+				// Continues after the stream so that its data is only
+				// scanned, copied and inflated once
+				last = f.indexOf('/ObjStm', streamEnd);
 			}
 		}
 
-		// Extracts subject from PDF 1.4
-		if (result == null && f.substring(0, 8) == '%PDF-1.4')
+		// Extracts inline or referenced subject from other PDF versions,
+		// including files rewritten by external editors (eg. Preview
+		// saves PDF 1.3 with the subject as a literal string)
+		if (result == null && f.substring(0, 5) == '%PDF-')
 		{
 			var check = '/Subject (%3Cmxfile';
+			var inline = true;
 			var curline = '';
 			var checked = 0;
 			var pos = 0;
@@ -2270,7 +2872,7 @@
 					curline += String.fromCharCode(b);
 				}
 				
-				if (b == check.charCodeAt(checked))
+				if (inline && b == check.charCodeAt(checked))
 				{
 					checked++;
 				}
@@ -2291,6 +2893,10 @@
 
 						break;
 					}
+
+					// Later subjects have no closing tag either so the
+					// rest of the file only fills the lookup table
+					inline = false;
 				}
 				
 				// Creates table for lookup if no inline data is found
@@ -2324,11 +2930,16 @@
 		
 		if (result != null)
 		{
+			// Decodes the string escapes of external editors that rewrite
+			// the subject as a literal string (eg. Preview escapes the
+			// backslashes of the embedded subject), then the escaped
+			// parentheses of the embedded subject
 			result = decodeURIComponent(result.
+				replace(/\\([\\()])/g, '$1').
 				replace(/\\\(/g, "(").
 				replace(/\\\)/g, ")"));
 		}
-		
+
 		return result;
 	};
 
@@ -2344,10 +2955,11 @@
 		var trailer = obj['trailer'];
 		var result = null;
 
-		// Gets Info object
+		// Gets Info object without a leading .* in the patterns
+		// as failing matches would be quadratic in the line length
 		if (trailer != null)
 		{
-			var arr = /.* \/Info (\d+) (\d+) R/g.exec(trailer.join('\n'));
+			var arr = / \/Info (\d+) (\d+) R/g.exec(trailer.join('\n'));
 			
 			if (arr != null && arr.length > 0)
 			{
@@ -2355,7 +2967,7 @@
 				
 				if (info != null)
 				{
-					arr = /.* \/Subject (\d+) (\d+) R/g.exec(info.join('\n'));
+					arr = / \/Subject (\d+) (\d+) R/g.exec(info.join('\n'));
 				
 					if (arr != null && arr.length > 0)
 					{
@@ -2443,7 +3055,70 @@
 			{
 				urlParams['test'] = '1'
 			}
-			
+
+			// Inline embed mode options
+			if (config.passiveScroll)
+			{
+				Editor.passiveScroll = true;
+
+				// Mouse wheel scrolls the host page unless zoomWheel is set
+				Graph.zoomWheel = false;
+			}
+
+			if (config.noResizers)
+			{
+				Editor.noResizers = true;
+			}
+
+			if (config.preserveViewState)
+			{
+				Editor.preserveViewState = true;
+			}
+
+			// Keyboard chords the embedding host wants to handle itself (e.g.
+			// Ctrl+P for VS Code Quick Open). In embed mode draw.io intercepts
+			// these in the capture phase, suppresses its own handling, and posts
+			// the host's command back, so a host can reclaim shortcuts even across
+			// a cross-origin iframe where it cannot inject its own key listener.
+			// Each entry is {key, ctrl, shift, alt, command}; see
+			// EditorUi.installPassThroughKeys.
+			if (config.passThroughKeys != null)
+			{
+				Editor.passThroughKeys = config.passThroughKeys;
+			}
+
+			// Custom keyboard shortcuts that bind keys to actions and
+			// override the default bindings. Each entry is {keyCode,
+			// control, shift, alt, action} where action is the name of
+			// an entry in EditorUi.actions, or null to remove an
+			// existing binding. See EditorUi.installKeyboardShortcuts.
+			if (config.keyboardShortcuts != null)
+			{
+				if (Array.isArray(config.keyboardShortcuts))
+				{
+					Editor.keyboardShortcuts = config.keyboardShortcuts;
+				}
+				else
+				{
+					EditorUi.debug('Configuration Error: Array expected for keyboardShortcuts');
+				}
+			}
+
+			// When set, the host blocks new windows/tabs (e.g. a VS Code webview):
+			// link clicks are forwarded to the host via {event:'openLink'} instead
+			// of window.open, and "open in new window/tab" options are hidden.
+			// Implies popupsAllowed=false. See Editor.suppressNewWindows.
+			if (config.suppressNewWindows)
+			{
+				Editor.suppressNewWindows = true;
+				Editor.popupsAllowed = false;
+			}
+
+			if (config.useInternalClipboard)
+			{
+				EditorUi.prototype.useInternalClipboard = config.useInternalClipboard;
+			}
+
 			if (config.customCss != null)
 			{
 				var style = document.createElement('style');
@@ -2451,10 +3126,40 @@
 				style.appendChild(document.createTextNode(config.customCss));
 				document.head.appendChild(style);
 			}
+
+			// Overrides existing or adds new language resources for
+			// mxResources.get. Maps from resource keys to strings, or to
+			// objects with one entry per language and main as the fallback,
+			// eg. {"saveAs": {"main": "Save a Copy", "de": "Kopie speichern"},
+			// "myKey": "My Text"}. See Editor.applyCustomResources.
+			if (config.resources != null)
+			{
+				if (typeof config.resources === 'object' &&
+					!Array.isArray(config.resources))
+				{
+					Editor.customResources = config.resources;
+					Editor.applyCustomResources();
+				}
+				else
+				{
+					EditorUi.debug('Configuration Error: Object expected for resources');
+				}
+			}
 			
+			if (config.enableLocalFonts != null)
+			{
+				Editor.enableLocalFonts = config.enableLocalFonts;
+			}
+
+			if (config.enableCustomGitLabUrl != null)
+			{
+				Editor.enableCustomGitLabUrl = config.enableCustomGitLabUrl;
+			}
+
 			if (config.defaultFonts != null)
 			{
 				Menus.prototype.defaultFonts = config.defaultFonts
+				Editor.addAllowedFontUrls(config.defaultFonts);
 			}
 
 			if (config.presetColors != null)
@@ -2487,6 +3192,23 @@
 				Graph.selectParentLayer = config.selectParentLayer
 			}
 
+			if (config.intersectionSelect != null)
+			{
+				Graph.intersectionSelect = config.intersectionSelect
+			}
+
+			if (config.swimlaneSelectionEnabled != null)
+			{
+				Graph.prototype.swimlaneSelectionEnabled = config.swimlaneSelectionEnabled;
+			}
+
+			// One box with resize and rotation handles for multiple selected
+			// cells (see Graph.MultiSelectionHandler)
+			if (config.multiSelectionHandles != null)
+			{
+				Graph.prototype.multiSelectionHandlesEnabled = config.multiSelectionHandles === true;
+			}
+
 			if (config.autosaveDelay != null)
 			{
 				DrawioFile.prototype.autosaveDelay = config.autosaveDelay
@@ -2495,6 +3217,30 @@
 			if (config.templateFile != null)
 			{
 				EditorUi.templateFile = config.templateFile;
+			}
+
+			if (config.enabledTemplateSections != null)
+			{
+				if (Array.isArray(config.enabledTemplateSections))
+				{
+					EditorUi.enabledTemplateSections = config.enabledTemplateSections;
+				}
+				else
+				{
+					EditorUi.debug('Configuration Error: Array expected for enabledTemplateSections');
+				}
+			}
+
+			if (config.customTemplates != null)
+			{
+				if (Array.isArray(config.customTemplates))
+				{
+					EditorUi.customTemplates = config.customTemplates;
+				}
+				else
+				{
+					EditorUi.debug('Configuration Error: Array expected for customTemplates');
+				}
 			}
 			
 			if (config.styles != null)
@@ -2514,12 +3260,27 @@
 				Editor.globalVars = config.globalVars;
 			}
 
+			if (config.defaultFileType != null)
+			{
+				Editor.defaultFileType = config.defaultFileType;
+			}
+
 			if (config.compressXml != null)
 			{
 				Editor.defaultCompressed = config.compressXml;
 				Editor.compressXml = config.compressXml;
 			}
-			
+
+			if (config.compressStyles != null)
+			{
+				var modelCodec = mxCodecRegistry.getCodec(mxGraphModel);
+
+				if (modelCodec != null)
+				{
+					modelCodec.enableStyleCompression = config.compressStyles;
+				}
+			}
+
 			if (config.includeDiagram != null)
 			{
 				Editor.defaultIncludeDiagram = config.includeDiagram;
@@ -2528,6 +3289,49 @@
 			if (config.simpleLabels != null)
 			{
 				Editor.simpleLabels = config.simpleLabels;
+			}
+
+			if (config.optimizeHtmlLabels != null)
+			{
+				Editor.optimizeHtmlLabels = config.optimizeHtmlLabels;
+			}
+
+			if (config.fastRendering != null)
+			{
+				Editor.fastRendering = config.fastRendering;
+			}
+
+			if (config.forceExplore != null)
+			{
+				Editor.forceExplore = config.forceExplore;
+			}
+
+			if (config.springMove != null)
+			{
+				Editor.springMove = config.springMove;
+			}
+
+			if (config.mathOutputSize != null)
+			{
+				Editor.mathOutputSize = config.mathOutputSize;
+			}
+
+			// Default Mermaid config used when inserting/editing Mermaid
+			// diagrams (theme, themeVariables, per-diagram-type options, ...),
+			// letting a deployment enforce a unified Mermaid look. The
+			// security-critical keys (securityLevel, startOnLoad, maxTextSize)
+			// are re-forced in EditorUi.getMermaidConfig after this default is
+			// cloned, so they cannot be weakened here.
+			if (config.mermaid != null)
+			{
+				if (typeof config.mermaid === 'object' && !Array.isArray(config.mermaid))
+				{
+					EditorUi.defaultMermaidConfig = config.mermaid;
+				}
+				else
+				{
+					EditorUi.debug('Configuration Error: Object expected for mermaid');
+				}
 			}
 
 			if (config.pasteAtMousePointer != null)
@@ -2540,11 +3344,95 @@
 				Editor.fitDiagramOnLoad = config.fitDiagramOnLoad;
 			}
 
+			if (config.fitDiagramOnPage != null)
+			{
+				Editor.fitDiagramOnPage = config.fitDiagramOnPage;
+			}
+
 			if (config.showLinkIcons != null)
 			{
 				Editor.showLinkIcons = config.showLinkIcons;
 			}
 
+			if (config.showTooltipIcons != null)
+			{
+				Editor.showTooltipIcons = config.showTooltipIcons;
+			}
+
+			if (config.showNoteIcons != null)
+			{
+				Editor.showNoteIcons = config.showNoteIcons;
+			}
+
+			if (config.tooltipFontSize != null)
+			{
+				var val = parseInt(config.tooltipFontSize);
+
+				if (!isNaN(val) && val > 0)
+				{
+					Editor.tooltipFontSize = val;
+				}
+				else
+				{
+					EditorUi.debug('Configuration Error: Int > 0 expected for tooltipFontSize');
+				}
+			}
+
+			if (config.tooltipMaxWidth != null)
+			{
+				var val = parseInt(config.tooltipMaxWidth);
+
+				if (!isNaN(val) && val >= 0)
+				{
+					Editor.tooltipMaxWidth = val;
+				}
+				else
+				{
+					EditorUi.debug('Configuration Error: Int >= 0 expected for tooltipMaxWidth');
+				}
+			}
+
+			if (config.expandPatternsForPrint != null)
+			{
+				Editor.expandPatternsForPrint = config.expandPatternsForPrint;
+			}
+
+			if (config.showConnectHandle != null)
+			{
+				Editor.showConnectHandle = config.showConnectHandle;
+			}
+
+			if (config.enableInlineToolbar != null)
+			{
+				Editor.enableInlineToolbar = config.enableInlineToolbar;
+			}
+
+			if (config.enableShapeInlineToolbar != null)
+			{
+				Editor.enableShapeInlineToolbar = config.enableShapeInlineToolbar;
+			}
+
+			// Handlers are not defined in the embedded graph
+			if (config.enableSizeGuides != null && typeof mxVertexHandler !== 'undefined')
+			{
+				mxVertexHandler.prototype.sizeGuidesEnabled = config.enableSizeGuides;
+			}
+
+			if (config.enablePositionGuides != null && typeof mxGuide !== 'undefined')
+			{
+				mxGuide.prototype.positionEnabled = config.enablePositionGuides;
+			}
+
+			if (config.enableDistanceGuides != null && typeof mxGuide !== 'undefined')
+			{
+				mxGuide.prototype.distanceEnabled = config.enableDistanceGuides;
+			}
+
+			if (config.defaultTransparentGroups != null)
+			{
+				Editor.defaultTransparentGroups = config.defaultTransparentGroups;
+			}
+			
 			if (config.oneDriveInlinePicker != null)
 			{
 				Editor.oneDriveInlinePicker = config.oneDriveInlinePicker;
@@ -2575,6 +3463,18 @@
 				mxUtils.lightDarkColorSupported = config.enableLightDarkColors;
 			}
 			
+			// Uses system colors for the defaults of darkColor, lightColor
+			// and defaultPageBackgroundColor, the default colors of shapes
+			// and the user interface (see :root.geSystemColors in CSS)
+			if (config.systemColors)
+			{
+				Editor.systemColors = true;
+				Editor.darkColor = 'Canvas';
+				Editor.lightColor = 'CanvasText';
+				Editor.pageBackgroundColor = 'Canvas';
+				document.documentElement.classList.add('geSystemColors');
+			}
+
 			if (config.darkColor != null)
 			{
 				Editor.darkColor = config.darkColor;
@@ -2585,11 +3485,46 @@
 				Editor.darkColorVar = config.darkColorVar;
 			}
 
-			// Updates colors that depend on Editor.darkColor
+			if (config.lightColor != null)
+			{
+				Editor.lightColor = config.lightColor;
+			}
+
+			if (config.lightColorVar != null)
+			{
+				Editor.lightColorVar = config.lightColorVar;
+			}
+
+			if (config.defaultPageBackgroundColor != null)
+			{
+				Editor.pageBackgroundColor = config.defaultPageBackgroundColor;
+			}
+
+			if (config.defaultDarkPageBackgroundColor != null)
+			{
+				Editor.darkPageBackgroundColor = config.defaultDarkPageBackgroundColor;
+			}
+
+			if (config.defaultGridColor != null)
+			{
+				mxGraphView.prototype.defaultGridColor = config.defaultGridColor;
+			}
+
+			if (config.defaultDarkGridColor != null)
+			{
+				mxGraphView.prototype.defaultDarkGridColor = config.defaultDarkGridColor;
+			}
+
+			// Updates the initial grid color for the current theme
+			mxGraphView.prototype.gridColor = (Editor.isDarkMode()) ?
+				mxGraphView.prototype.defaultDarkGridColor :
+				mxGraphView.prototype.defaultGridColor;
+
+			// Updates colors that depend on Editor.darkColor and Editor.lightColor
 			// LATER: Add event to update darkColor dependencies
-			Graph.prototype.defaultPageBackgroundColor = 'light-dark(#ffffff, ' + Editor.darkColor + ')';
-			Graph.prototype.shapeBackgroundColor = 'light-dark(#ffffff, var(' +
-				Editor.darkColorVar + ', ' + Editor.darkColor + '))';
+			Graph.prototype.defaultPageBackgroundColor = Editor.getDefaultPageBackgroundColor();
+			Graph.prototype.shapeForegroundColor = Editor.getShapeForegroundColor();
+			Graph.prototype.shapeBackgroundColor = Editor.getShapeBackgroundColor();
 			
 			if (config.settingsName != null)
 			{
@@ -2602,6 +3537,7 @@
 			{
 				Menus.prototype.defaultFonts = config.customFonts.
 					concat(Menus.prototype.defaultFonts);
+				Editor.addAllowedFontUrls(config.customFonts);
 			}
 			
 			if (config.customPresetColors != null)
@@ -2667,11 +3603,30 @@
 			{
 				Editor.defaultCustomLibraries = config.defaultCustomLibraries;
 			}
+
+			// Language bundles installed for offline use on startup
+			if (config.defaultLanguages != null)
+			{
+				if (Array.isArray(config.defaultLanguages))
+				{
+					Editor.defaultLanguages = config.defaultLanguages;
+				}
+				else
+				{
+					EditorUi.debug('Configuration Error: Array expected for defaultLanguages');
+				}
+			}
 			
 			// Disables custom libraries
 			if (config.enableCustomLibraries != null)
 			{
 				Editor.enableCustomLibraries = config.enableCustomLibraries;
+			}
+
+			// Inlines icon search results as data URIs on insert
+			if (config.inlineExtIcons != null)
+			{
+				Editor.inlineExtIcons = config.inlineExtIcons;
 			}
 			
 			// Overrides default vertex style
@@ -2686,6 +3641,12 @@
 				Graph.prototype.defaultEdgeStyle = config.defaultEdgeStyle;
 			}
 
+			// Overrides default shape picker entries
+			if (config.shapePicker != null)
+			{
+				EditorUi.prototype.defaultShapePickerEntries = config.shapePicker.shapes;
+			}
+
 			// Overrides default page visible
 			if (config.defaultPageVisible != null)
 			{
@@ -2698,10 +3659,59 @@
 				Graph.prototype.defaultGridEnabled = config.defaultGridEnabled;
 			}
 
+			// Overrides default connection arrows on hover
+			if (config.defaultConnectionArrowsEnabled != null)
+			{
+				Graph.prototype.defaultConnectionArrowsEnabled = config.defaultConnectionArrowsEnabled;
+				Graph.prototype.connectionArrowsEnabled = config.defaultConnectionArrowsEnabled;
+			}
+
+			// Overrides default connectable (connection handler)
+			if (config.defaultConnectable != null)
+			{
+				Graph.prototype.defaultConnectable = config.defaultConnectable;
+			}
+
+			// Overrides copy on connect
+			if (config.copyOnConnect != null)
+			{
+				mxConnectionHandler.prototype.createTarget = config.copyOnConnect;
+			}
+
+			// Overrides stop editing on enter
+			if (config.stopEditingOnEnter != null)
+			{
+				mxGraph.prototype.enterStopsCellEditing = config.stopEditingOnEnter;
+			}
+
+			// Shift+Cursor selects the nearest shape and Alt+Cursor moves by the grid size
+			if (config.shiftArrowSelect != null)
+			{
+				EditorUi.prototype.shiftArrowSelect = config.shiftArrowSelect;
+			}
+
+			// Overrides default folding enabled
+			if (config.defaultFoldingEnabled != null)
+			{
+				Graph.prototype.defaultFoldingEnabled = config.defaultFoldingEnabled;
+			}
+
+			// Overrides folding icon size
+			if (config.foldingIconSize != null)
+			{
+				Graph.updateFoldingImages(config.foldingIconSize);
+			}
+
 			// Overrides mouse wheel function
 			if (config.zoomWheel != null)
 			{
 				Graph.zoomWheel = config.zoomWheel;
+			}
+
+			// Enables browser translation mirror
+			if (config.browserTranslate != null)
+			{
+				Graph.browserTranslate = config.browserTranslate;
 			}
 
 			// Overrides zoom factor
@@ -2829,7 +3839,7 @@
 			if (config.autosaveDelay != null)
 			{
 				var val = parseInt(config.autosaveDelay);
-				
+
 				if (!isNaN(val) && val > 0)
 				{
 					DrawioFile.prototype.autosaveDelay = val;
@@ -2885,9 +3895,14 @@
 				Editor.foreignObjectImages = config.foreignObjectImages;
 			}
 
+			if (config.embedSvgFonts != null)
+			{
+				Editor.embedSvgFonts = config.embedSvgFonts;
+			}
+
 			if (config.shadowColor != null)
 			{
-				mxConstants.SHADOW_COLOR = config.shadowColor;
+				mxConstants.SHADOWCOLOR = config.shadowColor;
 			}
 
 			if (config.shadowOpacity != null)
@@ -2915,11 +3930,75 @@
 				Editor.enableAnimations = config.enableAnimations;
 			}
 
+			if (config.insertAnimations != null)
+			{
+				Editor.insertAnimations = config.insertAnimations;
+			}
+
+			if (config.enableWindowDocking != null)
+			{
+				Editor.enableWindowDocking = config.enableWindowDocking;
+			}
+
+			if (config.restoreVisibleWindows != null)
+			{
+				Editor.restoreVisibleWindows = config.restoreVisibleWindows;
+			}
+
+			if (config.compact != null)
+			{
+				EditorUi.prototype.defaultCompact = config.compact;
+			}
+
+			if (config.noAutoFocus != null)
+			{
+				EditorUi.prototype.noAutoFocus = config.noAutoFocus;
+			}
+
+			if (config.hideMenuItems != null)
+			{
+				if (Array.isArray(config.hideMenuItems))
+				{
+					Menus.prototype.hiddenMenuItems = {};
+
+					for (var i = 0; i < config.hideMenuItems.length; i++)
+					{
+						Menus.prototype.hiddenMenuItems[config.hideMenuItems[i]] = true;
+					}
+				}
+				else
+				{
+					EditorUi.debug('Configuration Error: Array expected for hideMenuItems');
+				}
+			}
+
+			if (config.hideMenus != null)
+			{
+				if (Array.isArray(config.hideMenus))
+				{
+					var hiddenLookup = {};
+
+					for (var i = 0; i < config.hideMenus.length; i++)
+					{
+						hiddenLookup[config.hideMenus[i]] = true;
+					}
+
+					Menus.prototype.defaultMenuItems = Menus.prototype.defaultMenuItems.filter(function(m)
+					{
+						return !hiddenLookup[m];
+					});
+				}
+				else
+				{
+					EditorUi.debug('Configuration Error: Array expected for hideMenus');
+				}
+			}
+
 			if (config.enableAi != null)
 			{
 				Editor.enableAi = config.enableAi;
 			}
-			
+
 			if (config.enableChatGpt != null)
 			{
 				Editor.enableAi = config.enableChatGpt;
@@ -2966,6 +4045,56 @@
 			}
 		}
 	};
+
+	/**
+	 * Applies Editor.customResources to mxResources, see Editor.configure.
+	 * Values with one entry per language are resolved using the lowercase
+	 * current language, the part before the dash (eg. de for de-ch) or
+	 * main, in this order.
+	 */
+	Editor.applyCustomResources = function()
+	{
+		if (Editor.customResources != null)
+		{
+			var lan = (mxClient.language != null) ?
+				mxClient.language.toLowerCase() : null;
+			var dash = (lan != null) ? lan.indexOf('-') : -1;
+
+			for (var key in Editor.customResources)
+			{
+				var value = Editor.customResources[key];
+
+				if (value != null && typeof value === 'object')
+				{
+					value = ((lan != null) ? value[lan] : null) ||
+						((dash > 0) ? value[lan.substring(0, dash)] : null) ||
+						value['main'];
+				}
+
+				// Configured values are plain text since some resources
+				// are written as HTML, eg. menu items and alert links
+				if (typeof value === 'string' && value.indexOf('<') < 0)
+				{
+					mxResources.resources[key] = value;
+				}
+				else if (value != null)
+				{
+					EditorUi.debug('Configuration Error: Text expected for resource', key);
+				}
+			}
+		}
+	};
+
+	// Reapplies custom resources after each parsed resource bundle so that
+	// configured values take precedence over the built-in language files,
+	// including after the language was changed
+	var mxResourcesParse = mxResources.parse;
+
+	mxResources.parse = function(text)
+	{
+		mxResourcesParse.apply(this, arguments);
+		Editor.applyCustomResources();
+	};
 	
 	/**
 	 * 
@@ -2974,7 +4103,369 @@
 	{
 		return typeof window.mxSettings !== 'undefined' && (isLocalStorage || mxClient.IS_CHROMEAPP);
 	};
-	
+
+	/**
+	 * Expands SVG fill patterns into inline vector geometry clipped to each
+	 * shape so that patterns are not rasterized by Chrome's PDF backend.
+	 */
+	Editor.expandSvgPatterns = function(svg)
+	{
+		var svgNS = 'http://www.w3.org/2000/svg';
+		var clipCounter = 0;
+		// Per-call prefix so multi-page print output (multiple SVGs in one
+		// document) can't collide on clipPath ids — without it the second
+		// SVG's url(#expand-pattern-clip-1) resolves to the first SVG's clip
+		// and the pattern fill is clipped off the page.
+		var clipPrefix = 'expand-pattern-clip-' + Editor.guid(8) + '-';
+
+		/**
+		 * Parses a patternTransform attribute string into its components.
+		 * Expected form: "translate(tx,ty) rotate(angle) scale(s)"
+		 */
+		function parsePatternTransform(str)
+		{
+			var tx = 0, ty = 0, angle = 0, sx = 1, sy = 1;
+
+			if (str != null)
+			{
+				var translateMatch = str.match(/translate\(\s*([^,\s]+)[,\s]+([^)]+)\)/);
+
+				if (translateMatch != null)
+				{
+					tx = parseFloat(translateMatch[1]);
+					ty = parseFloat(translateMatch[2]);
+				}
+
+				var rotateMatch = str.match(/rotate\(\s*([^)]+)\)/);
+
+				if (rotateMatch != null)
+				{
+					angle = parseFloat(rotateMatch[1]) * Math.PI / 180;
+				}
+
+				var scaleMatch = str.match(/scale\(\s*([^,\s)]+)(?:[,\s]+([^)]+))?\)/);
+
+				if (scaleMatch != null)
+				{
+					sx = parseFloat(scaleMatch[1]);
+					sy = (scaleMatch[2] != null) ? parseFloat(scaleMatch[2]) : sx;
+				}
+			}
+
+			return {tx: tx, ty: ty, angle: angle, sx: sx, sy: sy};
+		};
+
+		/**
+		 * Transforms a point from pattern space to user space.
+		 */
+		function transformPoint(x, y, t)
+		{
+			// Apply scale
+			var sx = x * t.sx;
+			var sy = y * t.sy;
+
+			// Apply rotation
+			var cos = Math.cos(t.angle);
+			var sin = Math.sin(t.angle);
+			var rx = sx * cos - sy * sin;
+			var ry = sx * sin + sy * cos;
+
+			// Apply translation
+			return {x: rx + t.tx, y: ry + t.ty};
+		};
+
+		/**
+		 * Transforms a point from user space to pattern space (inverse).
+		 */
+		function inverseTransformPoint(x, y, t)
+		{
+			// Remove translation
+			var dx = x - t.tx;
+			var dy = y - t.ty;
+
+			// Inverse rotation
+			var cos = Math.cos(-t.angle);
+			var sin = Math.sin(-t.angle);
+			var rx = dx * cos - dy * sin;
+			var ry = dx * sin + dy * cos;
+
+			// Inverse scale
+			return {x: rx / t.sx, y: ry / t.sy};
+		};
+
+		/**
+		 * Resolves a fill URL reference to a pattern element.
+		 */
+		function resolvePattern(el, svgRoot)
+		{
+			var fill = el.getAttribute('fill');
+
+			if (fill == null || fill.indexOf('url(') !== 0)
+			{
+				return null;
+			}
+
+			var match = fill.match(/url\([^#]*#([^)"]+)\)?/);
+
+			if (match == null)
+			{
+				return null;
+			}
+
+			var patternId = match[1];
+
+			// Uses querySelector on SVG root instead of getElementById
+			// because the print preview document may not have indexed IDs
+			try
+			{
+				var pattern = svgRoot.querySelector('#' + CSS.escape(patternId));
+
+				return (pattern != null && pattern.nodeName === 'pattern') ? pattern : null;
+			}
+			catch (e)
+			{
+				return null;
+			}
+		};
+
+		/**
+		 * Expands a single pattern-filled element.
+		 */
+		function expandElement(el, pattern, svgRoot)
+		{
+			var bbox;
+
+			try
+			{
+				bbox = el.getBBox();
+			}
+			catch (e)
+			{
+				return;
+			}
+
+			if (bbox.width === 0 || bbox.height === 0)
+			{
+				return;
+			}
+
+			var pw = parseFloat(pattern.getAttribute('width'));
+			var ph = parseFloat(pattern.getAttribute('height'));
+
+			if (isNaN(pw) || isNaN(ph) || pw <= 0 || ph <= 0)
+			{
+				return;
+			}
+
+			var t = parsePatternTransform(pattern.getAttribute('patternTransform'));
+
+			// Bbox is already in the element's user coordinate system, which is
+			// the space the pattern's userSpaceOnUse references. Do not apply the
+			// element's CTM — that would shift coordinates into SVG viewport space
+			// and miscompute the tile range whenever an ancestor group has a
+			// transform (notably the print preview's CSS-transform scale+translate
+			// when crop or fit is enabled).
+			var corners = [
+				{x: bbox.x, y: bbox.y},
+				{x: bbox.x + bbox.width, y: bbox.y},
+				{x: bbox.x + bbox.width, y: bbox.y + bbox.height},
+				{x: bbox.x, y: bbox.y + bbox.height}
+			];
+
+			// Transform corners to pattern space (inverse of patternTransform)
+			var minX = Infinity, minY = Infinity;
+			var maxX = -Infinity, maxY = -Infinity;
+
+			for (var i = 0; i < corners.length; i++)
+			{
+				var p = inverseTransformPoint(corners[i].x, corners[i].y, t);
+				minX = Math.min(minX, p.x);
+				minY = Math.min(minY, p.y);
+				maxX = Math.max(maxX, p.x);
+				maxY = Math.max(maxY, p.y);
+			}
+
+			// Compute tile index range with margin
+			var tileMinX = Math.floor(minX / pw) - 1;
+			var tileMinY = Math.floor(minY / ph) - 1;
+			var tileMaxX = Math.ceil(maxX / pw) + 1;
+			var tileMaxY = Math.ceil(maxY / ph) + 1;
+
+			// Safety limit to prevent excessive tiles
+			var maxTiles = 10000;
+			var tileCount = (tileMaxX - tileMinX) * (tileMaxY - tileMinY);
+
+			if (tileCount > maxTiles)
+			{
+				return;
+			}
+
+			// Create the clip path from the element
+			var clipId = clipPrefix + (++clipCounter);
+			var clipPath = svgRoot.ownerDocument.createElementNS(svgNS, 'clipPath');
+			clipPath.setAttribute('id', clipId);
+
+			var clipShape = el.cloneNode(true);
+			clipShape.removeAttribute('fill');
+			clipShape.removeAttribute('fill-opacity');
+			clipShape.removeAttribute('stroke');
+			clipShape.removeAttribute('stroke-width');
+			clipShape.removeAttribute('stroke-opacity');
+			clipShape.removeAttribute('style');
+			clipShape.removeAttribute('pointer-events');
+			clipShape.setAttribute('fill', 'black');
+			clipPath.appendChild(clipShape);
+
+			// Create outer group with clip path
+			var outerGroup = svgRoot.ownerDocument.createElementNS(svgNS, 'g');
+			outerGroup.setAttribute('clip-path', 'url(#' + clipId + ')');
+
+			// Preserve fill-opacity from the original element
+			var fillOpacity = el.getAttribute('fill-opacity');
+
+			if (fillOpacity != null)
+			{
+				outerGroup.setAttribute('opacity', fillOpacity);
+			}
+
+			// The clip path is in the element's parent coordinate space,
+			// so the outer group should be at the same level
+			// Create inner group with patternTransform
+			var innerGroup = svgRoot.ownerDocument.createElementNS(svgNS, 'g');
+			innerGroup.setAttribute('transform',
+				'translate(' + t.tx + ',' + t.ty + ')' +
+				((t.angle !== 0) ? ' rotate(' + (t.angle * 180 / Math.PI) + ')' : '') +
+				' scale(' + t.sx + ((t.sy !== t.sx) ? ',' + t.sy : '') + ')');
+
+			// Replicates the implicit clipping of pattern content to the tile
+			// (overflow is hidden on SVG patterns) so that expanded tiles
+			// render exactly like the on-screen pattern, eg. the default
+			// hatch stroke is centered on the tile edge and only half of
+			// its width is visible
+			var tileClipId = clipPrefix + (++clipCounter);
+			var tileClip = svgRoot.ownerDocument.createElementNS(svgNS, 'clipPath');
+			tileClip.setAttribute('id', tileClipId);
+
+			var tileRect = svgRoot.ownerDocument.createElementNS(svgNS, 'rect');
+			tileRect.setAttribute('x', '0');
+			tileRect.setAttribute('y', '0');
+			tileRect.setAttribute('width', pw);
+			tileRect.setAttribute('height', ph);
+			tileClip.appendChild(tileRect);
+
+			// Generate tiles by cloning pattern children
+			var patternChildren = pattern.childNodes;
+
+			for (var tx = tileMinX; tx < tileMaxX; tx++)
+			{
+				for (var ty = tileMinY; ty < tileMaxY; ty++)
+				{
+					var tileGroup = svgRoot.ownerDocument.createElementNS(svgNS, 'g');
+					tileGroup.setAttribute('transform',
+						'translate(' + (tx * pw) + ',' + (ty * ph) + ')');
+
+					// Evaluated in the tile's user space so the shared
+					// rect clips each tile in its local coordinates
+					tileGroup.setAttribute('clip-path', 'url(#' + tileClipId + ')');
+
+					for (var c = 0; c < patternChildren.length; c++)
+					{
+						if (patternChildren[c].nodeType === 1)
+						{
+							tileGroup.appendChild(patternChildren[c].cloneNode(true));
+						}
+					}
+
+					innerGroup.appendChild(tileGroup);
+				}
+			}
+
+			outerGroup.appendChild(innerGroup);
+
+			// Insert defs and group into SVG
+			var defs = svgRoot.querySelector('defs');
+
+			if (defs == null)
+			{
+				defs = svgRoot.ownerDocument.createElementNS(svgNS, 'defs');
+				svgRoot.insertBefore(defs, svgRoot.firstChild);
+			}
+
+			defs.appendChild(clipPath);
+			defs.appendChild(tileClip);
+
+			// Insert the pattern group after the element's parent group
+			// to maintain correct stacking order
+			el.parentNode.insertBefore(outerGroup, el.nextSibling);
+
+			// Remove the pattern fill from the element. The pattern's
+			// transparent regions are truly transparent (the fill color is
+			// used as the pattern line color, not as a background).
+			el.setAttribute('fill', 'none');
+			el.style.fill = '';
+		};
+
+		// Main: find all pattern-filled elements and expand them
+		var elements = svg.querySelectorAll('[fill^="url("]');
+
+		for (var i = 0; i < elements.length; i++)
+		{
+			var pattern = resolvePattern(elements[i], svg);
+
+			if (pattern != null)
+			{
+				expandElement(elements[i], pattern, svg);
+			}
+		}
+
+		// Also check elements with fill set via style attribute
+		var styledElements = svg.querySelectorAll('[style]');
+
+		for (var i = 0; i < styledElements.length; i++)
+		{
+			var style = styledElements[i].getAttribute('style');
+
+			if (style != null && style.indexOf('url(') !== -1)
+			{
+				var pattern = resolvePattern(styledElements[i], svg);
+
+				if (pattern != null)
+				{
+					expandElement(styledElements[i], pattern, svg);
+				}
+			}
+		}
+	};
+
+	/**
+	 * Allows the given font URL to point at the local filesystem. Only for
+	 * URLs that come from the configuration, see Graph.isValidFontUrl.
+	 */
+	Editor.addAllowedFontUrl = function(url)
+	{
+		if (typeof url === 'string' && url.length > 0)
+		{
+			Graph.allowedFontUrls[url] = true;
+		}
+	};
+
+	/**
+	 * Allows the font URLs in a configured font list (customFonts, defaultFonts).
+	 */
+	Editor.addAllowedFontUrls = function(fonts)
+	{
+		if (Array.isArray(fonts))
+		{
+			for (var i = 0; i < fonts.length; i++)
+			{
+				if (fonts[i] != null && typeof fonts[i] === 'object')
+				{
+					Editor.addAllowedFontUrl(fonts[i].fontUrl);
+				}
+			}
+		}
+	};
+
 	/**
 	 * Adds the global fontCss configuration.
 	 */
@@ -2983,6 +4474,22 @@
 		if (fontCss != null)
 		{
 			Editor.prototype.fontCss = fontCss;
+
+			// The configured font CSS is trusted, so its URLs are allowed
+			// even where they point at local files
+			var urls = fontCss.split('url(');
+
+			for (var i = 1; i < urls.length; i++)
+			{
+				var end = urls[i].indexOf(')');
+
+				if (end > 0)
+				{
+					Editor.addAllowedFontUrl(Editor.trimCssUrl(
+						urls[i].substring(0, end)));
+				}
+			}
+
 			var t = document.getElementsByTagName('script')[0];
 			
 			if (t != null && t.parentNode != null)
@@ -3057,6 +4564,37 @@
 	};
 
 	/**
+	 * Returns a global unique ID from the CSPRNG for values that must not
+	 * be guessable, such as realtime channel IDs and keys and cache secrets.
+	 * Editor.guid uses Math.random, which is not a CSPRNG. Falls back to
+	 * Editor.guid if no CSPRNG is reachable (eg. a page redefined crypto),
+	 * where realtime is off for keyed channels (isEncryptionAvailable).
+	 */
+	Editor.secureGuid = function(length)
+	{
+		var len = (length != null) ? length : Editor.GUID_LENGTH;
+
+		try
+		{
+			var bytes = new Uint8Array(len);
+			window.crypto.getRandomValues(bytes);
+			var rtn = [];
+
+			// Unbiased as the alphabet has 64 characters, a divisor of 256
+			for (var i = 0; i < len; i++)
+			{
+				rtn.push(Editor.GUID_ALPHABET.charAt(bytes[i] % Editor.GUID_ALPHABET.length));
+			}
+
+			return rtn.join('');
+		}
+		catch (e)
+		{
+			return Editor.guid(len);
+		}
+	};
+
+	/**
 	 * Interval for updating the file status.
 	 */
 	Editor.updateStatusInterval = 10000;
@@ -3096,7 +4634,7 @@
 	/**
 	 * AI backend timeout in seconds.
 	 */
-	Editor.prototype.generateTimeout = 60000;
+	Editor.prototype.generateTimeout = 90000;
 	
 	/**
 	 * Executes the first step for connecting to Google Drive.
@@ -3104,9 +4642,9 @@
 	Editor.prototype.editButtonLink = (urlParams['edit'] != null) ? decodeURIComponent(urlParams['edit']) : null;
 
 	/**
-	 * Specifies if img.crossOrigin is supported. This is true for all browsers except IE10 and earlier.
+	 * Specifies if img.crossOrigin is supported.
 	 */
-	Editor.prototype.crossOriginImages = !mxClient.IS_IE;
+	Editor.prototype.crossOriginImages = true;
 	
 	/**
 	 * Adds support for old stylesheets and compressed files
@@ -3173,11 +4711,6 @@
 					this.graph.setBackgroundImage(null);
 				}
 				
-				this.graph.useCssTransforms = !mxClient.NO_FO &&
-					this.isChromelessView() &&
-					this.graph.isCssTransformsSupported();
-				this.graph.updateCssTransform();
-
 				this.graph.setShadowVisible(node.getAttribute('shadow') == '1', false);
 				
 				var extFonts = node.getAttribute('extFonts');
@@ -3326,101 +4859,59 @@
 		this.graph.setAdaptiveColors(null);
 		this.graph.view.x0 = null;
 		this.graph.view.y0 = null;
-		
-		this.graph.useCssTransforms = !mxClient.NO_FO &&
-			this.isChromelessView() &&
-			this.graph.isCssTransformsSupported();
-		this.graph.updateCssTransform();
-		
+
 		editorResetGraph.apply(this, arguments);
 	};
 
 	/**
-	 * Math support.
-	 */
-	var editorUpdateGraphComponents = Editor.prototype.updateGraphComponents;
-	Editor.prototype.updateGraphComponents = function()
-	{
-		editorUpdateGraphComponents.apply(this, arguments);
-		
-		this.graph.useCssTransforms = !mxClient.NO_FO &&
-			this.isChromelessView() &&
-			this.graph.isCssTransformsSupported();
-		this.graph.updateCssTransform();
-	};
-	
-	/**
-	 * Initializes math typesetting and loads respective code.
+	 * Initializes math typesetting. The code is loaded when math is first
+	 * typeset (see Editor.loadMath). It uses its own global, DrawioMathJax,
+	 * for its configuration and API instead of MathJax, so a MathJax that the
+	 * page loads itself (viewer and embed) is never used or changed.
 	 */
 	Editor.initMath = function(src, config)
 	{
-		if (typeof window.MathJax === 'undefined')
+		if (typeof window.DrawioMathJax === 'undefined')
 		{
-			src = (src != null) ? src : DRAW_MATH_URL + '/startup.js';
+			// drawio-mathjax.min.js is a single file with everything for SVG
+			// output preloaded (see etc/mathjax)
+			src = (src != null) ? src : DRAW_MATH_URL + '/drawio-mathjax.min.js';
+
+			// Containers to typeset once the bundle has loaded
 			Editor.mathJaxQueue = [];
 
-			// Blocks concurrent rendering while
-			// async rendering is in progress
-			var rendering = null;
-
-			function mathJaxDone()
-			{
-				rendering = null;
-
-				if (Editor.mathJaxQueue.length > 0)
-				{
-					Editor.doMathJaxRender(Editor.mathJaxQueue.shift());
-				}
-				else
-				{
-					Editor.onMathJaxDone();
-				}
-			};
-			
 			Editor.doMathJaxRender = function(container)
 			{
+				// Disables automatic line breaking for inline math to
+				// avoid unwanted breaks in narrow label containers
+				if (DrawioMathJax.startup != null && DrawioMathJax.startup.output != null &&
+					DrawioMathJax.startup.output.options != null &&
+					DrawioMathJax.startup.output.options.linebreaks != null)
+				{
+					DrawioMathJax.startup.output.options.linebreaks.inline = false;
+				}
+
+				// Synchronous: the bundle contains every component and restarts
+				// without a retry (see etc/mathjax)
 				try
 				{
-					if (rendering == null)
-					{
-						MathJax.typesetClear([container]);
-						MathJax.typeset([container]);
-						mathJaxDone();
-					}
-					else if (rendering != container)
-					{
-						Editor.mathJaxQueue.push(container);
-					}
+					DrawioMathJax.typesetClear([container]);
+					DrawioMathJax.typeset([container]);
 				}
 				catch (e)
 				{
-					MathJax.typesetClear([container]);
+					DrawioMathJax.typesetClear([container]);
 
-					if (e.retry != null)
-					{
-						rendering = container;
-
-						e.retry.then(function()
-						{
-							MathJax.typesetPromise([container]).then(mathJaxDone)['catch'](function(e)
-							{
-								console.log('Error in MathJax.typesetPromise: ' + e.toString());
-								mathJaxDone();
-							});
-						})['catch'](function(e)
-						{
-							console.log('Error in MathJax.retry: ' + e.toString());
-							mathJaxDone();
-						});;
-					}
-					else if (window.console != null)
+					if (window.console != null)
 					{
 						console.log('Error in MathJax.typeset: ' + e.toString());
 					}
 				}
+
+				Editor.onMathJaxDone();
 			};
 			
-			window.MathJax = (config != null) ? config :
+			window.DrawioMathJax = (config != null) ? config :
 			{
 				options:
 				{
@@ -3429,9 +4920,8 @@
 				},
 				loader:
 				{
-					load: [(urlParams['math-output'] == 'html') ?
-						'output/chtml' : 'output/svg', 'input/tex',
-						'input/asciimath', 'ui/safe'],
+					load: ['output/svg', 'input/tex', 'input/asciimath',
+						'ui/safe', '[tex]/html'],
 					paths: {
 						'fonts': DRAW_MATH_URL + '/fonts'
 					}
@@ -3443,31 +4933,143 @@
 				{
 					pageReady: function()
 					{
-						for (var i = 0; i < Editor.mathJaxQueue.length; i++)	
-						{	
-							Editor.doMathJaxRender(Editor.mathJaxQueue[i]);	
+						// Typesets what was requested while the bundle was loading
+						var queue = Editor.mathJaxQueue;
+						Editor.mathJaxQueue = [];
+
+						for (var i = 0; i < queue.length; i++)
+						{
+							Editor.doMathJaxRender(queue[i]);
+						}
+
+						mathReady();
+					}
+				}
+			};
+
+			// The bundle is only loaded when math is first typeset, so pages
+			// without math never load it
+			var loading = false;
+			var failed = false;
+			var callbacks = [];
+
+			// Calls the functions that wait for the bundle, also if it could
+			// not be loaded
+			var mathReady = function()
+			{
+				var fns = callbacks;
+				callbacks = [];
+
+				for (var i = 0; i < fns.length; i++)
+				{
+					fns[i]();
+				}
+			};
+
+			// Loads the bundle if it is not loaded. The optional callback is
+			// called once math can be typeset, or if the bundle cannot be loaded.
+			Editor.loadMath = function(callback)
+			{
+				if (callback != null)
+				{
+					if (failed || (typeof DrawioMathJax !== 'undefined' &&
+						typeof DrawioMathJax.typeset === 'function'))
+					{
+						callback();
+					}
+					else
+					{
+						callbacks.push(callback);
+					}
+				}
+
+				if (!loading)
+				{
+					loading = true;
+
+					var tags = document.getElementsByTagName('script');
+
+					if (tags != null && tags.length > 0)
+					{
+						var s = document.createElement('script');
+						s.setAttribute('type', 'text/javascript');
+						s.setAttribute('src', src);
+
+						// Shows the queued containers without typesetting if the
+						// bundle cannot be loaded, e.g. offline without a cache
+						s.onerror = function()
+						{
+							failed = true;
+							var queue = Editor.mathJaxQueue;
+							Editor.mathJaxQueue = [];
+
+							for (var i = 0; i < queue.length; i++)
+							{
+								Editor.onMathJaxDone();
+							}
+
+							mathReady();
+						};
+
+						tags[0].parentNode.appendChild(s);
+					}
+				}
+			};
+
+			// Typesets now or, while the bundle is loading, when it has loaded
+			Editor.MathJaxRender = function(container)
+			{
+				if (typeof DrawioMathJax !== 'undefined' && typeof DrawioMathJax.typeset === 'function')
+				{
+					Editor.doMathJaxRender(container);
+				}
+				else if (failed)
+				{
+					Editor.onMathJaxDone();
+				}
+				else
+				{
+					Editor.mathJaxQueue.push(container);
+					Editor.loadMath();
+				}
+			};
+
+			// Graphs of the editors whose label bounds are refreshed after
+			// MathJax has typeset (see Editor.prototype.init and destroy)
+			Editor.mathGraphs = [];
+
+			// Adds global MathJax render callback. Hook for listeners.
+			Editor.onMathJaxDone = function()
+			{
+				// Refreshes cached label bounds after MathJax has typeset, so
+				// view bounds (used for export/scrollbars) reflect the rendered
+				// math size rather than the raw formula text size.
+				if (Editor.mathOutputSize)
+				{
+					var graphs = Editor.mathGraphs.slice();
+
+					for (var i = 0; i < graphs.length; i++)
+					{
+						if (graphs[i].mathEnabled)
+						{
+							graphs[i].refreshMathBounds();
+
+							if (graphs[i].container != null)
+							{
+								graphs[i].container.style.visibility = '';
+							}
 						}
 					}
 				}
 			};
 
-			// Adds global enqueue method for async rendering
-			Editor.MathJaxRender = function(container)
+			// Destroyed editors no longer refresh their graphs
+			var editorDestroy = Editor.prototype.destroy;
+
+			Editor.prototype.destroy = function()
 			{
-				if (typeof MathJax !== 'undefined' && typeof MathJax.typeset === 'function')
-				{
-					Editor.doMathJaxRender(container);
-				}
-				else
-				{
-					Editor.mathJaxQueue.push(container);
-				}
-			};
-			
-			// Adds global MathJax render callback
-			Editor.onMathJaxDone = function()
-			{
-				// Hook for listeners
+				mxUtils.remove(this.graph, Editor.mathGraphs);
+				editorDestroy.apply(this, arguments);
 			};
 
 			// Updates math typesetting after changes
@@ -3482,25 +5084,446 @@
 					if (this.graph.container != null &&
 						this.graph.mathEnabled)
 					{
+						// Hides container until typeset completes to avoid
+						// showing the raw formula source. For a synchronous
+						// typeset, hide and show happen in the same tick.
+						if (Editor.mathOutputSize)
+						{
+							this.graph.container.style.visibility = 'hidden';
+						}
+
 						Editor.MathJaxRender(this.graph.container);
 					}
+					else if (this.graph.container != null &&
+						Editor.mathJaxQueue != null)
+					{
+						// Cancels typesetting that waits for MathJax if math was
+						// disabled in the meantime, eg. after switching to a page
+						// without math, and shows the container again
+						var queued = false;
+
+						for (var i = Editor.mathJaxQueue.length - 1; i >= 0; i--)
+						{
+							if (Editor.mathJaxQueue[i] == this.graph.container)
+							{
+								Editor.mathJaxQueue.splice(i, 1);
+								queued = true;
+							}
+						}
+
+						if (queued && Editor.mathOutputSize)
+						{
+							this.graph.container.style.visibility = '';
+						}
+					}
 				});
-				
+
 				this.graph.model.addListener(mxEvent.CHANGE, renderMath);
 				this.graph.addListener(mxEvent.REFRESH, renderMath);
+
+				// Typesets math in tooltips if math is enabled. The tooltip
+				// markup is sanitized before it is shown (convertValueToTooltip
+				// uses Graph.sanitizeHtml and metadata tooltips are escaped),
+				// so this typesets the same kind of content as labels.
+				var tooltipHandler = this.graph.tooltipHandler;
+
+				if (tooltipHandler != null)
+				{
+					var tooltipGraph = this.graph;
+					var tooltipHandlerShow = tooltipHandler.show;
+
+					tooltipHandler.show = function()
+					{
+						tooltipHandlerShow.apply(this, arguments);
+
+						if (tooltipGraph.mathEnabled && this.div != null &&
+							this.div.style.visibility != 'hidden' &&
+							Editor.containsMath(mxUtils.getTextContent(this.div)))
+						{
+							Editor.MathJaxRender(this.div);
+
+							// Keeps the tooltip inside the page if the typesetting
+							// was synchronous and changed the size of the tooltip
+							mxUtils.fit(this.div);
+						}
+					};
+				}
+
+				// Refreshes the label bounds after MathJax has typeset (see
+				// Editor.onMathJaxDone)
+				Editor.mathGraphs.push(this.graph);
 			};
-			
-			var tags = document.getElementsByTagName('script');
-			
-			if (tags != null && tags.length > 0)
+		}
+	};
+
+	/**
+	 * Adds the source of every typeset formula in the given container as
+	 * invisible text over the formula, so that math can be selected, searched
+	 * and copied in PDF output. The SVG output draws glyphs as paths, which
+	 * leaves formulas out of the text of a PDF. The text is the formula as typed
+	 * including its delimiters, on the baseline of the formula and stretched to
+	 * the width of the formula. It is nearly transparent rather than hidden,
+	 * which keeps it selectable. The alpha is not 0 as older Chrome versions
+	 * (eg. 128 in the export server, still 136) leave fully transparent text
+	 * out of the PDF.
+	 *
+	 * The text is HTML in a foreignObject at a font size of 16px, scaled to
+	 * the size of the formula with a transform. Chrome writes SVG text, and
+	 * HTML text at the font size of the viewBox units (1000 per em) under the
+	 * small scale of the viewBox, as one text run per glyph, which macOS
+	 * Preview breaks into lines at glyphs above or below the others (eg. _ and
+	 * `). The foreignObject is painted with the formula, so that the source
+	 * keeps its place in the surrounding text, which it would not as a
+	 * transformed HTML element outside of the SVG.
+	 *
+	 * The role img that MathJax puts on the SVG is removed, as Chrome writes
+	 * tagged PDFs and leaves the content of an image out of the text
+	 * structure, which is what macOS Preview selects and searches. Only used
+	 * for PDF export and print, where nothing else needs the formula for
+	 * selection. The source is added as a text node, so it cannot inject
+	 * markup.
+	 */
+	Editor.addMathTextLayer = function(container, mathJax)
+	{
+		mathJax = (mathJax != null) ? mathJax :
+			((typeof DrawioMathJax !== 'undefined') ? DrawioMathJax : null);
+
+		var doc = (mathJax != null && mathJax.startup != null) ?
+			mathJax.startup.document : null;
+
+		if (container == null || doc == null ||
+			typeof doc.getMathItemsWithin !== 'function')
+		{
+			return;
+		}
+
+		var items = doc.getMathItemsWithin(container);
+		var layers = [];
+
+		for (var i = 0; i < items.length; i++)
+		{
+			var item = items[i];
+			var svg = (item.typesetRoot != null) ? item.typesetRoot.firstChild : null;
+			var source = ((item.start != null && item.start.delim != null) ? item.start.delim : '') +
+				((item.math != null) ? item.math : '') +
+				((item.end != null && item.end.delim != null) ? item.end.delim : '');
+			source = source.replace(/\s+/g, ' ').trim();
+
+			// Skips output that is not a single SVG and formulas that have a layer
+			if (svg != null && svg.nodeName.toLowerCase() == 'svg' &&
+				svg.viewBox != null && svg.viewBox.baseVal != null &&
+				svg.viewBox.baseVal.width > 0 && source.length > 0 &&
+				!(svg.lastChild != null && svg.lastChild.nodeName.toLowerCase() == 'foreignobject' &&
+				svg.lastChild.getAttribute('class') == 'geMathSource'))
 			{
-				var s = document.createElement('script');
-				s.setAttribute('type', 'text/javascript');
-				s.setAttribute('src', src);
-				tags[0].parentNode.appendChild(s);
+				// The viewBox has the baseline at 0 and 1000 units per em of
+				// the math, which is scaled relative to the surrounding text.
+				// Units of the foreignObject are 16px per em of the surrounding
+				// text.
+				var vb = svg.viewBox.baseVal;
+				var scale = (item.metrics != null && item.metrics.scale > 0) ?
+					item.metrics.scale : 1;
+				var units = 1000 / scale / 16;
+				var ownerDoc = svg.ownerDocument;
+
+				var fo = ownerDoc.createElementNS(mxConstants.NS_SVG, 'foreignObject');
+				fo.setAttribute('class', 'geMathSource');
+				fo.setAttribute('y', vb.y / units);
+				fo.setAttribute('width', vb.width / units);
+				fo.setAttribute('height', vb.height / units);
+				fo.style.overflow = 'visible';
+
+				// Resets the inherited text styles that would show the text
+				// or position each glyph separately
+				var div = ownerDoc.createElement('div');
+				div.style.cssText = 'font-size:16px;line-height:0;white-space:pre;' +
+					'color:rgba(0,0,0,0.002);text-shadow:none;letter-spacing:normal;' +
+					'word-spacing:normal;text-transform:none;text-align:left;direction:ltr;';
+
+				// Empty inline block with its bottom on the baseline of the
+				// text, as high as the formula above its baseline
+				var strut = ownerDoc.createElement('span');
+				strut.style.display = 'inline-block';
+				strut.style.height = Math.max(0, -vb.y / units) + 'px';
+				div.appendChild(strut);
+
+				var text = ownerDoc.createElement('span');
+				mxUtils.write(text, source);
+				div.appendChild(text);
+				fo.appendChild(div);
+				svg.appendChild(fo);
+
+				layers.push({svg: svg, fo: fo, text: text, vb: vb, units: units});
+			}
+		}
+
+		// Measures after all layers were added for a single layout
+		for (var i = 0; i < layers.length; i++)
+		{
+			var layer = layers[i];
+			var textWidth = layer.text.offsetWidth;
+
+			if (textWidth > 0)
+			{
+				layer.fo.setAttribute('width', textWidth);
+				layer.fo.setAttribute('transform', 'translate(' + layer.vb.x + ',0)' +
+					'scale(' + (layer.vb.width / textWidth) + ',' + layer.units + ')');
+				layer.svg.removeAttribute('role');
+			}
+			else
+			{
+				layer.fo.parentNode.removeChild(layer.fo);
 			}
 		}
 	};
+
+	/**
+	 * Returns true if the given label contains TeX or AsciiMath delimiters
+	 * that MathJax would typeset.
+	 */
+	Editor.containsMath = function(text)
+	{
+		return text != null && (text.indexOf('$') >= 0 ||
+			text.indexOf('\\(') >= 0 || text.indexOf('\\[') >= 0 ||
+			text.indexOf('\\begin{') >= 0 || text.indexOf('`') >= 0);
+	};
+
+	// Overrides autosize so that labels with math are measured after MathJax
+	// has typeset them, rather than measuring the raw formula source.
+	(function()
+	{
+		var graphGetPreferredSizeForCell = Graph.prototype.getPreferredSizeForCell;
+		var measureDiv = null;
+
+		Graph.prototype.getPreferredSizeForCell = function(cell, w, gridEnabled)
+		{
+			if (!Editor.mathOutputSize || !this.mathEnabled ||
+				typeof DrawioMathJax === 'undefined' ||
+				typeof DrawioMathJax.typeset !== 'function' || this.model.isEdge(cell))
+			{
+				return graphGetPreferredSizeForCell.apply(this, arguments);
+			}
+
+			var state = this.view.createState(cell);
+			var label = (state != null) ? this.cellRenderer.getLabelValue(state) : null;
+
+			if (label == null || label.length === 0 || !Editor.containsMath(label))
+			{
+				return graphGetPreferredSizeForCell.apply(this, arguments);
+			}
+
+			var origGetSizeForString = mxUtils.getSizeForString;
+
+			mxUtils.getSizeForString = function(text, fontSize, fontFamily, textWidth, fontStyle)
+			{
+				if (measureDiv == null)
+				{
+					measureDiv = document.createElement('div');
+					measureDiv.style.cssText = 'position:absolute;visibility:hidden;' +
+						'left:-10000px;top:-10000px;display:inline-block;';
+					document.body.appendChild(measureDiv);
+				}
+
+				measureDiv.style.fontSize = fontSize + 'px';
+				measureDiv.style.fontFamily = fontFamily;
+				measureDiv.style.fontWeight = ((fontStyle & mxConstants.FONT_BOLD) ==
+					mxConstants.FONT_BOLD) ? 'bold' : '';
+				measureDiv.style.fontStyle = ((fontStyle & mxConstants.FONT_ITALIC) ==
+					mxConstants.FONT_ITALIC) ? 'italic' : '';
+
+				if (textWidth != null && textWidth > 0)
+				{
+					measureDiv.style.width = textWidth + 'px';
+					measureDiv.style.whiteSpace = 'normal';
+				}
+				else
+				{
+					measureDiv.style.width = '';
+					measureDiv.style.whiteSpace = 'nowrap';
+				}
+
+				// Clears MathJax state attached by previous typeset
+				DrawioMathJax.typesetClear([measureDiv]);
+				measureDiv.innerHTML = Graph.sanitizeHtml(text);
+
+				try
+				{
+					DrawioMathJax.typeset([measureDiv]);
+					var rect = measureDiv.getBoundingClientRect();
+					return new mxRectangle(0, 0, rect.width, rect.height);
+				}
+				catch (e)
+				{
+					// Falls back to text measurement if typesetting fails
+					return origGetSizeForString.apply(this, arguments);
+				}
+			};
+
+			try
+			{
+				return graphGetPreferredSizeForCell.apply(this, arguments);
+			}
+			finally
+			{
+				mxUtils.getSizeForString = origGetSizeForString;
+			}
+		};
+	})();
+
+	/**
+	 * Updates the size of the autosize vertices with math in their label,
+	 * whose size depends on whether the formula or its source is shown, eg.
+	 * when math typesetting is turned on or off. Turning math on needs the
+	 * MathJax bundle to measure the formulas (see Editor.loadMath).
+	 */
+	Graph.prototype.updateMathCellSizes = function()
+	{
+		if (Editor.mathOutputSize)
+		{
+			var model = this.model;
+			var cells = model.filterDescendants(mxUtils.bind(this, function(cell)
+			{
+				return model.isVertex(cell) && model.getChildCount(cell) == 0 &&
+					this.isAutoSizeCell(cell) && Editor.containsMath(this.getLabel(cell));
+			}));
+
+			model.beginUpdate();
+			try
+			{
+				for (var i = 0; i < cells.length; i++)
+				{
+					this.updateCellSize(cells[i]);
+				}
+			}
+			finally
+			{
+				model.endUpdate();
+			}
+		}
+	};
+
+	/**
+	 * Re-reads the rendered DOM size of every label that contains math so the
+	 * view's bounding box reflects MathJax's rendered output instead of the raw
+	 * formula source. Cell geometry is not modified. No-op when nothing math-y
+	 * is in the diagram.
+	 */
+	Graph.prototype.refreshMathBounds = function()
+	{
+		if (!Editor.mathOutputSize || !this.mathEnabled)
+		{
+			return;
+		}
+
+		var view = this.view;
+		var hasMath = false;
+
+		view.states.visit(mxUtils.bind(this, function(key, state)
+		{
+			if (state == null || state.text == null)
+			{
+				return;
+			}
+
+			var label = this.cellRenderer.getLabelValue(state);
+
+			if (typeof label === 'string' && Editor.containsMath(label))
+			{
+				state.text.updateBoundingBox();
+				hasMath = true;
+			}
+		}));
+
+		if (!hasMath)
+		{
+			return;
+		}
+
+		var rootCell = (view.currentRoot != null) ? view.currentRoot : this.model.getRoot();
+		var rootState = view.getState(rootCell);
+
+		if (rootState != null)
+		{
+			var bounds = view.getBoundingBox(rootState, true, false);
+			view.setGraphBounds((bounds != null) ? bounds : view.getEmptyBounds());
+			this.sizeDidChange();
+		}
+
+		this.fireEvent(new mxEventObject('mathRefreshed'));
+	};
+
+	// Re-runs initial fit-to-window after MathJax has typeset, so the fit uses
+	// the rendered math bounds rather than the (still wrong) raw-text bounds
+	// that were available at file-load time.
+	(function()
+	{
+		var editorUiInitialFitDiagram = EditorUi.prototype.initialFitDiagram;
+
+		EditorUi.prototype.initialFitDiagram = function(maxScale)
+		{
+			editorUiInitialFitDiagram.apply(this, arguments);
+
+			var graph = this.editor.graph;
+
+			if (!Editor.mathOutputSize || graph == null || !graph.mathEnabled)
+			{
+				return;
+			}
+
+			var args = arguments;
+			var ui = this;
+			var fired = false;
+
+			// Registers the mathRefreshed listener synchronously so it captures
+			// the typeset that follows. Once MathJax has loaded it typesets
+			// synchronously inside the same dispatch as initialFitDiagram
+			// (pageSelected fires from change.execute, then edit.notify fires
+			// CHANGE → renderMath → typeset → mathRefreshed), so a deferred
+			// registration would miss the event.
+			var listener = function()
+			{
+				if (fired)
+				{
+					return;
+				}
+
+				fired = true;
+				graph.removeListener(listener);
+
+				// Reset to "fresh-load" defaults (scale=1, default scroll)
+				// so that re-running initialFitDiagram with zoomOutOnly=true
+				// either no-ops cleanly (matching a no-math page's fresh
+				// state) or zooms out as needed for oversized content.
+				graph.zoomTo(1);
+				ui.resetScrollbars();
+
+				editorUiInitialFitDiagram.apply(ui, args);
+			};
+
+			graph.addListener('mathRefreshed', listener);
+
+			// Defers a cleanup check to a microtask so the listener doesn't
+			// leak when MathJax is unavailable or the diagram contains no math
+			// to typeset (mathRefreshed never fires in that case). Only a
+			// typeset waiting for MathJax to load is still pending.
+			Promise.resolve().then(function()
+			{
+				if (fired)
+				{
+					return;
+				}
+
+				var pending = (typeof DrawioMathJax === 'undefined') ||
+					(typeof DrawioMathJax.typeset !== 'function') ||
+					(Editor.mathJaxQueue != null && Editor.mathJaxQueue.length > 0);
+
+				if (!pending)
+				{
+					graph.removeListener(listener);
+				}
+			});
+		};
+	})();
 
 	/**
 	 * Parses line of CSV values according to RFC 4180.
@@ -3540,6 +5563,95 @@
 		{
 			return [];
 		}
+	};
+
+	/**
+	 * Route on icons.diagrams.net that redirects image URLs on
+	 * cdn*.iconfinder.com to the same or a similar icon in the icon cache,
+	 * which has CORS, and other icons back to Iconfinder (icon-search2
+	 * worker). Set to null to load these images from Iconfinder. Lockdown and
+	 * stealth mode send no requests to draw.io servers.
+	 */
+	Editor.iconfinderCacheUrl = (urlParams['lockdown'] != '1' &&
+		urlParams['stealth'] != '1') ?
+		'https://icons.diagrams.net/iconfinder/data/icons/' : null;
+
+	/**
+	 * Returns the URL of the icon cache route for the given image URL on
+	 * Iconfinder, otherwise the given URL. The cell style keeps the original
+	 * URL. Paths with malformed escapes, empty or dot segments, backslashes or
+	 * control characters (browsers drop tabs and newlines in URLs) are not
+	 * rewritten.
+	 */
+	Editor.getIconfinderCacheUrl = function(url)
+	{
+		if (Editor.iconfinderCacheUrl != null && typeof url === 'string' &&
+			url.indexOf('.iconfinder.com/data/icons/') > 0)
+		{
+			var match = /^https?:\/\/cdn[0-5]?\.iconfinder\.com\/data\/icons\/([^\/?#]+\/[^?#]+)$/.exec(url);
+
+			if (match != null)
+			{
+				var path = null;
+
+				try
+				{
+					path = decodeURIComponent(match[1]);
+				}
+				catch (e)
+				{
+					// Malformed escapes are not rewritten
+				}
+
+				if (path != null && !/(^|\/)\.{0,2}(\/|$)/.test(path) &&
+					!/[\\\x00-\x1f\x7f]/.test(path))
+				{
+					url = Editor.iconfinderCacheUrl + match[1];
+				}
+			}
+		}
+
+		return url;
+	};
+
+	/**
+	 * Folder of the images of the old Arista template in the icon cache: the
+	 * same files as jgraph.github.io/drawio-libs/libs/arista/, which Confluence
+	 * Cloud does not allow. Set to null to load them from jgraph.github.io.
+	 * Lockdown and stealth mode send no requests to draw.io servers.
+	 */
+	Editor.aristaCacheUrl = (urlParams['lockdown'] != '1' &&
+		urlParams['stealth'] != '1') ?
+		'https://icons.diagrams.net/assets/arista/1/' : null;
+
+	/**
+	 * Returns the URL in the icon cache for the given image URL of the old
+	 * Arista template, otherwise the given URL. Only a plain SVG file name
+	 * directly in the folder is rewritten.
+	 */
+	Editor.getAristaCacheUrl = function(url)
+	{
+		if (Editor.aristaCacheUrl != null && typeof url === 'string' &&
+			url.indexOf('jgraph.github.io/drawio-libs/libs/arista/') > 0)
+		{
+			var match = /^https?:\/\/jgraph\.github\.io\/drawio-libs\/libs\/arista\/([A-Za-z0-9_\-.]+\.svg)$/.exec(url);
+
+			if (match != null)
+			{
+				url = Editor.aristaCacheUrl + match[1];
+			}
+		}
+
+		return url;
+	};
+
+	/**
+	 * Returns the URL in the icon cache for the given image URL on Iconfinder or
+	 * of the old Arista template, otherwise the given URL.
+	 */
+	Editor.getIconCacheUrl = function(url)
+	{
+		return Editor.getAristaCacheUrl(Editor.getIconfinderCacheUrl(url));
 	};
 
 	/**
@@ -3591,6 +5703,7 @@
 		// /^https?:\/\/[^\/]*\.iconfinder.com\//.test(url) ||
 		return (this.corsRegExp != null && this.corsRegExp.test(url)) ||
 			url.substring(0, 34) === 'https://raw.githubusercontent.com/' ||
+			url.substring(0, 27) === 'https://icons.diagrams.net/' ||
 			url.substring(0, 29) === 'https://fonts.googleapis.com/' ||
 			url.substring(0, 26) === 'https://fonts.gstatic.com/';
 	};
@@ -3717,10 +5830,10 @@
 								forceConvert) ? convertScale : 1;
 
 					        var canvas = document.createElement('canvas');
-					        var ctx = canvas.getContext('2d');
-							ctx.scale(convertScale, convertScale);
 					        canvas.height = img.height * convertScale;
 					        canvas.width = img.width * convertScale;
+					        var ctx = canvas.getContext('2d');
+							ctx.scale(convertScale, convertScale);
 					        ctx.drawImage(img, 0, 0);
 							
 				        	callback(canvas.toDataURL());
@@ -3854,10 +5967,468 @@
 			}
 		});
 		
+		// Converts SVG images referenced in use tags, eg. for themed images
+		// with cssVars, into local symbols with the theming per use tag
+		var symbolCache = new Object();
+
+		// Adds definitions to the defs of the root, which are not in a page
+		// that is hidden in an SVG of all pages (see Graph.createSvgWithViews)
+		var getDefs = function()
+		{
+			var defs = null;
+
+			for (var node = svgRoot.firstChild; node != null && defs == null; node = node.nextSibling)
+			{
+				if (node.nodeName == 'defs')
+				{
+					defs = node;
+				}
+			}
+
+			if (defs == null)
+			{
+				var doc = svgRoot.ownerDocument;
+				defs = (doc.createElementNS != null) ?
+					doc.createElementNS(mxConstants.NS_SVG, 'defs') :
+					doc.createElement('defs');
+				svgRoot.insertBefore(defs, svgRoot.firstChild);
+			}
+
+			return defs;
+		};
+
+		var convertUses = mxUtils.bind(this, function()
+		{
+			var uses = svgRoot.getElementsByTagName('use');
+
+			for (var i = 0; i < uses.length; i++)
+			{
+				(mxUtils.bind(this, function(use)
+				{
+					pending.push(mxUtils.bind(this, function()
+					{
+						try
+						{
+							var href = use.getAttribute('href');
+
+							if (href == null)
+							{
+								href = use.getAttribute('xlink:href');
+							}
+
+							if (href != null && href.charAt(0) != '#' &&
+								href.substring(0, 5) != 'data:')
+							{
+								var src = converter.convert(href);
+
+								var inlineSymbol = function(uri)
+								{
+									var id = Graph.createSvgImageSymbol(
+										getDefs(), symbolCache, uri, true);
+
+									if (id != null)
+									{
+										use.setAttribute('href', '#' + id);
+										use.setAttribute('xlink:href', '#' + id);
+									}
+
+									next();
+								};
+
+								var tmp = cache[src];
+
+								if (tmp == null)
+								{
+									this.convertImageToDataUri(src, function(uri)
+									{
+										if (uri != null && uri != src)
+										{
+											cache[src] = uri;
+										}
+
+										inlineSymbol(uri);
+									});
+								}
+								else
+								{
+									inlineSymbol(tmp);
+								}
+							}
+							else
+							{
+								next();
+							}
+						}
+						catch (e)
+						{
+							next();
+						}
+					}));
+				}))(uses[i]);
+			}
+		});
+
+		// Collapses images that share the same data so that the data is
+		// stored only once, eg. for images with the same URL that were
+		// embedded at multiple sizes or aspect ratios, including inline
+		// instances. Uses symbols with the intrinsic size of the image so
+		// that use tags can scale the shared content, with one symbol per
+		// aspect mode that reference a shared image for the data. Images
+		// that match the source of an existing symbol for themed images
+		// in their page or in the defs of the root are redirected to that
+		// symbol.
+		var dedupImageDefs = mxUtils.bind(this, function()
+		{
+			pending.push(mxUtils.bind(this, function()
+			{
+				try
+				{
+					var temp = svgRoot.getElementsByTagName('image');
+					var images = [];
+
+					for (var i = 0; i < temp.length; i++)
+					{
+						images.push(temp[i]);
+					}
+
+					var redirects = {};
+					var payloads = {};
+					var keys = [];
+
+					// Returns the page of the given node in an SVG of all pages
+					var getPage = function(node)
+					{
+						while (node.parentNode != null && node.parentNode != svgRoot)
+						{
+							node = node.parentNode;
+						}
+
+						return (node.nodeName == 'svg') ? node : null;
+					};
+
+					var retargetUses = function()
+					{
+						var uses = svgRoot.getElementsByTagName('use');
+
+						for (var i = 0; i < uses.length; i++)
+						{
+							var ref = uses[i].getAttribute('href');
+
+							if (ref == null)
+							{
+								ref = uses[i].getAttribute('xlink:href');
+							}
+
+							if (ref != null && redirects[ref] != null)
+							{
+								uses[i].setAttribute('href', '#' + redirects[ref]);
+								uses[i].setAttribute('xlink:href', '#' + redirects[ref]);
+							}
+						}
+					};
+
+					var replaceWithUse = function(img, id)
+					{
+						var use = (svgRoot.ownerDocument.createElementNS != null) ?
+							svgRoot.ownerDocument.createElementNS(mxConstants.NS_SVG, 'use') :
+							svgRoot.ownerDocument.createElement('use');
+
+						// Copies position and rendering attributes
+						var attrs = img.attributes;
+
+						for (var j = 0; j < attrs.length; j++)
+						{
+							var name = attrs[j].name;
+
+							if (name != 'href' && name != 'xlink:href' &&
+								name != 'preserveAspectRatio')
+							{
+								use.setAttribute(name, attrs[j].value);
+							}
+						}
+
+						use.setAttribute('href', '#' + id);
+						use.setAttribute('xlink:href', '#' + id);
+						img.parentNode.replaceChild(use, img);
+					};
+
+					for (var i = 0; i < images.length; i++)
+					{
+						var img = images[i];
+						var def = img;
+						var inline = true;
+
+						if (img.parentNode.nodeName == 'symbol')
+						{
+							// Accepts images wrapped in a symbol for shared
+							// sizing and ignores other symbol content
+							if (img.getAttribute('id') == null &&
+								String(img.parentNode.getAttribute('id') || '').
+									substring(0, 9) == 'mx-image-')
+							{
+								def = img.parentNode;
+								inline = false;
+							}
+							else
+							{
+								continue;
+							}
+						}
+						else if (String(img.getAttribute('id') || '').
+							substring(0, 9) == 'mx-image-')
+						{
+							inline = false;
+						}
+
+						var href = img.getAttribute('xlink:href');
+
+						if (href != null && href.substring(0, 5) == 'data:')
+						{
+							var par = def.getAttribute('preserveAspectRatio') || '';
+
+							// Redirects to an existing symbol for themed images
+							// with the same source, which have a deterministic ID
+							if (href.substring(0, 18) == 'data:image/svg+xml')
+							{
+								var symbolId = 'mx-symbol-' + mxUtils.hashCode(
+									href + '|' + (par != 'none'));
+								var symbol = svgRoot.querySelector('[id="' + symbolId + '"]');
+
+								if (symbol != null && symbol.nodeName == 'symbol' &&
+									(getPage(symbol) == null || getPage(symbol) == getPage(img)))
+								{
+									if (inline)
+									{
+										replaceWithUse(img, symbolId);
+									}
+									else
+									{
+										redirects['#' + def.getAttribute('id')] = symbolId;
+										def.parentNode.removeChild(def);
+									}
+
+									continue;
+								}
+							}
+
+							if (payloads[href] == null)
+							{
+								payloads[href] = {};
+								keys.push(href);
+							}
+
+							if (payloads[href][par] == null)
+							{
+								payloads[href][par] = [];
+							}
+
+							payloads[href][par].push({node: def, inline: inline});
+						}
+					}
+
+					retargetUses();
+
+					var processNext = function()
+					{
+						var href = null;
+						var work = null;
+
+						// Finds next payload with multiple instances or aspects
+						while (keys.length > 0 && href == null)
+						{
+							href = keys.pop();
+							work = payloads[href];
+							var count = 0;
+							var members = 0;
+
+							for (var par in work)
+							{
+								count++;
+								members = Math.max(members, work[par].length);
+							}
+
+							if (count < 2 && members < 2)
+							{
+								href = null;
+							}
+						}
+
+						if (href == null)
+						{
+							next();
+						}
+						else
+						{
+							var loader = new Image();
+
+							loader.onload = function()
+							{
+								try
+								{
+									var w = loader.naturalWidth;
+									var h = loader.naturalHeight;
+
+									if (w > 0 && h > 0)
+									{
+										var doc = svgRoot.ownerDocument;
+										var aspects = 0;
+
+										for (var par in work)
+										{
+											aspects++;
+										}
+
+										var createElt = function(tag)
+										{
+											return (doc.createElementNS != null) ?
+												doc.createElementNS(mxConstants.NS_SVG, tag) :
+												doc.createElement(tag);
+										};
+
+										var createImage = function()
+										{
+											var inner = createElt('image');
+											inner.setAttribute('width', w);
+											inner.setAttribute('height', h);
+
+											// Workaround for missing namespace support
+											if (inner.setAttributeNS == null)
+											{
+												inner.setAttribute('xlink:href', href);
+											}
+											else
+											{
+												inner.setAttributeNS(mxConstants.NS_XLINK,
+													'xlink:href', href);
+											}
+
+											return inner;
+										};
+
+										var shared = null;
+
+										// Stores the data in a shared image if it is
+										// used with multiple aspect modes
+										if (aspects > 1)
+										{
+											shared = 'mx-data-' + mxUtils.hashCode(href);
+
+											// Resolves collisions with existing IDs
+											while (svgRoot.querySelector('[id="' + shared + '"]') != null)
+											{
+												shared += '-1';
+											}
+
+											var data = createImage();
+											data.setAttribute('id', shared);
+											getDefs().appendChild(data);
+										}
+
+										for (var par in work)
+										{
+											var imgs = work[par];
+											var id = null;
+
+											// Reuses the ID of the first shared definition
+											for (var i = 0; i < imgs.length && id == null; i++)
+											{
+												if (!imgs[i].inline)
+												{
+													id = imgs[i].node.getAttribute('id');
+												}
+											}
+
+											if (id == null)
+											{
+												id = 'mx-image-' + mxUtils.hashCode(href + '|' + par);
+
+												// Resolves collisions with existing IDs
+												while (svgRoot.querySelector('[id="' + id + '"]') != null)
+												{
+													id += '-1';
+												}
+											}
+
+											var symbol = createElt('symbol');
+											symbol.setAttribute('id', id);
+											symbol.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+
+											if (par != '')
+											{
+												symbol.setAttribute('preserveAspectRatio', par);
+											}
+
+											if (shared != null)
+											{
+												var use = createElt('use');
+												use.setAttribute('href', '#' + shared);
+												use.setAttribute('xlink:href', '#' + shared);
+												symbol.appendChild(use);
+											}
+											else
+											{
+												symbol.appendChild(createImage());
+											}
+
+											getDefs().appendChild(symbol);
+
+											// Replaces inline images with use tags and
+											// removes the shared definitions
+											for (var i = 0; i < imgs.length; i++)
+											{
+												var node = imgs[i].node;
+
+												if (imgs[i].inline)
+												{
+													replaceWithUse(node, id);
+												}
+												else
+												{
+													if (node.getAttribute('id') != id)
+													{
+														redirects['#' + node.getAttribute('id')] = id;
+													}
+
+													node.parentNode.removeChild(node);
+												}
+											}
+										}
+
+										retargetUses();
+									}
+								}
+								catch (e)
+								{
+									// ignore
+								}
+
+								processNext();
+							};
+
+							loader.onerror = function()
+							{
+								processNext();
+							};
+
+							loader.src = href;
+						}
+					};
+
+					processNext();
+				}
+				catch (e)
+				{
+					next();
+				}
+			}));
+		});
+
 		// Converts all known image tags in output
 		// LATER: Add support for images in CSS
 		convertImages('image', 'xlink:href');
 		convertImages('img', 'src');
+		convertUses();
+		dedupImageDefs();
 		next();
 	};
 		
@@ -4095,7 +6666,8 @@
 		
         if (this.cachedFonts == null) 
         {
-        	this.cachedFonts = {};
+        	// Null prototype: keyed by font URLs parsed from the diagram's extFonts
+        	this.cachedFonts = Object.create(null);
         }
 
         var finish = mxUtils.bind(this, function()
@@ -4134,10 +6706,14 @@
 
                 (mxUtils.bind(this, function(url)
                 {
-                    if (this.cachedFonts[url] == null)
+                	var cached = this.cachedFonts[url];
+
+                    if (cached == null)
                     {
-                        // Mark font as being fetched and fetch it
-                    	this.cachedFonts[url] = url;
+                        // Marks font as being fetched, concurrent calls wait
+                        // for the result via the callbacks in the waiters list
+                        var waiters = [];
+                    	this.cachedFonts[url] = waiters;
                         waiting++;
                         
                         var mime = 'application/x-font-ttf';
@@ -4168,21 +6744,41 @@
                             mime = 'application/font-sfnt';
                         }
 
+						var fontDone = mxUtils.bind(this, function(uri)
+						{
+							this.cachedFonts[url] = uri;
+							waiting--;
+							finish();
+
+							for (var k = 0; k < waiters.length; k++)
+							{
+								waiters[k]();
+							}
+						});
+
 						this.mapFontUrl(mime, url, mxUtils.bind(this, function(realMime, realUrl)
 						{
 							// LATER: Remove cache-control header
-							this.loadUrl(realUrl, mxUtils.bind(this, function(uri)
+							this.loadUrl(realUrl, function(uri)
 							{
-								this.cachedFonts[url] = uri;
-								waiting--;
-								finish();
-							}), mxUtils.bind(this, function(err)
+								fontDone(uri);
+							}, function(err)
 							{
-								// LATER: handle error
-								waiting--;
-								finish();
-							}), true, null, 'data:' + realMime + ';charset=utf-8;base64,');
+								// LATER: handle error, keeps external font URL
+								fontDone(url);
+							}, true, null, 'data:' + realMime + ';charset=utf-8;base64,');
 						}));
+                    }
+                    else if (typeof cached != 'string')
+                    {
+                        // Waits for the font that is being fetched in another call
+                        waiting++;
+
+                        cached.push(function()
+                        {
+                            waiting--;
+                            finish();
+                        });
                     }
                 }))(Editor.trimCssUrl(parts[i].substring(0, idx)), format);
             }
@@ -4240,11 +6836,12 @@
 	};
     
     /**
-     * Embeds external fonts
+     * Embeds the external fonts in the given font lookup. Default lookup
+     * is Graph.customFontElements.
      */
-    Editor.prototype.embedExtFonts = function(callback)
+    Editor.prototype.embedExtFonts = function(callback, lookup)
     {
-    	var extFonts = this.graph.getCustomFonts();
+    	var extFonts = this.graph.getCustomFonts(lookup);
 		
 		if (extFonts.length > 0)
 		{
@@ -4283,7 +6880,7 @@
 		                    }), mxUtils.bind(this, function(err)
 		                    {
 		                        waiting--;
-								content.push('@import url(' + fontUrl + ');\n');
+								content.push('@import url("' + Graph.escapeCssString(fontUrl) + '");\n');
 		                        googleCssDone();
 		                    }));
 						}
@@ -4295,8 +6892,8 @@
 					else
 					{
 						content.push('@font-face {' +
-							'font-family: "' + fontName + '";' + 
-							'src: url("' + fontUrl + '")}\n');
+							'font-family: "' + Graph.escapeCssString(fontName) + '";' +
+							'src: url("' + Graph.escapeCssString(fontUrl) + '")}\n');
 					}
 				}))(extFonts[i].name, extFonts[i].url);
 			}
@@ -4419,7 +7016,20 @@
 			ignoreSelection = (ignoreSelection != null) ? ignoreSelection : true;
 			graph = (graph != null) ? graph : this.graph;
 			border = (border != null) ? border : 0;
-			
+
+			// Waits for the outlines of images that edges end on (see Graph.waitForOutlines)
+			if (graph.hasPendingOutlines())
+			{
+				var args = arguments;
+
+				graph.waitForOutlines(mxUtils.bind(this, function()
+				{
+					this.exportToCanvas.apply(this, args);
+				}), 10000);
+
+				return;
+			}
+
 			var bg = (transparentBackground) ? null : graph.background;
 			
 			if (bg == mxConstants.NONE)
@@ -4435,7 +7045,7 @@
 			// Handles special case where background is null but transparent is false
 			if (bg == null && transparentBackground == false)
 			{
-				bg = 'light-dark(#ffffff,' + Editor.darkColor + ')';
+				bg = Editor.getDefaultPageBackgroundColor();
 			}
 
 			this.convertImages(graph.getSvg(null, null, border, noCrop, null, ignoreSelection,
@@ -4480,6 +7090,15 @@
 									graph.getAdaptiveColors() != 'none') ?
 									cssBg.dark : cssBg.light;
 								ctx.fill();
+
+								// Adds the gradient of the page background
+								var gradient = graph.getBackgroundGradient(bg);
+
+								if (gradient != null)
+								{
+									Graph.fillBackgroundGradient(ctx, gradient, w, h,
+										theme == 'dark' && graph.getAdaptiveColors() != 'none');
+								}
 					   		}
 		
 					   		if (scale != 1)
@@ -4511,9 +7130,11 @@
 							    var curViewScale = view.scale;
 							    view.scale = 1; //Reset the scale temporary to generate unscaled grid image which is then scaled
 								var gridImage = btoa(unescape(encodeURIComponent(view.createSvgGrid(view.gridColor))));
+								// Steps by the size of the tile, which is the grid size if
+								// it is at least minGridSize (the loop ends as it is positive)
+								var phase = view.getGridLineDistance() * view.gridSteps * scale;
 								view.scale = curViewScale;
 								gridImage = 'data:image/svg+xml;base64,' + gridImage;
-				                var phase = graph.gridSize * view.gridSteps * scale;
 				                
 				                var b = graph.getGraphBounds();
 								var tx = view.translate.x * curViewScale;
@@ -4828,10 +7449,15 @@
 	// Overrides ID for pages
 	if (typeof window.EditDataDialog !== 'undefined')
 	{
-		EditDataDialog.getDisplayIdForCell = function(ui, cell)
+		EditDataDialog.getDisplayIdForCell = function(ui, cell, optionalGraph)
 		{
 			var id = null;
-			
+
+			if (optionalGraph != null)
+			{
+				return null;
+			}
+
 			if (ui.editor.graph.getModel().getParent(cell) != null)
 			{
 				id = cell.getId();
@@ -4840,7 +7466,7 @@
 			{
 				id = ui.currentPage.getId();
 			}
-			
+
 			return id;
 		};
 	}
@@ -4858,7 +7484,7 @@
 		td = document.createElement('td');
 		td.style.fontSize = '10pt';
 		td.style.width = '100px';
-		mxUtils.write(td, mxResources.get('name', null, 'Name') + ':');
+		mxUtils.write(td, mxResources.get('name') + ':');
 		
 		row.appendChild(td);
 		
@@ -4875,7 +7501,7 @@
 		
 		td = document.createElement('td');
 		td.style.fontSize = '10pt';
-		mxUtils.write(td, mxResources.get('type', null, 'Type') + ':');
+		mxUtils.write(td, mxResources.get('type') + ':');
 		
 		row.appendChild(td);
 		
@@ -4884,32 +7510,32 @@
 
 		var boolOption = document.createElement('option');
 		boolOption.setAttribute('value', 'bool');
-		mxUtils.write(boolOption, mxResources.get('bool', null, 'Boolean'));
+		mxUtils.write(boolOption, mxResources.get('bool'));
 		typeSelect.appendChild(boolOption);
 		
 		var clrOption = document.createElement('option');
 		clrOption.setAttribute('value', 'color');
-		mxUtils.write(clrOption, mxResources.get('color', null, 'Color'));
+		mxUtils.write(clrOption, mxResources.get('color'));
 		typeSelect.appendChild(clrOption);
 		
 		var enumOption = document.createElement('option');
 		enumOption.setAttribute('value', 'enum');
-		mxUtils.write(enumOption, mxResources.get('enum', null, 'Enumeration'));
+		mxUtils.write(enumOption, mxResources.get('enum'));
 		typeSelect.appendChild(enumOption);
 
 		var floatOption = document.createElement('option');
 		floatOption.setAttribute('value', 'float');
-		mxUtils.write(floatOption, mxResources.get('float', null, 'Float'));
+		mxUtils.write(floatOption, mxResources.get('float'));
 		typeSelect.appendChild(floatOption);
 
 		var intOption = document.createElement('option');
 		intOption.setAttribute('value', 'int');
-		mxUtils.write(intOption, mxResources.get('int', null, 'Int'));
+		mxUtils.write(intOption, mxResources.get('int'));
 		typeSelect.appendChild(intOption);
 		
 		var strOption = document.createElement('option');
 		strOption.setAttribute('value', 'string');
-		mxUtils.write(strOption, mxResources.get('string', null, 'String'));
+		mxUtils.write(strOption, mxResources.get('string'));
 		typeSelect.appendChild(strOption);
 
 		td = document.createElement('td');
@@ -4922,7 +7548,7 @@
 
 		td = document.createElement('td');
 		td.style.fontSize = '10pt';
-		mxUtils.write(td, mxResources.get('dispName', null, 'Display Name') + ':');
+		mxUtils.write(td, mxResources.get('dispName') + ':');
 		
 		row.appendChild(td);
 		
@@ -4939,7 +7565,7 @@
 
 		td = document.createElement('td');
 		td.style.fontSize = '10pt';
-		mxUtils.write(td, mxResources.get('enumList', null, 'Enum List') + ' (csv):');
+		mxUtils.write(td, mxResources.get('enumList') + ' (csv):');
 		
 		listRow.appendChild(td);
 		
@@ -4978,7 +7604,7 @@
 		td.style.paddingTop = '22px';
 		td.colSpan = 2;
 		
-		var addBtn = mxUtils.button(mxResources.get('add', null, 'Add'), mxUtils.bind(this, function()
+		var addBtn = mxUtils.button(mxResources.get('add'), mxUtils.bind(this, function()
 		{
 	    	var name = nameInput.value;
 
@@ -5134,7 +7760,7 @@
 			}
 			
 			// Adds math option
-	        if (this.isMathOptionVisible() && graph.isEnabled() && typeof(MathJax) !== 'undefined')
+	        if (this.isMathOptionVisible() && graph.isEnabled() && typeof(DrawioMathJax) !== 'undefined')
 	        {
 				var option = this.createOption(mxResources.get('mathematicalTypesetting'), function()
 				{
@@ -5173,11 +7799,35 @@
 
 		mxCellRenderer.prototype.defaultVertexShape.prototype.customProperties = [
 	        {name: 'arcSize', dispName: 'Arc Size', type: 'float', min:0, defVal: mxConstants.LINE_ARCSIZE},
-	        {name: 'absoluteArcSize', dispName: 'Abs. Arc Size', type: 'bool', defVal: false}
+	        {name: 'absoluteArcSize', dispName: 'Abs. Arc Size', type: 'bool', defVal: false},
+	        Editor.roundedPerimeterProperty,
+	        {name: 'footerSize', dispName: 'Footer Size', type: 'float', min: 0, defVal: 0},
+	        // primary shows the color in the style panel (see getCustomColors)
+	        // for cells that actually have a footer
+	        {name: 'footerColor', dispName: 'Footer Color', type: 'color', defVal: null,
+	        	primary: true, isVisible: function(state, format)
+	        	{
+	        		return mxUtils.getValue(state.style, 'footerSize', 0) > 0;
+	        	}}
+	      ];
+
+		mxCellRenderer.defaultShapes['ellipse'].prototype.customProperties = [
+	        {name: 'centerRadius', dispName: 'Center Radius', type: 'float', min: 0, defVal: 0},
+	        // primary shows the color in the style panel (see getCustomColors)
+	        // for ellipses that actually have a center circle (UML final states)
+	        {name: 'centerColor', dispName: 'Center Color', type: 'color', defVal: null,
+	        	primary: true, isVisible: function(state, format)
+	        	{
+	        		return mxUtils.getValue(state.style, 'centerRadius', 0) > 0;
+	        	}}
 	      ];
 
 		mxCellRenderer.defaultShapes['link'].prototype.customProperties = [
 	        {name: 'width', dispName: 'Width', type: 'float', min:0, defVal: 4}
+		];
+
+		mxCellRenderer.defaultShapes['zigzag'].prototype.customProperties = [
+	        {name: 'size', dispName: 'Size', type: 'float', min:5, defVal: 20}
 		];
 
 		mxCellRenderer.defaultShapes['flexArrow'].prototype.customProperties = [
@@ -5186,12 +7836,21 @@
 	        {name: 'endWidth', dispName: 'End Width', type: 'float', min:0, defVal: 20}
 		];
 
+		mxCellRenderer.defaultShapes['taperedArrow'].prototype.customProperties = [
+	        {name: 'startWidth', dispName: 'Start Width', type: 'float', min:0,
+	        	defVal: mxCellRenderer.defaultShapes['taperedArrow'].prototype.defaultStartWidth},
+	        {name: 'endWidth', dispName: 'End Width', type: 'float', min:0,
+	        	defVal: mxCellRenderer.defaultShapes['taperedArrow'].prototype.defaultEndWidth}
+		];
+
 		mxCellRenderer.defaultShapes['process'].prototype.customProperties = [
-			{name: 'size', dispName: 'Indent', type: 'float', min: 0, max: 0.5, defVal: 0.1}
+			{name: 'size', dispName: 'Indent', type: 'float', min: 0, max: 0.5, defVal: 0.1},
+			Editor.roundedPerimeterProperty
 		];
 
 		mxCellRenderer.defaultShapes['rhombus'].prototype.customProperties = [
 	        {name: 'arcSize', dispName: 'Arc Size', type: 'float', min:0, max: 50, defVal: mxConstants.LINE_ARCSIZE},
+	        Editor.roundedPerimeterProperty,
 	        {name: 'double', dispName: 'Double', type: 'bool', defVal: false}
 		];
 		
@@ -5204,6 +7863,7 @@
 		
 		mxCellRenderer.defaultShapes['parallelogram'].prototype.customProperties = [
 	        {name: 'arcSize', dispName: 'Arc Size', type: 'float', min:0, defVal: mxConstants.LINE_ARCSIZE},
+	        Editor.roundedPerimeterProperty,
 			{name: 'size', dispName: 'Slope Angle', type: 'float', min:0, max: 1, defVal: 0.2, isVisible: function(state)
 			{
 				return mxUtils.getValue(state.style, 'fixedSize', '0') == '0';
@@ -5216,6 +7876,7 @@
 		
 		mxCellRenderer.defaultShapes['hexagon'].prototype.customProperties = [
 	        {name: 'arcSize', dispName: 'Arc Size', type: 'float', min:0, defVal: mxConstants.LINE_ARCSIZE},
+	        Editor.roundedPerimeterProperty,
 			{name: 'size', dispName: 'Slope Angle', type: 'float', min:0, max: 1, defVal: 0.25, isVisible: function(state)
 			{
 				return mxUtils.getValue(state.style, 'fixedSize', '0') == '0';
@@ -5227,15 +7888,19 @@
 		];
 		
 		mxCellRenderer.defaultShapes['triangle'].prototype.customProperties = [
-	        {name: 'arcSize', dispName: 'Arc Size', type: 'float', min:0, defVal: mxConstants.LINE_ARCSIZE}
+	        {name: 'arcSize', dispName: 'Arc Size', type: 'float', min:0, defVal: mxConstants.LINE_ARCSIZE},
+	        Editor.roundedPerimeterProperty
 		];
 		
 		mxCellRenderer.defaultShapes['document'].prototype.customProperties = [
-	        {name: 'size', dispName: 'Size', type: 'float', defVal: 0.3, min:0, max:1}
+	        {name: 'size', dispName: 'Size', type: 'float', defVal: 0.3, min:0, max:1},
+	        {name: 'arcSize', dispName: 'Arc Size', type: 'float', min:0, defVal: mxConstants.LINE_ARCSIZE},
+	        {name: 'boundedLbl', dispName: 'Bounded Label', type: 'bool', defVal: false}
 		];
 		
 		mxCellRenderer.defaultShapes['internalStorage'].prototype.customProperties = [
 	        {name: 'arcSize', dispName: 'Arc Size', type: 'float', min:0, defVal: mxConstants.LINE_ARCSIZE},
+	        Editor.roundedPerimeterProperty,
 	        {name: 'dx', dispName: 'Left Line', type: 'float', min:0, defVal: 20},
 	        {name: 'dy', dispName: 'Top Line', type: 'float', min:0, defVal: 20}
 		];
@@ -5243,28 +7908,49 @@
 		mxCellRenderer.defaultShapes['cube'].prototype.customProperties = [
 	        {name: 'size', dispName: 'Size', type: 'float', min:0, defVal:20 },
 	        {name: 'darkOpacity', dispName: 'Dark Opacity', type: 'float', min:-1, max:1, defVal:0 },
-	        {name: 'darkOpacity2', dispName: 'Dark Opacity 2', type: 'float', min:-1, max:1, defVal:0 }
+	        {name: 'darkOpacity2', dispName: 'Dark Opacity 2', type: 'float', min:-1, max:1, defVal:0 },
+	        {name: 'boundedLbl', dispName: 'Bounded Label', type: 'bool', defVal: false}
+		];
+
+		mxCellRenderer.defaultShapes['cylinder'].prototype.customProperties = [
+	        {name: 'boundedLbl', dispName: 'Bounded Label', type: 'bool', defVal: false}
+		];
+
+		mxCellRenderer.defaultShapes['cylinder3'].prototype.customProperties = [
+	        {name: 'boundedLbl', dispName: 'Bounded Label', type: 'bool', defVal: false}
+		];
+
+		mxCellRenderer.defaultShapes['umlState'].prototype.customProperties = [
+	        {name: 'boundedLbl', dispName: 'Bounded Label', type: 'bool', defVal: false}
 		];
 		
 		mxCellRenderer.defaultShapes['step'].prototype.customProperties = [
 			{name: 'arcSize', dispName: 'Arc Size', type: 'float', min:0, defVal: mxConstants.LINE_ARCSIZE},
+			Editor.roundedPerimeterProperty,
 	        {name: 'size', dispName: 'Notch Size', type: 'float', min:0, defVal:20},
 	        {name: 'fixedSize', dispName: 'Fixed Size', type: 'bool', defVal:true}
 		];
 		
 		mxCellRenderer.defaultShapes['trapezoid'].prototype.customProperties = [
 	        {name: 'arcSize', dispName: 'Arc Size', type: 'float', min:0, defVal: mxConstants.LINE_ARCSIZE},
+	        Editor.roundedPerimeterProperty,
 	        {name: 'size', dispName: 'Slope Angle', type: 'float', min:0, max: 1, defVal: 0.2}
 		];
 		
 		mxCellRenderer.defaultShapes['tape'].prototype.customProperties = [
-	        {name: 'size', dispName: 'Size', type: 'float', min:0, max:1, defVal:0.4 }
+	        {name: 'size', dispName: 'Size', type: 'float', min:0, max:1, defVal:0.4 },
+	        {name: 'arcSize', dispName: 'Arc Size', type: 'float', min:0, defVal: mxConstants.LINE_ARCSIZE},
+	        {name: 'boundedLbl', dispName: 'Bounded Label', type: 'bool', defVal: false}
 		];
 		
 		mxCellRenderer.defaultShapes['note'].prototype.customProperties = [
 	        {name: 'size', dispName: 'Fold Size', type: 'float', min:0, defVal: 30},
 	        {name: 'darkOpacity', dispName: 'Dark Opacity', type: 'float', min:-1, max:1, defVal:0 },
 	    ];
+
+		mxCellRenderer.defaultShapes['note2'].prototype.customProperties = [
+	        {name: 'boundedLbl', dispName: 'Bounded Label', type: 'bool', defVal: false}
+		];
 		
 		mxCellRenderer.defaultShapes['card'].prototype.customProperties = [
 	        {name: 'arcSize', dispName: 'Arc Size', type: 'float', min:0, defVal: mxConstants.LINE_ARCSIZE},
@@ -5278,31 +7964,49 @@
 	        {name: 'position', dispName: 'Callout Position', type: 'float', min:0, max:1, defVal: 0.5},
 	        {name: 'position2', dispName: 'Callout Tip Position', type: 'float', min:0, max:1, defVal: 0.5}
 	    ];
-		
+
+		mxCellRenderer.defaultShapes['wedgeCallout'].prototype.customProperties = [
+	        {name: 'arcSize', dispName: 'Arc Size', type: 'float', min:0, defVal: mxConstants.LINE_ARCSIZE},
+	        {name: 'tipX', dispName: 'Tip X', type: 'float', min:-100, max:100, defVal: -0.25},
+	        {name: 'tipY', dispName: 'Tip Y', type: 'float', min:-100, max:100, defVal: 1},
+	        {name: 'base', dispName: 'Callout Width', type: 'float', min:0, defVal: 20}
+	    ];
+
 		mxCellRenderer.defaultShapes['folder'].prototype.customProperties = [
 	        {name: 'tabWidth', dispName: 'Tab Width', type: 'float'},
 	        {name: 'tabHeight', dispName: 'Tab Height', type: 'float'},
 	        {name: 'tabPosition', dispName: 'Tap Position', type: 'enum',
 	        	enumList: [{val: 'left', dispName: 'Left'}, {val: 'right', dispName: 'Right'}]
-	        }
+	        },
+	        {name: 'boundedLbl', dispName: 'Bounded Label', type: 'bool', defVal: false}
 	    ];
 		
 		mxCellRenderer.defaultShapes['swimlane'].prototype.customProperties = [
 	        {name: 'arcSize', dispName: 'Arc Size', type: 'float', min:0, defVal: 15},
 	        {name: 'absoluteArcSize', dispName: 'Abs. Arc Size', type: 'bool', defVal: false},
 	        {name: 'startSize', dispName: 'Header Size', type: 'float'},
+	        {name: 'footerSize', dispName: 'Footer Size', type: 'float', min: 0, defVal: 0},
 			{name: 'swimlaneHead', dispName: 'Head Border', type: 'bool', defVal: true},
 			{name: 'swimlaneBody', dispName: 'Body Border', type: 'bool', defVal: true},
 	        {name: 'horizontal', dispName: 'Horizontal', type: 'bool', defVal: true},
 	        {name: 'separatorColor', dispName: 'Separator Color', type: 'color', defVal: null},
+	        {name: 'fixedHeader', dispName: 'Fixed Header', type: 'bool', defVal: true,
+				getDefaultValue: function(state, format)
+				{
+					var shape = mxCellRenderer.defaultShapes[mxUtils.getValue(state.style, 'shape', '')];
+					return (shape != null && shape.prototype.fixedHeaderDefault != null) ?
+						(shape.prototype.fixedHeaderDefault ? '1' : '0') : '1';
+				}},
 	    ];
-		
+
 		mxCellRenderer.defaultShapes['table'].prototype.customProperties = [
 			{name: 'rowLines', dispName: 'Row Lines', type: 'bool', defVal: true},
 			{name: 'columnLines', dispName: 'Column Lines', type: 'bool', defVal: true},
 			{name: 'fixedRows', dispName: 'Fixed Rows', type: 'bool', defVal: false},
 			{name: 'resizeLast', dispName: 'Resize Last Column', type: 'bool', defVal: false},
-			{name: 'resizeLastRow', dispName: 'Resize Last Row', type: 'bool', defVal: false}].
+			{name: 'resizeLastRow', dispName: 'Resize Last Row', type: 'bool', defVal: false},
+			{name: 'tableRender', dispName: 'Borders', type: 'enum', defVal: 'separate',
+				enumList: [{val: 'separate', dispName: 'Separate'}, {val: 'collapsed', dispName: 'Collapsed'}]}].
 			concat(mxCellRenderer.defaultShapes['swimlane'].prototype.customProperties).
 			concat(mxCellRenderer.defaultShapes['partialRectangle'].prototype.customProperties);
 
@@ -5342,16 +8046,35 @@
 	        {name: 'imageWidth', dispName: 'Image Width', type: 'float', min:0, defVal: 24},
 	        {name: 'imageHeight', dispName: 'Image Height', type: 'float', min:0, defVal: 24},
 	        {name: 'arcSize', dispName: 'Arc Size', type: 'float', min:0, defVal: 12},
-	        {name: 'absoluteArcSize', dispName: 'Abs. Arc Size', type: 'bool', defVal: false}
+	        {name: 'absoluteArcSize', dispName: 'Abs. Arc Size', type: 'bool', defVal: false},
+	        Editor.roundedPerimeterProperty,
+	        {name: 'footerSize', dispName: 'Footer Size', type: 'float', min: 0, defVal: 0},
+	        // primary shows the color in the style panel (see getCustomColors)
+	        // for cells that actually have a footer
+	        {name: 'footerColor', dispName: 'Footer Color', type: 'color', defVal: null,
+	        	primary: true, isVisible: function(state, format)
+	        	{
+	        		return mxUtils.getValue(state.style, 'footerSize', 0) > 0;
+	        	}}
 	    ];
 		
 		mxCellRenderer.defaultShapes['dataStorage'].prototype.customProperties = [
-	        {name: 'size', dispName: 'Size', type: 'float', min:0, max:1, defVal:0.1 }
+	        {name: 'size', dispName: 'Size', type: 'float', min:0, max:1, defVal:0.1 },
+	        {name: 'arcSize', dispName: 'Arc Size', type: 'float', min:0, defVal: mxConstants.LINE_ARCSIZE}
+		];
+		
+		mxCellRenderer.defaultShapes['or'].prototype.customProperties = [
+	        {name: 'arcSize', dispName: 'Arc Size', type: 'float', min:0, defVal: mxConstants.LINE_ARCSIZE}
+		];
+		
+		mxCellRenderer.defaultShapes['xor'].prototype.customProperties = [
+	        {name: 'arcSize', dispName: 'Arc Size', type: 'float', min:0, defVal: mxConstants.LINE_ARCSIZE}
 		];
 		
 		mxCellRenderer.defaultShapes['manualInput'].prototype.customProperties = [
 	        {name: 'size', dispName: 'Size', type: 'float', min:0, defVal:30 },
-	        {name: 'arcSize', dispName: 'Arc Size', type: 'float', min:0, defVal: 20}
+	        {name: 'arcSize', dispName: 'Arc Size', type: 'float', min:0, defVal: 20},
+	        {name: 'boundedLbl', dispName: 'Bounded Label', type: 'bool', defVal: false}
 		];
 		
 		mxCellRenderer.defaultShapes['loopLimit'].prototype.customProperties = [
@@ -5394,20 +8117,27 @@
 		
 		mxCellRenderer.defaultShapes['umlLifeline'].prototype.customProperties = [
 			{name: 'participant', dispName:'Participant', type:'enum', defVal:'none', enumList:[
-				{val:'none', dispName: 'Default'},	
-				{val:'umlActor', dispName: 'Actor'},	
-				{val:'umlBoundary', dispName: 'Boundary'},	
-				{val:'umlEntity', dispName: 'Entity'},	
-				{val:'umlControl', dispName: 'Control'},	
+				{val:'none', dispName: 'Default'},
+				{val:'umlActor', dispName: 'Actor'},
+				{val:'umlBoundary', dispName: 'Boundary'},
+				{val:'umlEntity', dispName: 'Entity'},
+				{val:'umlControl', dispName: 'Control'},
 				]},
-			{name: 'size', dispName:'Height', type:'float', defVal:40, min:0}
+			{name: 'size', dispName:'Height', type:'float', defVal:40, min:0},
+			{name: 'lifelineMirror', dispName:'Mirror Head', type:'bool', defVal:false}
 		];
 		
 		mxCellRenderer.defaultShapes['umlFrame'].prototype.customProperties = [
 			{name: 'width', dispName:'Title Width', type:'float', defVal:60, min:0},
 			{name: 'height', dispName:'Title Height', type:'float', defVal:30, min:0}
 		];
-		
+
+		// Space between the lanes of a tie (see mxGraphView.updateTieLayout)
+		mxCellRenderer.defaultShapes['tie'].prototype.customProperties = [
+			{name: 'tieSpacing', dispName: 'Spacing', type: 'float', min: 0, max: 100,
+				defVal: Graph.prototype.defaultTieSpacing}
+		];
+
 		/**
 		 * Configures global color schemes.
 		 */
@@ -5456,7 +8186,6 @@
 			var sstate = this.editorUi.getSelectionState();
 
 			if (this.defaultColorSchemes != null && this.defaultColorSchemes.length > 0 &&
-				sstate.style.shape != 'image' && !sstate.containsLabel &&
 				sstate.cells.length > 0)
 			{
 				this.container.appendChild(this.addStyles(this.createPanel()));
@@ -5508,7 +8237,7 @@
 			var that = this;
 			var graph = this.editorUi.editor.graph;
 			var secondLevel = [];
-			
+
 			function insertAfter(newElem, curElem)
 			{
 				curElem.parentNode.insertBefore(newElem, curElem.nextSibling);
@@ -5662,14 +8391,17 @@
 						}
 						else
 						{
-							clrDiv.style.background = color;
+							// Uses the longhand as the shorthand also loads
+							// images from the style
+							clrDiv.style.background = '';
+							clrDiv.style.backgroundColor = color;
 						}
 					}
 				};
 				
 				updateBackground(pValue);
 
-				btn = mxUtils.button('', mxUtils.bind(that, function(evt)
+				var btn = mxUtils.button('', mxUtils.bind(that, function(evt)
 				{
 					this.editorUi.pickColor(pValue, function(color)
 					{
@@ -5700,7 +8432,7 @@
 						parentRow: myRow, isDeletable: true, flipBkg: flipBkg});
 				}
 				
-				btn = mxUtils.button('+', mxUtils.bind(that, function(evt)
+				var btn = mxUtils.button('+', mxUtils.bind(that, function(evt)
 				{
 					var beforeElem = myRow;
 					var index = 0;
@@ -5791,6 +8523,10 @@
 				var label = mxResources.get(pDiplayName, null, pDiplayName);
 				mxUtils.write(td, label);
 				td.setAttribute('title', label);
+
+				// Array items use the text of their parent row for filtering
+				row.filterText = (prop.parentRow != null && prop.parentRow.filterText != null) ?
+					prop.parentRow.filterText : (pName + ' ' + label).toLowerCase();
 				
 				if (rightAlig)
 				{
@@ -5801,7 +8537,7 @@
 				td = document.createElement('td');
 				td.className = 'gePropRowCell';
 				td.setAttribute('title', (pValue != null) ?
-					decodeURIComponent(pValue) : mxResources.get('none'));
+					mxUtils.safeDecodeURIComponent(pValue) : mxResources.get('none'));
 
 				mxEvent.addListener(td, 'click', mxUtils.bind(that, function(e)
 				{
@@ -5859,6 +8595,11 @@
 						var nullValue = 'null';
 						var nullOption = null;
 						setElementPos(td, select);
+						select.style.boxSizing = 'border-box';
+						select.style.height = '100%';
+						select.style.padding = '0';
+						select.style.margin = '0';
+						select.style.border = '0';
 
 						for (var i = 0; i < pEnumList.length; i++)
 						{
@@ -5900,11 +8641,15 @@
 						{
 							valueDiv.innerHTML = '';
 
+							// Map the null sentinel back to actual null so op.val == ... matches.
+							var effectiveVal = (select[select.selectedIndex] == nullOption ||
+								select.value == nullValue) ? null : select.value;
+
 							for (let i = 0; i < pEnumList.length; i++)
 							{
 								let op = pEnumList[i];
 
-								if (op.val == select.value)
+								if (op.val == effectiveVal)
 								{
 									mxUtils.write(valueDiv, mxResources.get(op.dispName, null, op.dispName));
 									break;
@@ -5947,6 +8692,9 @@
 
 						div.appendChild(inp);
 						row.firstChild.appendChild(div);
+
+						// Always shows id and shape
+						row.filterText = null;
 					}
 					else
 					{
@@ -5960,7 +8708,7 @@
 					let valueDiv = document.createElement('div');
 					valueDiv.className = 'gePropValue';
 					td.appendChild(valueDiv);
-					valueDiv.innerHTML = mxUtils.htmlEntities(decodeURIComponent(pValue));
+					valueDiv.innerHTML = mxUtils.htmlEntities(mxUtils.safeDecodeURIComponent(pValue));
 
 					mxEvent.addListener(td, 'click', mxUtils.bind(that, function(e)
 					{
@@ -5976,7 +8724,7 @@
 						valueDiv.innerHTML = '';
 						var input = document.createElement('input');
 						setElementPos(valueDiv, input);
-						input.value = decodeURIComponent(pValue);
+						input.value = mxUtils.safeDecodeURIComponent(pValue);
 						input.className = 'gePropEditor';
 						
 						if ((pType == 'int' || pType == 'float') && !prop.allowAuto)
@@ -6000,16 +8748,25 @@
 						function setInputVal()
 						{
 							var inputVal = input.value;
-							inputVal = inputVal.length == 0 && pType != 'string' &&
-								pType != 'numbers'? 0 : inputVal;
-							
+							// LOCAL type: setInputVal can run twice for one edit
+							// (enter-commit + the blur listener) — mutating the
+							// row's pType would make the second run misparse the
+							// value (an empty value came back as 0, not auto).
+							var type = pType;
+
+							// A cleared value means AUTO for auto-capable properties
+							// (jettySize) — only an explicitly entered 0 means 0 —
+							// and 0 for the other numeric types.
+							inputVal = inputVal.trim().length == 0 && type != 'string' &&
+								type != 'numbers'? ((prop.allowAuto) ? 'auto' : 0) : inputVal;
+
 							if (prop.allowAuto)
 							{
 								if (inputVal.trim != null && inputVal.trim().
 									toLowerCase() == 'auto')
 								{
 									inputVal = 'auto';
-									pType = 'string';
+									type = 'string';
 								}
 								else
 								{
@@ -6017,11 +8774,11 @@
 									inputVal = isNaN(inputVal)? 0 : inputVal;
 								}
 							}
-							
+
 							if (prop.min != null && inputVal < prop.min)
 							{
 								inputVal = prop.min;
-							} 
+							}
 							else if (prop.max != null && inputVal > prop.max)
 							{
 								inputVal = prop.max;
@@ -6031,32 +8788,63 @@
 
 							try
 							{
-								newVal = (pType == 'numbers') ? inputVal.match(/\d+/g).map(Number).join(' ') :
-									encodeURIComponent((pType == 'int'? parseInt(inputVal) : inputVal) + '');
+								// Auto is the property's default: REMOVE the key
+								// (null unsets it in setCellStyles) instead of
+								// writing jettySize=auto into the style.
+								newVal = (type == 'numbers') ? inputVal.match(/\d*\.?\d+/g).map(Number).join(' ') :
+									(inputVal === 'auto' && prop.allowAuto && prop.defVal == 'auto') ? null :
+									encodeURIComponent((type == 'int'? parseInt(inputVal) : inputVal) + '');
 							}
 							catch(e)
 							{
 								// ignores parsing errors
 							}
-							
+
 							applyStyleVal(pName, newVal, prop, null, input);
 						}
 						
 						mxEvent.addListener(input, 'keypress', function(e)
 						{
-							if (e.keyCode == 13) 
+							if (e.keyCode == 13)
 							{
 								setInputVal();
 								//set value triggers a redraw of the panel which removes the input
 							}
 						});
-						
-						input.focus();
-						
-						//FF calls blur on focus! so set the event after focusing
-						mxEvent.addListener(input, 'blur', function() 
+
+						// Escape cancels the edit before the focus goes back to the
+						// diagram, which would apply the value (see EditorUi.keydownHandler)
+						var cancelled = false;
+
+						mxEvent.addListener(input, 'keydown', function(e)
 						{
-							setInputVal();
+							if (e.keyCode == 27)
+							{
+								input.value = mxUtils.safeDecodeURIComponent(pValue);
+								cancelled = true;
+							}
+						});
+
+						mxEvent.addListener(input, 'input', function()
+						{
+							cancelled = false;
+						});
+
+						input.focus();
+
+						//FF calls blur on focus! so set the event after focusing
+						mxEvent.addListener(input, 'blur', function()
+						{
+							if (!cancelled)
+							{
+								setInputVal();
+							}
+							else
+							{
+								// Shows the value without the input as before the click
+								valueDiv.innerHTML = mxUtils.htmlEntities(
+									mxUtils.safeDecodeURIComponent(pValue));
+							}
 						});
 					}));
 				}
@@ -6095,12 +8883,16 @@
 			th.style.backgroundSize = '20px';
 			mxUtils.write(th, mxResources.get('property'));
 			hrow.style.cursor = 'pointer';
-			
+
+			// Expands and collapses with the keyboard (click on the row below)
+			that.editorUi.initKeyboardButton(th);
+
 			var onFold = function()
 			{
 				var rows = grid.querySelectorAll('.gePropNonHeaderRow');
 				var display;
-				
+				th.setAttribute('aria-expanded', (that.editorUi.propertiesCollapsed) ? 'false' : 'true');
+
 				if (!that.editorUi.propertiesCollapsed)
 				{
 					th.style.backgroundImage = 'url(\'' + Editor.arrowDownImage + '\')';
@@ -6132,7 +8924,60 @@
 				{
 					rows[r].style.display = display;
 				}
+
+				if (display == '')
+				{
+					applyFilter();
+				}
 			};
+
+			// Filters the property rows by name
+			var filterRow = document.createElement('tr');
+			filterRow.className = 'gePropRow gePropNonHeaderRow';
+			var filterCell = document.createElement('td');
+			filterCell.className = 'gePropRowCell';
+			filterCell.setAttribute('colspan', '2');
+			var filterInput = document.createElement('input');
+			filterInput.setAttribute('type', 'text');
+			filterInput.setAttribute('placeholder', mxResources.get('search'));
+			filterInput.style.boxSizing = 'border-box';
+			filterInput.style.width = '100%';
+			filterInput.value = (this.editorUi.propertiesFilter != null) ?
+				this.editorUi.propertiesFilter : '';
+			filterCell.appendChild(filterInput);
+			filterRow.appendChild(filterCell);
+
+			function applyFilter()
+			{
+				var search = mxUtils.trim(filterInput.value).toLowerCase();
+				var rows = grid.querySelectorAll('.gePropNonHeaderRow');
+
+				for (var r = 0; r < rows.length; r++)
+				{
+					if (rows[r].filterText != null)
+					{
+						rows[r].style.display = (search.length == 0 ||
+							rows[r].filterText.indexOf(search) >= 0) ? '' : 'none';
+					}
+				}
+			};
+
+			mxEvent.addListener(filterInput, 'input', function()
+			{
+				that.editorUi.propertiesFilter = filterInput.value;
+				applyFilter();
+			});
+
+			mxEvent.addListener(filterInput, 'keydown', function(evt)
+			{
+				if (evt.keyCode == 27 /* Escape */)
+				{
+					filterInput.value = '';
+					that.editorUi.propertiesFilter = '';
+					applyFilter();
+					mxEvent.consume(evt);
+				}
+			});
 
 			mxEvent.addListener(hrow, 'click', function()
 			{
@@ -6147,7 +8992,17 @@
 			mxUtils.write(th2, mxResources.get('value'));
 			hrow.appendChild(th2);
 			grid.appendChild(hrow);
-			
+
+			// Filter is only used in the main properties panel
+			if (!hideId)
+			{
+				grid.appendChild(filterRow);
+			}
+			else
+			{
+				filterInput.value = '';
+			}
+
 			var isOdd = false;
 			var flipBkg = false;
 			
@@ -6282,6 +9137,8 @@
 						}));
 					}))(i);
 					
+					ui.initKeyboardButton(dot);
+					dot.setAttribute('aria-label', String(i + 1));
 					dots.push(dot);
 					switcher.appendChild(dot);
 				}
@@ -6312,7 +9169,7 @@
 						defaults[mxConstants.STYLE_FONTCOLOR] : 'default';
 					graph.replaceDefaultColors(new mxCell(), defaults);
 
-					var addButton = mxUtils.bind(this, function(colorset)
+					var addButton = mxUtils.bind(this, function(colorset, index)
 					{
 						var btn = mxUtils.button('', mxUtils.bind(this, function(evt)
 						{
@@ -6320,36 +9177,84 @@
 							try
 							{
 								var cells = ui.getSelectionState().cells;
-								
+								var model = graph.getModel();
+								var cellMeta = [];
+								var labelOnly = cells.length > 0;
+
 								for (var i = 0; i < cells.length; i++)
 								{
-									var style = graph.getModel().getStyle(cells[i]);
-									
+									var isEdgeLabel = model.isVertex(cells[i]) &&
+										model.isEdge(model.getParent(cells[i]));
+									var cellStyle = graph.getCellStyle(cells[i]);
+									var isImage = cellStyle != null && cellStyle.shape == 'image';
+									var geo = graph.getCellGeometry(cells[i]);
+
+									// Edge labels with a size are shapes that use the fill and
+									// stroke colors (see updateEdgeLabelShape) while zero-size
+									// edge labels and images use the label background and
+									// border colors
+									cellMeta.push({isLabel: isImage || (isEdgeLabel &&
+										(geo == null || geo.width <= 0 || geo.height <= 0))});
+
+									if (!isEdgeLabel && !isImage)
+									{
+										labelOnly = false;
+									}
+								}
+
+								for (var i = 0; i < cells.length; i++)
+								{
+									var meta = cellMeta[i];
+
+									if (!labelOnly && meta.isLabel)
+									{
+										continue;
+									}
+
+									// Tables and rows without a title are filled with the lane color
+									var fillKey = (meta.isLabel) ? mxConstants.STYLE_LABEL_BACKGROUNDCOLOR :
+										graph.getFillColorKey(cells[i]);
+									var strokeKey = (meta.isLabel) ? mxConstants.STYLE_LABEL_BORDERCOLOR :
+										mxConstants.STYLE_STROKECOLOR;
+
+									var style = model.getStyle(cells[i]);
+									var fontUpdated = false;
+
+									if (style != null && typeof style !== 'string')
+									{
+										style = String(style);
+									}
+
 									if (colorset != null)
 									{
 										if (!mxEvent.isShiftDown(evt))
 										{
 											if (colorset['fill'] == '' || colorset['fill'] == null)
 											{
-												style = mxUtils.setStyle(style, mxConstants.STYLE_FILLCOLOR, null);
+												style = mxUtils.setStyle(style, fillKey, null);
 											}
 											else
 											{
-												style = mxUtils.setStyle(style, mxConstants.STYLE_FILLCOLOR, colorset['fill']);
+												style = mxUtils.setStyle(style, fillKey, colorset['fill']);
 											}
 
-											if (colorset['gradient'] == '' || colorset['gradient'] == null)
+											if (!meta.isLabel)
 											{
-												style = mxUtils.setStyle(style, mxConstants.STYLE_GRADIENTCOLOR, null);
-											}
-											else
-											{
-												style = mxUtils.setStyle(style, mxConstants.STYLE_GRADIENTCOLOR, colorset['gradient']);
+												if (colorset['gradient'] == '' || colorset['gradient'] == null)
+												{
+													style = mxUtils.setStyle(style, mxConstants.STYLE_GRADIENTCOLOR, null);
+												}
+												else
+												{
+													style = mxUtils.setStyle(style, mxConstants.STYLE_GRADIENTCOLOR, colorset['gradient']);
+												}
 											}
 
 											if (!mxEvent.isControlDown(evt) && (!mxClient.IS_MAC || !mxEvent.isMetaDown(evt)) &&
-												graph.getModel().isVertex(cells[i]))
+												model.isVertex(cells[i]))
 											{
+												fontUpdated = true;
+
 												if (colorset['font'] == '' || colorset['font'] == null)
 												{
 													style = mxUtils.setStyle(style, mxConstants.STYLE_FONTCOLOR, null);
@@ -6360,33 +9265,53 @@
 												}
 											}
 										}
-										
+
 										if (!mxEvent.isAltDown(evt))
 										{
-											if (colorset['stroke'] == '' || colorset['fill'] == null)
+											if (colorset['stroke'] == '' || colorset['stroke'] == null)
 											{
-												style = mxUtils.setStyle(style, mxConstants.STYLE_STROKECOLOR, null);
+												style = mxUtils.setStyle(style, strokeKey, null);
 											}
 											else
 											{
-												style = mxUtils.setStyle(style, mxConstants.STYLE_STROKECOLOR, colorset['stroke']);
+												style = mxUtils.setStyle(style, strokeKey, colorset['stroke']);
 											}
 										}
 									}
 									else
 									{
-										style = mxUtils.setStyle(style, mxConstants.STYLE_FILLCOLOR, null);
-										style = mxUtils.setStyle(style, mxConstants.STYLE_STROKECOLOR, null);
-										style = mxUtils.setStyle(style, mxConstants.STYLE_GRADIENTCOLOR, null);
-										
-										if (graph.getModel().isVertex(cells[i]))
+										style = mxUtils.setStyle(style, fillKey, null);
+										style = mxUtils.setStyle(style, strokeKey, null);
+
+										if (!meta.isLabel)
 										{
+											style = mxUtils.setStyle(style, mxConstants.STYLE_GRADIENTCOLOR, null);
+										}
+
+										if (model.isVertex(cells[i]))
+										{
+											fontUpdated = true;
 											style = mxUtils.setStyle(style, mxConstants.STYLE_FONTCOLOR, null);
 										}
 									}
 
-									graph.getModel().setStyle(cells[i], style);
+									// Disabling the font color in the Text tab also sets noLabel=1,
+									// which must be removed if the font color is enabled again here
+									// or the label stays hidden while the font color is checked.
+									// Uses the unresolved style as resolving removes none values.
+									if (fontUpdated && mxUtils.getValue(graph.getCellStyle(cells[i], false),
+										mxConstants.STYLE_FONTCOLOR, null) == mxConstants.NONE &&
+										(colorset == null || colorset['font'] != mxConstants.NONE))
+									{
+										style = mxUtils.setStyle(style, mxConstants.STYLE_NOLABEL, null);
+									}
+
+									// The colors are own values of labels of edges that inherit
+									// the text styles of the edge (see Graph.inheritedLabelStyles)
+									model.setStyle(cells[i], graph.removeChangedInheritedLabelKeys(cells[i], style));
 								}
+
+								graph.updateInheritedLabelValuesOfEdges(cells);
 							}
 							finally
 							{
@@ -6395,6 +9320,9 @@
 						}));
 		
 						btn.className = 'geStyleButton';
+						btn.setAttribute('aria-label', (colorset == null) ? mxResources.get('default') :
+							((colorset['title'] != null) ? colorset['title'] :
+							mxResources.get('style') + ' ' + (index + 1)));
 						btn.style.width = '36px';
 						btn.style.height = (this.defaultColorSchemes.length <= maxEntries) ? '24px' : '30px';
 						btn.style.margin = '0px 6px 6px 0px';
@@ -6475,6 +9403,10 @@
 										colorset['gradient']).light + ') 100%)';
 							lightBtn.style.clipPath = 'polygon(0 100%, 100% 0, 100% 100%)';
 							lightBtn.style.backgroundColor = 'transparent';
+
+							// Overlay of the button, which takes the keyboard focus
+							lightBtn.setAttribute('tabindex', '-1');
+							lightBtn.setAttribute('aria-hidden', 'true');
 							picker.appendChild(lightBtn);
 							lightBtn.style.marginLeft = '-42px';
 
@@ -6496,7 +9428,7 @@
 								mxUtils.br(picker);
 							}
 							
-							addButton(colorsets[i]);
+							addButton(colorsets[i], i);
 						}
 					}
 				});
@@ -6528,9 +9460,15 @@
 				right.style.cssText = 'position:absolute;left:186px;bottom:' + bottom + 'px;width:20px;' +
 					'background-image:url(' + Editor.chevronRightImage + ');';
 
+				ui.initKeyboardButton(left);
+				left.setAttribute('aria-label', mxResources.get('left'));
+				ui.initKeyboardButton(right);
+				right.setAttribute('aria-label', mxResources.get('right'));
+
+				// The buttons are absolute, so the left one comes first in the order of Tab
 				if (this.defaultColorSchemes.length > 1)
 				{
-					div.appendChild(left);
+					div.insertBefore(left, picker);
 					div.appendChild(right);
 				}
 				
@@ -6561,7 +9499,57 @@
 	/**
 	 * Lookup table for mapping from font URL and name to elements in the DOM.
 	 */
-	Graph.customFontElements = {};
+	// Uses a null prototype as the keys are untrusted, lowercased font
+	// names so that names such as __proto__ or constructor are stored as
+	// regular entries instead of resolving to inherited object members
+	Graph.customFontElements = Object.create(null);
+
+	/**
+	 * Font URLs that are allowed to point at the local filesystem. Populated
+	 * from the configuration (customFonts, defaultFonts, fontCss) by
+	 * Editor.addAllowedFontUrl. Null prototype as the keys are URLs.
+	 */
+	Graph.allowedFontUrls = Object.create(null);
+
+	/**
+	 * Returns true if the given font URL may be loaded. Font URLs come from
+	 * untrusted diagram content: a cell style's fontSource, a label's
+	 * data-font-src attribute and the file's extFonts attribute all end up
+	 * here. The desktop app resolves file:// URLs and absolute paths through
+	 * the main process, so an unchecked font URL is a read of an arbitrary
+	 * local file whose bytes are then embedded in the export. Only http(s),
+	 * data: and relative URLs are accepted, plus the local paths named in the
+	 * configuration.
+	 */
+	Graph.isValidFontUrl = function(url)
+	{
+		if (typeof url !== 'string' || url.length == 0)
+		{
+			return false;
+		}
+
+		if (Graph.allowedFontUrls[url])
+		{
+			return true;
+		}
+
+		// The check must run on the string the URL parser will see, not the
+		// raw one: leading and trailing C0 controls and spaces are stripped
+		// and tab, LF and CR are removed anywhere in the URL, so " file:..."
+		// and "file<tab>:..." would otherwise read as relative URLs here and
+		// still be fetched as file: URLs. Spaces inside the URL are kept as
+		// they are legal in a relative path.
+		var test = url.replace(/^[\x00-\x20]+/, '').replace(
+			/[\x00-\x20]+$/, '').replace(/[\t\n\r]/g, '');
+
+		// Anything with a scheme other than http(s) and data: is refused,
+		// which covers file: and Windows drive letters (C:\...), and so is
+		// anything starting with a slash or backslash, which covers absolute
+		// paths (/etc/passwd), UNC paths and protocol-relative URLs. What is
+		// left is relative URLs, which resolve against the app itself.
+		return /^https?:\/\//i.test(test) || /^data:/i.test(test) ||
+			(!/^[a-zA-Z][a-zA-Z0-9+.\-]*:/.test(test) && !/^[\\\/]/.test(test));
+	};
 
 	/**
 	 * Returns true if the given font URL references a Google font.
@@ -6584,15 +9572,42 @@
 	 * Uses CSS2 for Google fonts to support bold font style eg.
 	 * https://fonts.googleapis.com/css?family=IBM+Plex+Sans is rewritten as
 	 * https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500
+	 *
+	 * Only a single plain family name is rewritten. Anything else, such as a
+	 * CSS1 weight list (Roboto:400,700), multiple families (Roboto|Lato) or
+	 * extra parameters (&display=swap), raw or percent-encoded, is returned
+	 * unchanged as the CSS1 API still serves it and appending the CSS2 axis
+	 * to it gives an invalid request (HTTP 400).
 	 */
 	Graph.rewriteGoogleFontUrl = function(url)
 	{
 		if (url != null && url.substring(0, Editor.GOOGLE_FONTS.length) == Editor.GOOGLE_FONTS)
 		{
-			url = Editor.GOOGLE_FONTS_CSS2 + url.substring(Editor.GOOGLE_FONTS.length) + ':wght@400;500';
+			var family = url.substring(Editor.GOOGLE_FONTS.length);
+
+			if (/^(?:[\w+ \-]|%20)+$/.test(family))
+			{
+				url = Editor.GOOGLE_FONTS_CSS2 + family + ':wght@400;500';
+			}
 		}
 
 		return url;
+	};
+
+	/**
+	 * Escapes the given value for use inside a double-quoted CSS string,
+	 * such as a font-family name or a url(...) target. Font names and URLs
+	 * come from untrusted cell styles, so escaping the quote, backslash and
+	 * control characters (including newlines) keeps them inside the string
+	 * and prevents breaking out to inject CSS rules into exports or the
+	 * document stylesheet.
+	 */
+	Graph.escapeCssString = function(value)
+	{
+		return (value != null) ? String(value).replace(/[\x00-\x1f\x7f"\\]/g, function(chr)
+		{
+			return '\\' + chr.charCodeAt(0).toString(16) + ' ';
+		}) : value;
 	};
 
 	/**
@@ -6615,9 +9630,9 @@
 		{
 			if (style == null)
 			{
-				style = '@font-face {\n' +	
-					'font-family: "' + name + '";\n' + 	
-					'src: url("' + url + '");\n}'
+				style = '@font-face {\n' +
+					'font-family: "' + Graph.escapeCssString(name) + '";\n' +
+					'src: url("' + Graph.escapeCssString(url) + '");\n}'
 			}
 
 			elt = document.createElement('style');
@@ -6640,7 +9655,7 @@
 	 */
 	Graph.addFont = function(name, url, callback, elementLookup)
 	{
-		if (name != null && name.length > 0 && url != null && url.length > 0)
+		if (name != null && name.length > 0 && Graph.isValidFontUrl(url))
 		{
 			elementLookup = (elementLookup != null) ?
 				elementLookup : Graph.customFontElements;
@@ -6651,10 +9666,15 @@
 			{
 				var entry = elementLookup[key];
 				
-				// Replaces element if URL has changed
+				// Replaces element if URL has changed, element is not
+				// in the document for temporary font lookups
 				if (entry != null && entry.url != url)
 				{
-					entry.elt.parentNode.removeChild(entry.elt);
+					if (entry.elt.parentNode != null)
+					{
+						entry.elt.parentNode.removeChild(entry.elt);
+					}
+
 					entry = null;
 				}
 				
@@ -6738,7 +9758,8 @@
 			
 			if (url != null)
 			{
-				var name = (elts[i].nodeName == 'FONT') ?
+				// Node name is lowercase in XML documents (eg. SVG export)
+				var name = (elts[i].nodeName.toUpperCase() == 'FONT') ?
 					elts[i].getAttribute('face') :
 					elts[i].style.fontFamily;
 	
@@ -6805,6 +9826,12 @@
 	 * Specifies if the page should be visible for new files. Default is true.
 	 */
 	Graph.prototype.defaultPageVisible = urlParams['pv'] != '0';
+
+	/**
+	 * Copy on connect is enabled by default in the sketch theme. Use the
+	 * copyOnConnect configuration key to override.
+	 */
+	mxConnectionHandler.prototype.createTarget = urlParams['sketch'] == '1';
 
 	/**
 	 * Properties for the SVG shadow effect.
@@ -6892,23 +9919,19 @@
 		this.layoutManager.getLayout = function(cell)
 		{
 			// Workaround for possible invalid style after change and before view validation
-			var style = this.graph.getCellStyle(cell);
+			var style = this.graph.getChildLayoutStyle(cell);
 			
-			// mxRackContainer may be undefined as it is dynamically loaded at render time
 			if (style != null)
 			{
 				if (style['childLayout'] == 'rack')
 				{
 					var rackLayout = new mxStackLayout(this.graph, false);
-					var unitSize = 20;
 					
+					// Snaps to rack units only with rackUnitSize. Racks without it have not
+					// been snapped since 2021 and keep their device positions and sizes.
 					if (style['rackUnitSize'] != null)
 					{
 						rackLayout.gridSize = parseFloat(style['rackUnitSize']);
-					}
-					else
-					{
-						rackLayout.gridSize = (typeof mxRackContainer !== 'undefined') ? mxRackContainer.unitSize : unitSize;
 					}
 					
 					rackLayout.marginLeft = style['marginLeft'] || 0;
@@ -6931,12 +9954,21 @@
 	};
 
 	/**
-	 * Adds support for custom fonts in cell styles.
+	 * Adds support for custom fonts in cell styles and loads images on
+	 * Iconfinder and of the old Arista template from the icon cache.
 	 */
 	var graphPostProcessCellStyle = Graph.prototype.postProcessCellStyle;
 	Graph.prototype.postProcessCellStyle = function(cell, style)
 	{
-		return Graph.processFontStyle(graphPostProcessCellStyle.apply(this, arguments));
+		style = Graph.processFontStyle(graphPostProcessCellStyle.apply(this, arguments));
+
+		if (style != null && style[mxConstants.STYLE_IMAGE] != null)
+		{
+			style[mxConstants.STYLE_IMAGE] = Editor.getIconCacheUrl(
+				style[mxConstants.STYLE_IMAGE]);
+		}
+
+		return style;
 	};
 
 	/**
@@ -6990,6 +10022,10 @@
 		tagCloud.style.bottom = '0px';
 		div.appendChild(tagCloud);
 
+		// The tags with their buttons are one tab stop for the keyboard
+		// (see Editor.createKeyboardGrid)
+		var keyboardGrid = Editor.createKeyboardGrid(tagCloud);
+
 		function removeInvisibleSelectionCells()
 		{
 			var cells = graph.getSelectionCells();
@@ -7010,7 +10046,7 @@
 		{
 			graph.setHiddenTags(visible ? [] : allTags.slice());
 			removeInvisibleSelectionCells();
-			graph.refresh();
+			graph.refreshHiddenTags();
 		};
 		
 		graph.addListener(mxEvent.ROOT, function()
@@ -7020,11 +10056,13 @@
 	
 		function refreshTags(tags, selected)
 		{
+			keyboardGrid.begin();
 			tagCloud.innerText = '';
 	
 			if (tags.length > 0)
 			{
 				var table = document.createElement('table');
+				table.setAttribute('role', 'presentation');
 				table.setAttribute('cellpadding', '2');
 				table.style.boxSizing = 'border-box';
 				table.style.tableLayout = 'fixed';
@@ -7045,7 +10083,7 @@
 								temp.splice(index, 1);
 								graph.setHiddenTags(temp);
 								removeInvisibleSelectionCells();
-								graph.refresh();
+								graph.refreshHiddenTags();
 							};
 
 							function selectCells()
@@ -7069,9 +10107,15 @@
 							td.style.align = 'center';
 							td.style.width = '16px';
 
+							var controls = [];
 							var img = document.createElement('img');
 							img.setAttribute('src', visible ? Editor.visibleImage : Editor.hiddenImage);
-							img.setAttribute('title', mxResources.get(visible ? 'hideIt' : 'show', [tag]));
+							img.setAttribute('title', mxResources.get(visible ? 'hideIt' : 'show', [tag]) +
+								'\n' + mxResources.get('shiftClickShowOnly', [tag]));
+							img.setAttribute('aria-label', (visible) ? mxResources.get('hideIt', [tag]) :
+								mxResources.get('show') + ' ' + tag);
+							img.setAttribute('role', 'button');
+							controls.push(img);
 							mxUtils.setOpacity(img, visible ? 75 : 25);
 							img.className = 'geAdaptiveAsset';
 							img.style.verticalAlign = 'middle';
@@ -7089,13 +10133,45 @@
 							{
 								if (mxEvent.isShiftDown(evt))
 								{
-									setAllVisible(mxUtils.indexOf(graph.hiddenTags, tag) >= 0);
+									var otherTags = [];
+
+									for (var j = 0; j < allTags.length; j++)
+									{
+										if (allTags[j] !== tag)
+										{
+											otherTags.push(allTags[j]);
+										}
+									}
+
+									// If already showing only this tag, show all
+									var allOthersHidden = otherTags.length > 0;
+
+									for (var j = 0; j < otherTags.length; j++)
+									{
+										if (mxUtils.indexOf(graph.hiddenTags, otherTags[j]) < 0)
+										{
+											allOthersHidden = false;
+											break;
+										}
+									}
+
+									if (allOthersHidden && mxUtils.indexOf(graph.hiddenTags, tag) < 0)
+									{
+										graph.setHiddenTags([]);
+									}
+									else
+									{
+										graph.setHiddenTags(otherTags);
+									}
+
+									removeInvisibleSelectionCells();
+									graph.refreshHiddenTags();
 								}
 								else
 								{
 									graph.toggleHiddenTag(tag);
 									removeInvisibleSelectionCells();
-									graph.refresh();
+									graph.refreshHiddenTags();
 								}
 
 								mxEvent.consume(evt);
@@ -7110,6 +10186,9 @@
 							var img = document.createElement('img');
 							img.setAttribute('src', Editor.selectImage);
 							img.setAttribute('title', mxResources.get('select'));
+							img.setAttribute('aria-label', mxResources.get('select') + ' ' + tag);
+							img.setAttribute('role', 'button');
+							controls.push(img);
 							mxUtils.setOpacity(img, visible ? 75 : 25);
 							img.className = 'geAdaptiveAsset';
 							img.style.verticalAlign = 'middle';
@@ -7138,8 +10217,10 @@
 							td.style.verticalAlign = 'middle';
 							td.style.cursor = 'pointer';
 							td.setAttribute('title', tag);
+							td.setAttribute('role', 'button');
+							controls.push(td);
 	
-							a = document.createElement('a');
+							var a = document.createElement('a');
 							mxUtils.write(a, tag);
 							a.style.textOverflow = 'ellipsis';
 							a.style.position = 'relative';
@@ -7185,6 +10266,9 @@
 									var img = document.createElement('img');
 									img.setAttribute('src', Editor.trashImage);
 									img.setAttribute('title', mxResources.get('removeIt', [tag]));
+									img.setAttribute('aria-label', mxResources.get('removeIt', [tag]));
+									img.setAttribute('role', 'button');
+									controls.push(img);
 									mxUtils.setOpacity(img, visible ? 75 : 25);
 									img.className = 'geAdaptiveAsset';
 									img.style.verticalAlign = 'middle';
@@ -7228,6 +10312,8 @@
 									cb2.setAttribute('title', mxResources.get(
 										cb2.defaultChecked ?
 										'removeIt' : 'add', [tag]));
+									cb2.setAttribute('aria-label', tag);
+									controls.push(cb2);
 		
 									mxEvent.addListener(cb2, 'change', function(evt)
 									{
@@ -7249,6 +10335,7 @@
 								row.appendChild(td);
 							}
 	
+							keyboardGrid.addRow(tag, controls);
 							tbody.appendChild(row);
 						})(tags[i]);
 					}
@@ -7257,6 +10344,8 @@
 				table.appendChild(tbody);
 				tagCloud.appendChild(table);
 			}
+
+			keyboardGrid.end();
 		};
 	
 		var refreshUi = mxUtils.bind(this, function(sender, evt)
@@ -7315,6 +10404,7 @@
 			var resetLink = link.cloneNode(false);
 			resetLink.style.backgroundImage = 'url(' + Editor.visibleImage + ')';
 			resetLink.setAttribute('title', mxResources.get('reset'));
+			Editor.initKeyboardButton(resetLink);
 
 			mxEvent.addListener(resetLink, 'click', function(evt)
 			{
@@ -7326,7 +10416,7 @@
 				}
 	
 				removeInvisibleSelectionCells();
-				graph.refresh();
+				graph.refreshHiddenTags();
 				mxEvent.consume(evt);
 			});
 
@@ -7337,6 +10427,7 @@
 				var addLink = link.cloneNode(false);
 				addLink.style.backgroundImage = 'url(' + Editor.plusImage + ')';
 				addLink.setAttribute('title', mxResources.get('add'));
+				Editor.initKeyboardButton(addLink);
 			
 				mxEvent.addListener(addLink, 'click', function(evt)
 				{
@@ -7365,30 +10456,71 @@
 	};
 	
 	/**
-	 * Returns all custom fonts (old and new).
+	 * Returns all custom fonts (old and new) in the given font lookup.
+	 * Default lookup is Graph.customFontElements.
 	 */
-	Graph.prototype.getCustomFonts = function()
+	Graph.prototype.getCustomFonts = function(lookup)
 	{
-		var fonts = this.extFonts;
-		
-		if (fonts != null)
+		lookup = (lookup != null) ? lookup : Graph.customFontElements;
+		var fonts = [];
+
+		// This is the single funnel for embedExtFonts and getExtFontCss, which
+		// fetch the font and inline it in the export, so the fonts that came
+		// from the file (extFonts) are filtered here too
+		if (this.extFonts != null)
 		{
-			fonts = fonts.slice();
+			for (var i = 0; i < this.extFonts.length; i++)
+			{
+				if (Graph.isValidFontUrl(this.extFonts[i].url))
+				{
+					fonts.push(this.extFonts[i]);
+				}
+			}
 		}
-		else
+
+		for (var key in lookup)
 		{
-			fonts = [];
+			var font = lookup[key];
+
+			if (Graph.isValidFontUrl(font.url))
+			{
+				fonts.push({name: font.name, url: font.url});
+			}
 		}
-		
-		for (var key in Graph.customFontElements)
-		{
-			var font = Graph.customFontElements[key];
-			fonts.push({name: font.name, url: font.url});
-		}
-		
+
 		return fonts;
 	};
-	
+
+	/**
+	 * Returns the CSS with external references for the custom fonts in
+	 * the given font lookup. Default lookup is Graph.customFontElements.
+	 */
+	Graph.prototype.getExtFontCss = function(lookup)
+	{
+		var extFonts = this.getCustomFonts(lookup);
+		var prefix = '';
+		var postfix = '';
+
+		for (var i = 0; i < extFonts.length; i++)
+		{
+			var fontName = extFonts[i].name, fontUrl = extFonts[i].url;
+
+			if (Graph.isCssFontUrl(fontUrl))
+			{
+				prefix += '@import url("' + Graph.escapeCssString(
+					Graph.rewriteGoogleFontUrl(fontUrl)) + '");\n';
+			}
+			else
+			{
+				postfix += '@font-face {\n' +
+					'font-family: "' + Graph.escapeCssString(fontName) + '";\n' +
+					'src: url("' + Graph.escapeCssString(fontUrl) + '");\n}\n';
+			}
+		}
+
+		return prefix + postfix;
+	};
+
 	/**
 	 * Assigns the given custom font to the selected text.
 	 */
@@ -7532,8 +10664,35 @@
 	
 	Graph.prototype.getSvg = function(background, scale, border, nocrop, crisp,
 		ignoreSelection, showText, imgExport, linkTarget, hasShadow,
-		incExtFonts, theme, exportType, cells, noCssClass, disableLinks)
+		incExtFonts, theme, exportType, cells, noCssClass, disableLinks, grid)
 	{
+		// Sizes the export crop to the rendered MathJax output rather than the
+		// raw formula source. Export paths that build a temporary graph (and the
+		// headless export backend) compute the crop before the labels have been
+		// typeset, so the cached view bounds reflect the much wider source text
+		// and the export gets excessive margins. Typesets synchronously (only if
+		// the labels are not already typeset, to leave the live editor untouched)
+		// and refreshes the math bounds so the base getSvg crops correctly.
+		// [jgraph/drawio#5564]
+		if (Editor.mathOutputSize && this.mathEnabled &&
+			this.container != null && document.body.contains(this.container) &&
+			typeof DrawioMathJax !== 'undefined' && typeof DrawioMathJax.typeset === 'function')
+		{
+			if (this.container.getElementsByTagName('mjx-container').length == 0)
+			{
+				try
+				{
+					DrawioMathJax.typeset([this.container]);
+				}
+				catch (e)
+				{
+					// Fonts may not be loaded yet; bounds fall back to source size
+				}
+			}
+
+			this.refreshMathBounds();
+		}
+
 		var result = graphGetSvg.apply(this, arguments);
 
 		if (theme != null)
@@ -7546,44 +10705,26 @@
 				style = '';
 			}
 
-			var theme = (theme == 'auto' || this.getAdaptiveColors() == 'none') ?
-				((this.getAdaptiveColors() == 'none') ?
-					'light' : 'light dark') : theme;
+			// Writes only known themes into the style as the theme can come from
+			// the embed protocol or the export request (auto for other values)
+			theme = (this.getAdaptiveColors() == 'none') ? 'light' :
+				((theme == 'light' || theme == 'dark') ? theme : 'light dark');
 			style += ' color-scheme: ' + theme + ';';
 			result.setAttribute('style', style);
 		}
 		
-		var extFonts = this.getCustomFonts();
-		
+		var extFontCss = (incExtFonts) ? this.getExtFontCss() : '';
+
 		// Adds external fonts
-		if (incExtFonts && extFonts.length > 0)
+		if (extFontCss.length > 0)
 		{
 			var svgDoc = result.ownerDocument;
 			var style = (svgDoc.createElementNS != null) ?
 		    	svgDoc.createElementNS(mxConstants.NS_SVG, 'style') : svgDoc.createElement('style');
 			(svgDoc.setAttributeNS != null) ? style.setAttributeNS('type', 'text/css') :
 				style.setAttribute('type', 'text/css');
-			
-			var prefix = '';
-			var postfix = '';
-			    	
-			for (var i = 0; i < extFonts.length; i++)
-			{
-				var fontName = extFonts[i].name, fontUrl = extFonts[i].url;
-				
-				if (Graph.isCssFontUrl(fontUrl))
-				{
-					prefix += '@import url(' + Graph.rewriteGoogleFontUrl(fontUrl) + ');\n';
-				}
-				else
-				{
-					postfix += '@font-face {\n' +
-			            'font-family: "' + fontName + '";\n' + 
-			            'src: url("' + fontUrl + '");\n}\n';
-				}				
-			}
-			
-			style.appendChild(svgDoc.createTextNode(prefix + postfix));
+
+			style.appendChild(svgDoc.createTextNode(extFontCss));
 			result.getElementsByTagName('defs')[0].appendChild(style);
 		}
 
@@ -7667,7 +10808,7 @@
 	 */
 	mxGraphView.prototype.createEnumerationValue = function(state)
 	{
-		var value = decodeURIComponent(mxUtils.getValue(state.style, 'enumerateValue', ''));
+		var value = mxUtils.safeDecodeURIComponent(mxUtils.getValue(state.style, 'enumerateValue', ''));
 
 		if (value == '')
 		{
@@ -7679,11 +10820,29 @@
 	};
 
 	/**
-	 * Adds drawing and update of the shape number.
+	 * Returns true if the given state shows a shape number. This implementation
+	 * returns true if enumerate is 1 in the style of the state.
 	 */
-	mxGraphView.prototype.redrawEnumerationState = function(state)
+	mxGraphView.prototype.isEnumerated = function(state)
 	{
-		var enumerate = mxUtils.getValue(state.style, 'enumerate', 0) == '1';
+		return mxUtils.getValue(state.style, 'enumerate', 0) == '1';
+	};
+
+	/**
+	 * Adds drawing and update of the shape number. If keepValue is true then
+	 * an existing number is kept (eg. in exports, which do not number the
+	 * cells in a validation).
+	 */
+	mxGraphView.prototype.redrawEnumerationState = function(state, keepValue)
+	{
+		var enumerate = this.isEnumerated(state);
+
+		// The numbers depend on the order of the walk over all cells (see
+		// mxGraphView.validateInvalidCells)
+		if (enumerate)
+		{
+			this.fullValidationRequired = true;
+		}
 
 		if (enumerate && state.secondLabel == null)
 		{
@@ -7706,7 +10865,8 @@
 		if (shape != null)
 		{
 			var s = state.view.scale;
-			var value = this.createEnumerationValue(state);
+			var value = (keepValue && shape.value != null) ? shape.value :
+				this.createEnumerationValue(state);
 			var bounds = this.graph.model.isVertex(state.cell) ?
 				new mxRectangle(state.x + state.width - 4 * s, state.y + 4 * s, 0, 0) :
 				mxRectangle.fromPoint(state.view.getPoint(state));
@@ -7742,7 +10902,56 @@
 			this.view.validateBackgroundImage();
 		}
 	};
-	
+
+	/**
+	 * Updates the SVG for the background image if the data of the current
+	 * page is not the backgroundPageData that was used to create it.
+	 */
+	Graph.prototype.validateBackgroundPageData = function()
+	{
+		if (this.backgroundPageData !== this.model.getValue(this.model.getRoot()))
+		{
+			this.refreshBackgroundImage();
+		}
+	};
+
+	/**
+	 * Looks up placeholders in the given root of another page after the
+	 * layers and before the root of this graph, so that the data of the
+	 * page that shows this graph as its background page overrides the
+	 * data of the background page. Labels are created when the root of
+	 * the model is set, so this must be called before that.
+	 */
+	Graph.prototype.addPlaceholderRoot = function(root)
+	{
+		if (root != null)
+		{
+			var graphGetPlaceholderParent = this.getPlaceholderParent;
+
+			this.getPlaceholderParent = function(cell)
+			{
+				var modelRoot = this.model.getRoot();
+				var parent = graphGetPlaceholderParent.apply(this, arguments);
+
+				// Ignores the root if it is the root of this graph, for
+				// example for a page that is its own background page
+				if (root != modelRoot)
+				{
+					if (cell == root)
+					{
+						parent = modelRoot;
+					}
+					else if (parent == modelRoot)
+					{
+						parent = root;
+					}
+				}
+
+				return parent;
+			};
+		}
+	};
+
 	/**
 	 * Sets default style (used in editor.get/setGraphXml below)
 	 */
@@ -7752,6 +10961,88 @@
 	{
 		graphLoadStylesheet.apply(this, arguments);
 		this.currentStyle = 'default-style2';
+	};
+
+	/**
+	 * Returns a readable title for the given custom link (see
+	 * EditorUi.getLinkTitle). Page links are resolved by the caller.
+	 */
+	Graph.prototype.getCustomLinkTitle = function(href)
+	{
+		var generic = mxResources.get('action', null, 'Action');
+		var result = generic;
+
+		if (href.substring(0, 17) == 'data:action/json,')
+		{
+			try
+			{
+				var link = JSON.parse(href.substring(17));
+
+				// Mirrors LinkDialog.updateActionSummary so the link
+				// hint, link-icon tooltip, and Edit Link dialog all
+				// agree on the visible label. Resolution order:
+				//   1. User-supplied `title` on the custom action.
+				//   2. "Effects (N)" for animation-wrapper payloads.
+				//   3. Localized label of the first action key via
+				//      `CustomActionDialog.SCHEMAS[key]`.
+				//   4. Fallback to the generic "Action" string.
+				if (link != null &&
+					typeof link.title == 'string' &&
+					link.title.trim() != '')
+				{
+					result = link.title.trim();
+				}
+				else if (link != null && Array.isArray(link.actions) &&
+					link.actions.length > 0)
+				{
+					var first = Object.keys(link.actions[0])[0] || '';
+
+					if (first == 'animation' &&
+						link.actions[0].animation != null &&
+						Array.isArray(link.actions[0].animation.steps))
+					{
+						var sc = link.actions[0].animation.steps.length;
+						result = mxResources.get('effects', null, 'Effects') + ' (' + sc + ')';
+					}
+					else if (first != '')
+					{
+						var schema = (typeof CustomActionDialog !=
+							'undefined' && CustomActionDialog != null) ?
+							CustomActionDialog.SCHEMAS[first] : null;
+						var fallback = (schema != null) ?
+							schema.label : first;
+						var resKey = (schema != null && schema.labelKey) ?
+							schema.labelKey : first;
+						result = mxResources.get(resKey, null, fallback);
+					}
+				}
+			}
+			catch (e)
+			{
+				// ignore
+			}
+		}
+
+		// Action keys are untrusted and may resolve to inherited
+		// properties of the resources object such as constructor
+		return (typeof result == 'string') ? result : generic;
+	};
+
+	/**
+	 * Returns the custom link title for custom links so that link
+	 * tooltips in the viewer do not show the raw JSON of an action.
+	 */
+	var graphGetLinkTitle = Graph.prototype.getLinkTitle;
+
+	Graph.prototype.getLinkTitle = function(href)
+	{
+		// Also called with an EditorUi as this in EditorUi.getLinkTitle
+		if (Graph.prototype.isCustomLink(href) && !Graph.isPageLink(href))
+		{
+			return this.getCustomLinkTitle(href);
+		}
+
+		return graphGetLinkTitle.apply(this, arguments);
 	};
 
 	/**
@@ -7772,16 +11063,851 @@
 
 			if (link.actions != null)
 			{
-				this.executeCustomActions(link.actions, null, cell);
+				this.executeCustomActions(
+					Graph.flattenAnimationActions(link.actions), null, cell);
 			}
 		}
 	};
+
+	/**
+	 * Inlines any {animation: {steps: [...]}} action by replacing it with its
+	 * `steps` array (recursively). The wrapper is a UI/editing convenience —
+	 * at execution time the steps are just regular custom actions.
+	 */
+	Graph.flattenAnimationActions = function(actions)
+	{
+		if (!Array.isArray(actions))
+		{
+			return actions;
+		}
+
+		var out = [];
+
+		for (var i = 0; i < actions.length; i++)
+		{
+			var a = actions[i];
+
+			if (a != null && a.animation != null &&
+				Array.isArray(a.animation.steps))
+			{
+				var sub = Graph.flattenAnimationActions(a.animation.steps);
+
+				for (var j = 0; j < sub.length; j++)
+				{
+					out.push(sub[j]);
+				}
+			}
+			else
+			{
+				out.push(a);
+			}
+		}
+
+		return out;
+	};
 		
+	/**
+	 * Animates `container.scrollLeft / scrollTop` from (sx, sy) to
+	 * (tx, ty) over `duration` ms with an ease-out cubic curve.
+	 * Hand-rolled because the browser's `scrollTo({behavior:'smooth'})`
+	 * is unreliable when called immediately after a synchronous
+	 * scroll-mutating function (which is what `fitWindow` and
+	 * `scrollCellToVisible` are) — Chromium often consolidates the
+	 * sequence into a single jump.
+	 */
+	Graph.smoothScrollContainer = function(container, sx, sy, tx, ty, duration)
+	{
+		duration = duration || 600;
+
+		if (sx === tx && sy === ty) return;
+
+		container.scrollLeft = sx;
+		container.scrollTop = sy;
+
+		var startTime = (typeof performance != 'undefined' &&
+			performance.now != null) ? performance.now() : Date.now();
+		var dx = tx - sx;
+		var dy = ty - sy;
+
+		var step = function(now)
+		{
+			var t = Math.min(1, (now - startTime) / duration);
+			// Cubic ease-out: 1 - (1 - t)^3 — fast start, gentle settle.
+			var eased = 1 - Math.pow(1 - t, 3);
+			container.scrollLeft = sx + dx * eased;
+			container.scrollTop = sy + dy * eased;
+			if (t < 1) window.requestAnimationFrame(step);
+		};
+
+		window.requestAnimationFrame(step);
+	};
+
+	/**
+	 * Animates the view from the given previous scale and translate to the
+	 * current ones in the given duration (default 600 ms). The panes are
+	 * painted for the current view state, and a CSS transform that maps them
+	 * to the previous view state transitions to the identity, so the
+	 * background, the cells and the overlays move together. The transform is
+	 * on the SVG element if it is in a positioned container, so that the
+	 * browser does not repaint the cells in every frame, and an invisible
+	 * element keeps the scroll size of the container. Otherwise it is on the
+	 * canvas. Any other change of the view state stops the transition, so
+	 * user-driven zoom and pan snap instantly.
+	 */
+	Graph.prototype.transitionViewState = function(scale, translate, duration)
+	{
+		duration = (duration != null) ? duration : 600;
+		var view = this.view;
+		var node = view.getCanvas();
+		var svg = (node != null) ? node.ownerSVGElement : null;
+		var sizer = null;
+
+		if (this.stopViewStateTransition != null)
+		{
+			this.stopViewStateTransition();
+		}
+
+		// Maps (m + t) * s for the current view state to the previous one
+		var k = scale / view.scale;
+		var dx = scale * (translate.x - view.translate.x);
+		var dy = scale * (translate.y - view.translate.y);
+
+		if (node != null && (k != 1 || dx != 0 || dy != 0))
+		{
+			var thread = null;
+
+			if (svg != null && svg.parentNode == this.container &&
+				mxUtils.getCurrentStyle(this.container).position != 'static')
+			{
+				sizer = document.createElement('div');
+				sizer.style.cssText = 'position:absolute;left:0;top:0;' +
+					'visibility:hidden;pointer-events:none;' +
+					'width:' + this.container.scrollWidth + 'px;' +
+					'height:' + this.container.scrollHeight + 'px;';
+				this.container.appendChild(sizer);
+				node = svg;
+			}
+
+			var stop = mxUtils.bind(this, function()
+			{
+				node.style.transition = '';
+				node.style.transform = '';
+				node.style.transformOrigin = '';
+				node.style.willChange = '';
+
+				if (sizer != null && sizer.parentNode != null)
+				{
+					sizer.parentNode.removeChild(sizer);
+				}
+
+				node.removeEventListener('transitionend', transitionEnd);
+				view.removeListener(stop);
+				window.clearTimeout(thread);
+				this.stopViewStateTransition = null;
+			});
+
+			// Ignores transitions of descendants, eg. fading highlights
+			var transitionEnd = function(evt)
+			{
+				if (evt.target == node)
+				{
+					stop();
+				}
+			};
+
+			node.style.transition = 'none';
+			node.style.willChange = 'transform';
+			node.style.transformOrigin = '0 0';
+			node.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + k + ')';
+
+			// Forces the start state to be applied before the transition
+			node.getBoundingClientRect();
+			node.style.transition = 'transform ' + duration + 'ms cubic-bezier(0.16, 1, 0.3, 1)';
+			node.style.transform = 'translate(0px,0px) scale(1)';
+
+			node.addEventListener('transitionend', transitionEnd);
+			view.addListener(mxEvent.SCALE, stop);
+			view.addListener(mxEvent.TRANSLATE, stop);
+			view.addListener(mxEvent.SCALE_AND_TRANSLATE, stop);
+			thread = window.setTimeout(stop, duration + 100);
+			this.stopViewStateTransition = stop;
+		}
+	};
+
+	/**
+	 * Chromeless-mode equivalent of `fitWindow`. The lightbox container
+	 * is scrollable (`overflow:auto`), so we drive layout the same way
+	 * the editor's `fitWindow` does — keep `view.translate` stable,
+	 * change only the scale, and position the bounds via
+	 * `container.scrollLeft/scrollTop`.
+	 *
+	 * Why scale-only:
+	 *   • `view.translate` defines what graph point lives at the SVG
+	 *     element's (0, 0) (see `getChromelessTranslate`). Changing it
+	 *     shifts the "scroll origin", so the scrollbars would no longer
+	 *     show the same part of the diagram and its padding,
+	 *     regardless of where the viewbox is centered.
+	 *   • Scale changes with model coordinates are visually instant
+	 *     and don't require re-rendering cells.
+	 *
+	 * `view.setScale` routes through `viewStateChanged → validate +
+	 * sizeDidChange`. The latter resizes the SVG root's
+	 * `minWidth/minHeight` based on `getGraphBounds()`, which is
+	 * `(bounds in model units + translate) * scale`. So the container's
+	 * scrollable area grows / shrinks with the scale, and the translate
+	 * keeps the diagram's top-left anchored to the same SVG point.
+	 */
+	Graph.prototype.fitBoundsCssTransform = function(bounds, border)
+	{
+		var b = (border != null) ? border : 10;
+
+		// Clamp the requested viewbox to the diagram area — "best
+		// effort". The bits past the diagram are empty space we can't
+		// scroll into, so they'd just leave the viewbox off-centre at
+		// the edges. Intersecting with the diagram gives a viewbox we
+		// can actually position.
+		var gb = this.view.getModelGraphBounds();
+		var areaLeft = gb.x;
+		var areaTop = gb.y;
+		var areaRight = gb.x + gb.width;
+		var areaBottom = gb.y + gb.height;
+
+		var vbLeft = Math.max(areaLeft, bounds.x);
+		var vbTop = Math.max(areaTop, bounds.y);
+		var vbRight = Math.min(areaRight, bounds.x + bounds.width);
+		var vbBottom = Math.min(areaBottom, bounds.y + bounds.height);
+		var vbWidth = Math.max(1, vbRight - vbLeft);
+		var vbHeight = Math.max(1, vbBottom - vbTop);
+
+		var cw = this.container.clientWidth - b;
+		var ch = this.container.clientHeight - b;
+		var scale = this.getFitScale(Math.min(cw / vbWidth, ch / vbHeight));
+
+		// Editor-style layout for the lightbox: the translate of
+		// `getChromelessTranslate` maps the diagram's top-left to SVG
+		// (0, 0), or to the padding around the diagram in views that
+		// pad it like the editor (EditorUi). It is a stable,
+		// scale-independent value across viewbox actions, so repeated
+		// viewbox clicks at different zoom levels don't shift the
+		// scroll-origin's meaning. Panning happens entirely via
+		// `container.scrollLeft/Top`.
+		var tr = this.getChromelessTranslate(scale);
+		this.view.scaleAndTranslate(scale, tr.x, tr.y);
+		this.fitScale = this.view.scale;
+
+		// With the new translate, graph (gx, gy) renders at SVG position
+		// `ox + (gx - gb.x) * scale`. Centre the clamped viewbox in the
+		// viewport using the same math as `mxGraph.fitWindow`'s
+		// hasScrollbars branch.
+		var ox = (gb.x + tr.x) * scale;
+		var oy = (gb.y + tr.y) * scale;
+		var idealLeft = (vbLeft - gb.x) * scale -
+			Math.max((cw - vbWidth * scale) / 2 + b / 2, 0);
+		var idealTop = (vbTop - gb.y) * scale -
+			Math.max((ch - vbHeight * scale) / 2 + b / 2, 0);
+
+		// Clamps to the diagram + border area, which is
+		// `gb.width * scale + 2 * graphBorder` wide, so the visible
+		// viewport stays within it (the padding is only for panning).
+		var graphBorder = this.getBorder();
+		var svgWidth = gb.width * scale + 2 * graphBorder;
+		var svgHeight = gb.height * scale + 2 * graphBorder;
+		var maxLeft = svgWidth - this.container.clientWidth;
+		var maxTop = svgHeight - this.container.clientHeight;
+
+		this.container.scrollLeft = ox + ((maxLeft < 0) ? 0 :
+			Math.max(0, Math.min(idealLeft, maxLeft)));
+		this.container.scrollTop = oy + ((maxTop < 0) ? 0 :
+			Math.max(0, Math.min(idealTop, maxTop)));
+	};
+
+	/**
+	 * Smooth variant of `fitWindow`.
+	 *
+	 *   • Chromeless — `fitBoundsCssTransform` changes the scale and
+	 *     snaps scrollLeft/scrollTop to centre the bounds.
+	 *     `transitionViewState` animates the canvas from the previous
+	 *     scale, and `smoothScrollContainer` tweens scrollLeft/scrollTop
+	 *     in parallel.
+	 *
+	 *   • Editor — mxGraphView re-renders at each scale change, so we
+	 *     can't tween scale visually. Snap the zoom via fitWindow, then
+	 *     tween scrollLeft / scrollTop with `smoothScrollContainer`.
+	 *
+	 * The optional `done` callback fires once the transition has run its
+	 * full duration so callers (the action chain) can wait for it.
+	 */
+	/**
+	 * Returns true once the graph has been torn down — its container is null
+	 * (mxGraph.destroy nulls it) or the destroyed flag is set. Deferred
+	 * animation callbacks (loop iterations, smooth-transition timeouts, the
+	 * executeCustomActions chain) check this so they bail out instead of
+	 * dereferencing a null container after the lightbox / presentation view
+	 * closes mid-playback.
+	 */
+	Graph.prototype.isGraphTornDown = function()
+	{
+		return this.destroyed === true || this.container == null;
+	};
+
+	Graph.prototype.smoothFitWindow = function(bounds, border, done)
+	{
+		// Graph may have been torn down between scheduling and firing.
+		if (this.isGraphTornDown())
+		{
+			if (done != null) done();
+			return;
+		}
+
+		var duration = 600;
+		var container = this.container;
+		var startLeft = container.scrollLeft;
+		var startTop = container.scrollTop;
+
+		if (this.chromeless)
+		{
+			var scale = this.view.scale;
+			var translate = this.view.translate.clone();
+			this.fitBoundsCssTransform(bounds, border);
+			this.transitionViewState(scale, translate, duration);
+		}
+		else
+		{
+			this.fitWindow(bounds, border);
+		}
+
+		// Capture target scroll set by fitBoundsCssTransform / fitWindow,
+		// then animate from start → target in parallel with the canvas
+		// transition (chromeless) or with the snapped zoom (editor).
+		Graph.smoothScrollContainer(container, startLeft, startTop,
+			container.scrollLeft, container.scrollTop, duration);
+
+		// The scroll tween and the canvas transition both run for
+		// `duration` ms, so the transition is complete after `duration`.
+		if (done != null)
+		{
+			window.setTimeout(done, duration);
+		}
+	};
+
+	/**
+	 * Scrolls the given cell to the centre of the viewport in
+	 * chromeless mode. Equivalent to `scrollCellToVisible(cell, true)`
+	 * for the lightbox case.
+	 *
+	 * Normalizes `view.translate` to `getChromelessTranslate` so the
+	 * diagram is at the same place in the scrollable area as after
+	 * `fitBoundsCssTransform` (its top-left at `scrollLeft = 0`, or
+	 * after the padding in views that pad it like the editor). Without
+	 * this, if a viewbox action ran before, the translate was already
+	 * normalized; if the user clicked scroll right after lightbox
+	 * load, the translate was still the `chromelessResize` centred
+	 * value and the math would put the scroll target in the wrong
+	 * place. Normalizing makes the behaviour scale-invariant and
+	 * independent of which action came first.
+	 */
+	Graph.prototype.scrollCellToVisibleCssTransform = function(cell, border)
+	{
+		var state = this.view.getState(cell);
+
+		if (state == null) return;
+
+		var gb = this.view.getModelGraphBounds();
+		var s = this.view.scale;
+
+		// Normalize translate (no scale change). `scaleAndTranslate`
+		// routes through `viewStateChanged → validate + sizeDidChange`
+		// so the SVG element resizes to `gb.width * s + 2 * border`
+		// plus the padding.
+		var tr = this.getChromelessTranslate(s);
+
+		if (this.view.translate.x !== tr.x ||
+			this.view.translate.y !== tr.y)
+		{
+			this.view.scaleAndTranslate(s, tr.x, tr.y);
+		}
+
+		// With translate now `tr`, the screen position of the cell state,
+		// `(gx + translate) * s`, is `ox + (gx - gb.x) * s` for graph (gx, gy).
+		var ox = (gb.x + tr.x) * s;
+		var oy = (gb.y + tr.y) * s;
+		var cw = this.container.clientWidth;
+		var ch = this.container.clientHeight;
+
+		var graphBorder = this.getBorder();
+		var maxLeft = gb.width * s + 2 * graphBorder - cw;
+		var maxTop = gb.height * s + 2 * graphBorder - ch;
+
+		var left, top;
+
+		if (border != null)
+		{
+			// Bring the cell into view with `border` px of breathing room
+			// on every side, scrolling the minimum needed instead of
+			// centring. `border` is in screen px (like the viewbox border).
+			var cellLeft = state.x;
+			var cellTop = state.y;
+			var cellRight = state.x + state.width;
+			var cellBottom = state.y + state.height;
+
+			left = this.container.scrollLeft;
+			top = this.container.scrollTop;
+
+			if (cellLeft - border < left)
+			{
+				left = cellLeft - border;
+			}
+			else if (cellRight + border > left + cw)
+			{
+				left = cellRight + border - cw;
+			}
+
+			if (cellTop - border < top)
+			{
+				top = cellTop - border;
+			}
+			else if (cellBottom + border > top + ch)
+			{
+				top = cellBottom + border - ch;
+			}
+		}
+		else
+		{
+			// Centre the cell (default behaviour).
+			left = state.getCenterX() - cw / 2;
+			top = state.getCenterY() - ch / 2;
+		}
+
+		this.container.scrollLeft = ox + ((maxLeft < 0) ? 0 :
+			Math.max(0, Math.min(left - ox, maxLeft)));
+		this.container.scrollTop = oy + ((maxTop < 0) ? 0 :
+			Math.max(0, Math.min(top - oy, maxTop)));
+	};
+
+	/**
+	 * Editor (non-chromeless) scroll-to-visible with an optional `border`.
+	 * With no border this is just the base `scrollCellToVisible`. With a
+	 * border (screen px) the cell's rect is expanded by that much on every
+	 * side and scrolled minimally into view, so the cell lands with that
+	 * much breathing room instead of flush against the viewport edge.
+	 */
+	Graph.prototype.scrollCellToVisibleBorder = function(cell, border)
+	{
+		if (border == null)
+		{
+			this.scrollCellToVisible(cell);
+
+			return;
+		}
+
+		var state = this.view.getState(cell);
+
+		if (state == null) return;
+
+		// Same rect construction as the base scrollCellToVisible, expanded
+		// by `border` px on every side before scrolling it into view.
+		var x = -this.view.translate.x;
+		var y = -this.view.translate.y;
+
+		this.scrollRectToVisible(new mxRectangle(
+			x + state.x - border, y + state.y - border,
+			state.width + 2 * border, state.height + 2 * border));
+	};
+
+	/**
+	 * Smooth variant of `scrollCellToVisible`. Both chromeless and
+	 * editor paths now use `smoothScrollContainer` because
+	 * `scrollCellToVisibleCssTransform` mutates `scrollLeft/scrollTop`,
+	 * not `view.translate`, in the lightbox.
+	 *
+	 * `border` (screen px, optional) keeps that much breathing room around
+	 * the cell instead of centring it — see `scrollCellToVisibleCssTransform`
+	 * / `scrollCellToVisibleBorder`.
+	 *
+	 * The optional `done` callback fires once the transition has run its
+	 * full duration so callers (the action chain) can wait for it.
+	 */
+	Graph.prototype.smoothScrollCellToVisible = function(cell, border, done)
+	{
+		// Graph may have been torn down between scheduling and firing.
+		if (this.isGraphTornDown())
+		{
+			if (done != null) done();
+			return;
+		}
+
+		var duration = 600;
+		var container = this.container;
+		var startLeft = container.scrollLeft;
+		var startTop = container.scrollTop;
+
+		if (this.chromeless)
+		{
+			this.scrollCellToVisibleCssTransform(cell, border);
+		}
+		else
+		{
+			this.scrollCellToVisibleBorder(cell, border);
+		}
+
+		Graph.smoothScrollContainer(container, startLeft, startTop,
+			container.scrollLeft, container.scrollTop, duration);
+
+		if (done != null)
+		{
+			window.setTimeout(done, duration);
+		}
+	};
+
+	/**
+	 * Moves the given cell to the center of the view, eg. after it was
+	 * explored in a read-only view (see animateViewToCell).
+	 */
+	Graph.prototype.focusCell = function(cell)
+	{
+		this.animateViewToCell(cell);
+	};
+
+	/**
+	 * Returns the scale for showing the given cell state in the center of the
+	 * container: zooms out by at most 30 % if the cell does not fit into 60 %
+	 * of the container, and zooms in by at most 30 % if it is smaller than 40
+	 * pixels. Returns the current scale otherwise.
+	 */
+	Graph.prototype.getFocusScale = function(state)
+	{
+		var s = this.view.scale;
+		var w = Math.max(1, state.width / s);
+		var h = Math.max(1, state.height / s);
+		var fit = Math.min(this.container.clientWidth * 0.6 / w,
+			this.container.clientHeight * 0.6 / h);
+		var result = s;
+
+		if (s > fit)
+		{
+			result = Math.max(fit, s / 1.3);
+		}
+		else if (Math.max(w, h) * s < 40)
+		{
+			result = Math.min(fit, s * 1.3);
+		}
+
+		return result;
+	};
+
+	/**
+	 * Scrolls the given cell to the center of the container with a transition
+	 * of the view state (see transitionViewState) and the scale of
+	 * getFocusScale. The translate is kept, so the browser limits the scroll
+	 * position to the scrollable area. The optional clamp function returns
+	 * the scroll position to use for the given one.
+	 */
+	Graph.prototype.animateViewToCell = function(cell, duration, clamp)
+	{
+		var view = this.view;
+		var state = view.getState(cell);
+
+		if (state != null)
+		{
+			this.animateView(new mxPoint(state.getCenterX() / view.scale - view.translate.x,
+				state.getCenterY() / view.scale - view.translate.y),
+				this.getFocusScale(state), duration, clamp);
+		}
+	};
+
+	/**
+	 * Scrolls the given point in model units to the center of the container
+	 * with the given scale and a transition of the view state (see
+	 * transitionViewState). The optional clamp function returns the scroll
+	 * position to use for the given one.
+	 */
+	Graph.prototype.animateView = function(center, scale, duration, clamp)
+	{
+		var view = this.view;
+		var container = this.container;
+		var s0 = view.scale;
+		var tr0 = view.translate.clone();
+		var left = container.scrollLeft;
+		var top = container.scrollTop;
+
+		if (scale != s0)
+		{
+			view.setScale(scale);
+		}
+
+		var tr = view.translate;
+		var pt = new mxPoint((center.x + tr.x) * scale - container.clientWidth / 2,
+			(center.y + tr.y) * scale - container.clientHeight / 2);
+
+		if (clamp != null)
+		{
+			pt = clamp(pt.x, pt.y);
+		}
+
+		container.scrollLeft = pt.x;
+		container.scrollTop = pt.y;
+
+		// The change of the scroll position is part of the previous translate
+		this.transitionViewState(s0, new mxPoint(
+			tr0.x + (container.scrollLeft - left) / s0,
+			tr0.y + (container.scrollTop - top) / s0), duration);
+	};
+
+	/**
+	 * Transient toggle visibility — flips each cell's DOM opacity between
+	 * 0 and 1 without touching the model. Used by custom-action / animation
+	 * `toggle` steps when `transient !== false` (the default). Effects
+	 * are reverted by `graph.refresh()` since they only live in the SVG
+	 * group's inline `style.opacity`.
+	 */
+	Graph.prototype.toggleCellsTransient = function(cells)
+	{
+		var nodes = this.getNodesForCells(cells);
+
+		for (var i = 0; i < nodes.length; i++)
+		{
+			var cur = nodes[i].style.opacity;
+			// Default opacity is '' (full) — treat empty as visible.
+			var visible = (cur === '' || cur === null ||
+				parseFloat(cur) > 0);
+			nodes[i].style.opacity = visible ? 0 : 1;
+		}
+	};
+
+	/**
+	 * Transient counterpart of mxGraph's rule that an edge is not rendered
+	 * while one of its terminals is hidden. Called after a transient
+	 * `toggle` / `show` / `hide` changed the DOM opacity of the given cells:
+	 * every edge connected to them or to their descendants is hidden while
+	 * a terminal is transiently hidden, and an edge hidden this way gets its
+	 * previous opacity back once both terminals are visible again. Without
+	 * this, hiding cells transiently (animation steps, dialog preview) left
+	 * their connectors floating, while the model path and the Tags action
+	 * (`isCellVisible`) hide them.
+	 */
+	Graph.prototype.updateTransientTerminalEdges = function(cells)
+	{
+		var isHidden = mxUtils.bind(this, function(terminal)
+		{
+			var nodes = this.getNodesForCells([terminal]);
+
+			return nodes.length > 0 && nodes[0].style.opacity !== '' &&
+				!(parseFloat(nodes[0].style.opacity) > 0);
+		});
+
+		var listed = new Set(cells);
+		var edges = this.addAllEdges(cells);
+
+		for (var i = 0; i < edges.length; i++)
+		{
+			var state = this.view.getState(edges[i]);
+
+			if (state == null || !this.model.isEdge(state.cell))
+			{
+				continue;
+			}
+
+			var source = state.getVisibleTerminalState(true);
+			var target = state.getVisibleTerminalState(false);
+			var hidden = (source != null && isHidden(source.cell)) ||
+				(target != null && isHidden(target.cell));
+			var nodes = this.getNodesForCells([state.cell]);
+
+			for (var j = 0; j < nodes.length; j++)
+			{
+				var node = nodes[j];
+
+				if (hidden)
+				{
+					if (node.terminalHiddenOpacity == null)
+					{
+						node.terminalHiddenOpacity = node.style.opacity;
+					}
+
+					node.style.opacity = 0;
+				}
+				else if (node.terminalHiddenOpacity != null)
+				{
+					// An edge that is itself a target keeps the opacity the
+					// action gave it.
+					if (!listed.has(state.cell))
+					{
+						node.style.opacity = node.terminalHiddenOpacity;
+					}
+
+					delete node.terminalHiddenOpacity;
+				}
+			}
+		}
+	};
+
+	/**
+	 * Transient style setter — mutates `state.style[key]` and redraws the
+	 * affected cell states without touching the model. Subsequent view
+	 * validation (zoom / pan / refresh) re-reads from `cell.style` and
+	 * reverts the change, which is exactly what we want for animation /
+	 * custom-action steps that should leave the saved diagram untouched.
+	 */
+	Graph.prototype.setCellStylesTransient = function(key, value, cells)
+	{
+		for (var i = 0; i < cells.length; i++)
+		{
+			var state = this.view.getState(cells[i]);
+
+			if (state != null && state.style != null)
+			{
+				if (value == null)
+				{
+					delete state.style[key];
+				}
+				else
+				{
+					state.style[key] = value;
+				}
+
+				this.redrawTransientStyle(state);
+			}
+		}
+	};
+
+	/**
+	 * Repaints a state after its state.style was mutated transiently — the
+	 * same resetStyles + configure + redraw sequence mxCellRenderer runs for
+	 * a model style change, so a removed key falls back to its default (a
+	 * bare shape.apply keeps the previously painted field value, e.g. a
+	 * toggled-off strokeWidth stayed at 10). The label is repainted with
+	 * mxCellRenderer.redrawLabel, which derives the value again with
+	 * getLabelValue and creates a new text shape if the dialect changed:
+	 * html and whiteSpace decide if the label is HTML, and the escaping and
+	 * sanitizing in getLabelValue depend on it. Repainting the old text
+	 * kept the value of the old style, ie. a step that wrapped a plain
+	 * text label rendered its unescaped label as HTML.
+	 */
+	Graph.prototype.redrawTransientStyle = function(state)
+	{
+		if (state.shape != null)
+		{
+			state.shape.resetStyles();
+			this.cellRenderer.configureShape(state);
+			state.shape.redraw();
+		}
+
+		var text = state.text;
+		var prev = (text != null) ? text.node : null;
+		this.cellRenderer.redrawLabel(state, true);
+
+		// A new text shape is appended to the pane, so it is moved back
+		// behind the shape and keeps the transient opacity of the old one
+		if (state.text != null && state.text != text && state.text.node != null)
+		{
+			var node = state.text.node;
+
+			if (state.shape != null && state.shape.node != null &&
+				state.shape.node.parentNode == node.parentNode)
+			{
+				node.parentNode.insertBefore(node, state.shape.node.nextSibling);
+			}
+
+			if (prev != null)
+			{
+				node.style.opacity = prev.style.opacity;
+
+				if (prev.terminalHiddenOpacity != null)
+				{
+					node.terminalHiddenOpacity = prev.terminalHiddenOpacity;
+				}
+			}
+		}
+	};
+
+	/**
+	 * Returns the next style value for a toggleStyle step. With an explicit
+	 * `value` the key flips between `value` and `defaultValue` (null removes
+	 * the key so the stylesheet default applies — "strokeWidth 10" toggles
+	 * 10 ↔ default, "fontStyle 2" italic ↔ plain). Without `value` it is the
+	 * legacy boolean toggle: anything but a missing, empty, zero or 'false'
+	 * value counts as on and flips to '0', otherwise '1'. (The old
+	 * `truthy ? 0 : 1` test treated the string '0' as on, so a toggle on a
+	 * missing key wrote 0 and never turned anything on.)
+	 */
+	Graph.nextToggleStyleValue = function(current, value, defaultValue)
+	{
+		if (value != null && value !== '')
+		{
+			return (current != null && String(current) == String(value)) ?
+				defaultValue : value;
+		}
+
+		return (current != null && current !== '' && current != 0 &&
+			current !== 'false') ? '0' : '1';
+	};
+
+	/**
+	 * Model-mutating toggle for the toggleStyle action — see
+	 * Graph.nextToggleStyleValue for the value semantics. Like
+	 * mxGraph.toggleCellStyles, the first cell decides the target state for
+	 * all cells so a toggle link moves every cell in lockstep; `defaultValue`
+	 * is what a missing key counts as.
+	 */
+	Graph.prototype.toggleCellStyleValues = function(key, value, defaultValue, cells)
+	{
+		if (cells != null && cells.length > 0)
+		{
+			var current = mxUtils.getValue(this.getCurrentCellStyle(cells[0]),
+				key, defaultValue);
+			this.setCellStyles(key, Graph.nextToggleStyleValue(
+				current, value, defaultValue), cells);
+		}
+	};
+
+	/**
+	 * Transient style toggle — flips a key between `value` and
+	 * `defaultValue` (or '0' ↔ '1' without a value, see
+	 * Graph.nextToggleStyleValue) on each cell's state.style without model
+	 * mutation. Same revert-on-refresh semantics as setCellStylesTransient.
+	 */
+	Graph.prototype.toggleCellStylesTransient = function(key, defaultValue, cells, value)
+	{
+		for (var i = 0; i < cells.length; i++)
+		{
+			var state = this.view.getState(cells[i]);
+
+			if (state != null && state.style != null)
+			{
+				// Unlike the model path — which reads the first cell's
+				// style and applies the same value to all cells — this
+				// path toggles each cell independently, which matches
+				// what users intuitively expect from a multi-select
+				// toggle. The model path keeps its legacy semantics
+				// when invoked via `transient: false`.
+				var next = Graph.nextToggleStyleValue(mxUtils.getValue(
+					state.style, key, defaultValue), value, defaultValue);
+
+				if (next == null || next === '')
+				{
+					delete state.style[key];
+				}
+				else
+				{
+					state.style[key] = next;
+				}
+
+				this.redrawTransientStyle(state);
+			}
+		}
+	};
+
 	/**
 	 * Runs the given actions and invokes done when all actions have been executed.
 	 * When adding new actions that reference cell IDs support for updating
 	 * those cell IDs must be handled in Graph.updateCustomLinkActions
 	 */
+	/**
+	 * Hook for selecting the next or previous page with wrap around in the
+	 * page custom action. This implementation does nothing.
+	 */
+	Graph.prototype.selectNextPage = function(forward) { };
+
 	Graph.prototype.executeCustomActions = function(actions, done, cell)
 	{
 		if (!this.executingCustomActions)
@@ -7809,6 +11935,41 @@
 				}
 			});
 
+			// Custom-link actions (a user clicking a cell link — `cell` is the
+			// clicked cell) default to the legacy model-mutating visibility
+			// behavior so they can reveal model-hidden cells/layers/groups, the
+			// long-standing interactive-diagram contract that predates step
+			// animations. A transient (opacity-only) toggle can't reveal a cell
+			// with visible="0" — it has no rendered state/DOM node, so the
+			// action silently no-ops. Animation steps and the dialog preview
+			// pass cell == null and stay transient by default (no model
+			// mutation, no collab sync, no undo). Either side overrides per
+			// action with an explicit `transient` flag.
+			var defaultTransient = (cell == null);
+			var isTransient = function(params)
+			{
+				return (params.transient != null) ? params.transient : defaultTransient;
+			};
+
+			// Actions that resolve cells through their view states (DOM
+			// nodes, bounds) rather than the model.
+			var viewKeys = ['opacity', 'fadeIn', 'fadeOut', 'fadeTo', 'flow',
+				'wipeIn', 'wipeOut', 'popIn', 'popOut', 'select', 'highlight',
+				'scroll', 'viewbox'];
+
+			var needsView = function(action)
+			{
+				for (var i = 0; i < viewKeys.length; i++)
+				{
+					if (action[viewKeys[i]] != null)
+					{
+						return true;
+					}
+				}
+
+				return false;
+			};
+
 			var waitAndExecute = mxUtils.bind(this, function()
 			{
 				if (waitCounter > 0)
@@ -7822,13 +11983,53 @@
 				}
 			});
 
-			var executeNextAction = mxUtils.bind(this, function()
+			var dispatchNextAction = mxUtils.bind(this, function()
 			{
+				// Bail out if the graph was torn down (e.g. presentation /
+				// lightbox view closed) mid-animation — a deferred step must
+				// not dispatch into a null container / destroyed view. Stops
+				// the chain for ANY action type, not just the smooth viewport
+				// transitions that read this.container directly.
+				if (this.isGraphTornDown())
+				{
+					this.executingCustomActions = false;
+					this.stoppingCustomActions = false;
+					// Unwind the caller so a looping player resets its
+					// `running` flag — its runStep then hits the same guard
+					// and halts without re-dispatching. `done` is null for
+					// fire-and-forget callers (e.g. custom-link clicks).
+					if (done != null) { done(); }
+					return;
+				}
+
 				if (index < actions.length)
 				{
+					// Each iteration processes one step. The `immediate: true`
+					// step flag opts into running in parallel with the previous
+					// step: when set, we keep batching steps in the same call
+					// and they share one `waitCounter`. The chain advances once
+					// the whole batch finishes (i.e. all blocking effects in
+					// any step of the batch have completed). The first step is
+					// always processed unconditionally; only `immediate` on
+					// subsequent steps takes effect (the field is ignored on
+					// the first step in `actions`).
+					do
+					{
 					var stop = this.stoppingCustomActions;
 					var action = actions[index++];
 					var animations = [];
+
+					// The model path of an earlier step (e.g. a custom-link
+					// `show` of a hidden cell) is still inside the open
+					// transaction, so the view has not validated yet and a
+					// cell it revealed has no state. Effects that paint on
+					// cell states would silently skip that cell, while the
+					// transient preview (no transaction) paints it. Ends the
+					// transaction first so the step sees the current model.
+					if (updatingModel && needsView(action))
+					{
+						endUpdate();
+					}
 
 					// Executes open actions before starting transaction
 					if (action.open != null)
@@ -7837,8 +12038,27 @@
 
 						if (this.isCustomLink(action.open))
 						{
+							// A failed link (customLinkClicked shows the error
+							// dialog and returns false, e.g. pageNotFound)
+							// aborts the chain. The abort must reset the
+							// execution flags like the teardown guard above —
+							// leaving executingCustomActions latched sends
+							// every later call into the already-executing
+							// branch, silently disabling all custom links
+							// until the page is reloaded
+							// [jgraph/drawio-desktop#2161]. done() still fires
+							// so a waiting animation player unwinds instead of
+							// hanging on a step that never completes.
 							if (!this.customLinkClicked(action.open, cell))
 							{
+								this.executingCustomActions = false;
+								this.stoppingCustomActions = false;
+
+								if (done != null)
+								{
+									done();
+								}
+
 								return;
 							}
 						}
@@ -7846,6 +12066,13 @@
 						{
 							this.openLink(action.open);
 						}
+					}
+
+					// Selects the next or previous page with wrap around
+					if (action.page == 'next' || action.page == 'previous')
+					{
+						endUpdate();
+						this.selectNextPage(action.page == 'next');
 					}
 
 					if (action.wait != null && !stop)
@@ -7888,6 +12115,40 @@
 							0 : action.fadeOut.delay);
 					}
 
+					// Animated transition to an arbitrary target opacity. Sits
+					// between the existing `opacity` (instant) and `fadeIn`/
+					// `fadeOut` (animated, hardcoded 0 or 1) — picks up where
+					// they leave off for partial-opacity effects.
+					if (action.fadeTo != null && action.fadeTo.value != null)
+					{
+						waitCounter++;
+						var fadeNodes = this.getNodesForCells(
+							this.getCellsForAction(action.fadeTo, true));
+						var fadeDelay = (stop) ? 0 :
+							(action.fadeTo.delay != null ? action.fadeTo.delay : 1000);
+
+						Graph.setTransitionForNodes(fadeNodes,
+							'all ' + fadeDelay + 'ms ease-in-out');
+						Graph.setOpacityForNodes(fadeNodes, action.fadeTo.value);
+
+						window.setTimeout(function()
+						{
+							Graph.setTransitionForNodes(fadeNodes, null);
+							waitAndExecute();
+						}, fadeDelay);
+					}
+
+					// Toggles SVG flow animation on edge path elements. The
+					// CSS class is installed once at module load (see
+					// Editor.installAnimationStyles).
+					if (action.flow != null)
+					{
+						var flowCells = this.getCellsForAction(action.flow, true);
+						Editor.toggleFlowAnimation(this, flowCells,
+							action.flow.start === false ? 'stop' :
+							action.flow.start === true ? 'start' : 'toggle');
+					}
+
 					if (action.wipeIn != null)
 					{
 						animations = animations.concat(this.createWipeAnimations(
@@ -7900,45 +12161,131 @@
 							this.getCellsForAction(action.wipeOut, true), false));
 					}
 
-					// Executes all actions that change cell states
+					if (action.popIn != null)
+					{
+						animations = animations.concat(this.createPopAnimations(
+							this.getCellsForAction(action.popIn, true), true));
+					}
+
+					if (action.popOut != null)
+					{
+						animations = animations.concat(this.createPopAnimations(
+							this.getCellsForAction(action.popOut, true), false));
+					}
+
+					// Visibility / style actions. The default is context-
+					// dependent (see `isTransient` / `defaultTransient`
+					// above): animation steps are transient (DOM-only,
+					// reverted by the next `graph.refresh()`, never saved /
+					// synced / undoable), while custom-link clicks mutate the
+					// model — the legacy interactive-diagram behavior that can
+					// reveal model-hidden cells / layers / groups. An explicit
+					// `transient: true|false` on the params overrides either
+					// default (hidden from the picker UI).
 					if (action.toggle != null)
 					{
-						beginUpdate();
-						this.toggleCells(this.getCellsForAction(action.toggle, true));
+						if (!isTransient(action.toggle))
+						{
+							beginUpdate();
+							// Model path: resolve layers to the layer cell
+							// itself so its `visible` is toggled (cascading
+							// to descendants), not each child's flag.
+							this.toggleCells(this.getCellsForAction(
+								action.toggle, true, true));
+						}
+						else
+						{
+							var toggleCells = this.getCellsForAction(action.toggle, true);
+							this.toggleCellsTransient(toggleCells);
+							this.updateTransientTerminalEdges(toggleCells);
+						}
 					}
 
 					if (action.show != null)
 					{
-						beginUpdate();
 						var temp = this.getCellsForAction(action.show, true);
 						Graph.setOpacityForNodes(this.getNodesForCells(temp), 1);
-						this.setCellsVisible(temp, true);
+
+						if (isTransient(action.show))
+						{
+							this.updateTransientTerminalEdges(temp);
+						}
+						else
+						{
+							beginUpdate();
+							// Layers → the layer cell itself, so its `visible`
+							// is set (cascading to children) instead of each
+							// descendant's flag.
+							this.setCellsVisible(this.getCellsForAction(
+								action.show, true, true), true);
+						}
 					}
 
 					if (action.hide != null)
 					{
-						beginUpdate();
 						var temp = this.getCellsForAction(action.hide, true);
 						Graph.setOpacityForNodes(this.getNodesForCells(temp), 0);
-						this.setCellsVisible(temp, false);
+
+						if (isTransient(action.hide))
+						{
+							this.updateTransientTerminalEdges(temp);
+						}
+						else
+						{
+							beginUpdate();
+							this.setCellsVisible(this.getCellsForAction(
+								action.hide, true, true), false);
+						}
 					}
-					
+
 					if (action.toggleStyle != null && action.toggleStyle.key != null)
 					{
-						beginUpdate();
-						this.toggleCellStyles(action.toggleStyle.key, (action.toggleStyle.defaultValue != null) ?
-							action.toggleStyle.defaultValue : '0', this.getCellsForAction(action.toggleStyle, true));
+						var toggleStyleCells = this.getCellsForAction(action.toggleStyle, true);
+						// `value` toggles key ↔ value/defaultValue, without it the
+						// legacy boolean toggle runs (Graph.nextToggleStyleValue).
+						var toggleValue = action.toggleStyle.value;
+						var defValue = (action.toggleStyle.defaultValue !== '') ?
+							action.toggleStyle.defaultValue : null;
+
+						if (!isTransient(action.toggleStyle))
+						{
+							beginUpdate();
+							this.toggleCellStyleValues(action.toggleStyle.key,
+								toggleValue, defValue, toggleStyleCells);
+						}
+						else
+						{
+							this.toggleCellStylesTransient(action.toggleStyle.key,
+								defValue, toggleStyleCells, toggleValue);
+						}
 					}
 
 					if (action.style != null && action.style.key != null)
 					{
-						beginUpdate();
-						this.setCellStyles(action.style.key, action.style.value,
-							this.getCellsForAction(action.style, true));
+						var styleCells = this.getCellsForAction(action.style, true);
+
+						if (!isTransient(action.style))
+						{
+							beginUpdate();
+							this.setCellStyles(action.style.key,
+								action.style.value, styleCells);
+						}
+						else
+						{
+							this.setCellStylesTransient(action.style.key,
+								action.style.value, styleCells);
+						}
 					}
 
-					// Executes stateless actions on cells
+					// Executes stateless actions on cells. Validates the view
+					// first for a model-path show/hide in the same step (see
+					// needsView above).
 					var cells = [];
+
+					if (updatingModel && needsView(action))
+					{
+						endUpdate();
+					}
 						
 					if (action.select != null && this.isEnabled())
 					{
@@ -7958,15 +12305,112 @@
 					{
 						cells = this.getCellsForAction(action.scroll);
 					}
-					
+
 					if (action.viewbox != null)
 					{
-						this.fitWindow(action.viewbox, action.viewbox.border);
+						var vb = action.viewbox;
+
+						// Dynamic cell-bound viewbox: with a cells/tags/layers
+						// selector present, the box derives from the union of
+						// the resolved cells' bounds at execution time — the
+						// link follows the cells as the diagram evolves — and
+						// any static x/y/width/height is ignored. An
+						// unresolvable selector (e.g. only hidden cells, no
+						// state) skips the action, like scroll does.
+						if (vb.cells != null || vb.tags != null || vb.layers != null)
+						{
+							var vbBounds = this.getBoundingBox(
+								this.getCellsForAction(vb));
+
+							if (vbBounds != null)
+							{
+								// State bounds are screen coords — same
+								// normalization as fitDiagramToWindow.
+								var vbScale = this.view.scale;
+								var vbTrans = this.view.translate;
+
+								// Dynamic border is breathing room per side
+								// (screen px, like scroll's border). The fit
+								// implementations reserve the border once
+								// across the axis (clientWidth - border) and
+								// centre, which yields border/2 per side —
+								// invisible for typical values after scale
+								// quantization — so double it here.
+								var vbBorder = (vb.border != null && vb.border !== '' &&
+									!isNaN(parseFloat(vb.border))) ?
+									2 * parseFloat(vb.border) : null;
+
+								vb = {x: vbBounds.x / vbScale - vbTrans.x,
+									y: vbBounds.y / vbScale - vbTrans.y,
+									width: Math.max(1, vbBounds.width / vbScale),
+									height: Math.max(1, vbBounds.height / vbScale),
+									border: vbBorder, smooth: vb.smooth};
+							}
+							else
+							{
+								vb = null;
+							}
+						}
+
+						if (vb != null)
+						{
+							if (vb.smooth === true && !stop)
+							{
+								// Block the action chain until the smooth
+								// transition finishes so consecutive viewbox /
+								// scroll steps don't overrun each other. During
+								// stop we fall through to the instant snap below.
+								waitCounter++;
+								this.smoothFitWindow(vb, vb.border, waitAndExecute);
+							}
+							else if (this.chromeless)
+							{
+								// Regular fitWindow only zooms in chromeless mode
+								// (no scrollbars to pan), so we recreate the pan
+								// ourselves via fitBoundsCssTransform.
+								this.fitBoundsCssTransform(vb, vb.border);
+							}
+							else
+							{
+								this.fitWindow(vb, vb.border);
+							}
+						}
 					}
-					
+
 					if (cells.length > 0)
 					{
-						this.scrollCellToVisible(cells[0]);
+						// Optional `scroll.border` (screen px) keeps that much
+						// breathing room around the cell instead of centring
+						// it. Only `scroll` carries it — select/highlight-
+						// driven scrolls pass null (centre / base behaviour).
+						var scrollBorder = (action.scroll != null &&
+							action.scroll.border != null && action.scroll.border !== '' &&
+							!isNaN(parseFloat(action.scroll.border))) ?
+							parseFloat(action.scroll.border) : null;
+
+						// `scroll.smooth: true` animates the scroll
+						// instead of jumping the container.
+						if (action.scroll != null && action.scroll.smooth === true && !stop)
+						{
+							// Block the action chain until the smooth scroll
+							// finishes (see viewbox above). During stop we
+							// fall through to the instant scroll below.
+							waitCounter++;
+							this.smoothScrollCellToVisible(cells[0], scrollBorder, waitAndExecute);
+						}
+						else if (this.chromeless)
+						{
+							// Chromeless: use the helper that updates
+							// view.translate AND calls sizeDidChange (so
+							// the SVG element resizes to fit the panned
+							// region — without this the cell scrolls
+							// off-screen at high-zoom levels).
+							this.scrollCellToVisibleCssTransform(cells[0], scrollBorder);
+						}
+						else
+						{
+							this.scrollCellToVisibleBorder(cells[0], scrollBorder);
+						}
 					}
 					
 					if (cell != null && action.explore != null)
@@ -8027,16 +12471,50 @@
 							this.setHiddenTags(hidden);
 						}
 
-						this.refresh();
+						this.refreshHiddenTags();
 					}
 
 					if (animations.length > 0)
 					{
 						waitCounter++;
+
+						// Honour a per-effect duration (total ms) authored via
+						// the dialog's duration input or the legacy converter,
+						// which store it nested under the effect key (e.g.
+						// action.wipeIn.delay). executeAnimations wants a frame
+						// count + per-frame interval (total ≈ frames * interval),
+						// so keep the default frame count and derive the
+						// interval. Falls back to legacy top-level action.steps /
+						// action.delay, then executeAnimations' own defaults.
+						var animFrames = (action.steps != null) ? action.steps : 30;
+						var animInterval = action.delay;
+						var animKeys = ['wipeIn', 'wipeOut', 'popIn', 'popOut'];
+						var animDurMs = null;
+
+						for (var ak = 0; ak < animKeys.length; ak++)
+						{
+							var av = action[animKeys[ak]];
+
+							if (av != null && av.delay != null)
+							{
+								animDurMs = (animDurMs == null) ? av.delay :
+									Math.max(animDurMs, av.delay);
+							}
+						}
+
+						if (animDurMs != null)
+						{
+							animInterval = animDurMs / animFrames;
+						}
+
 						this.executeAnimations(animations, waitAndExecute,
-							(stop) ? 1 : action.steps,
-							(stop) ? 0 : action.delay);
+							(stop) ? 1 : animFrames,
+							(stop) ? 0 : animInterval);
 					}
+					}
+					while (index < actions.length &&
+						actions[index].immediate === true &&
+						!this.stoppingCustomActions);
 
 					if (waitCounter == 0)
 					{
@@ -8057,6 +12535,29 @@
 					{
 						done();
 					}
+				}
+			});
+
+			// An action that throws (e.g. a broken action body) must not
+			// leave executingCustomActions latched — that silently disables
+			// all custom links until the page is reloaded — nor leave the
+			// model transaction open. Wraps every dispatch entry (initial,
+			// recursive and the async waitAndExecute continuations) and
+			// rethrows so a synchronous caller still surfaces the error
+			// dialog (graph.customLinkClicked catches via handleError).
+			var executeNextAction = mxUtils.bind(this, function()
+			{
+				try
+				{
+					dispatchNextAction();
+				}
+				catch (e)
+				{
+					this.executingCustomActions = false;
+					this.stoppingCustomActions = false;
+					endUpdate();
+
+					throw e;
 				}
 			});
 
@@ -8156,6 +12657,7 @@
 			{
 				this.updateCustomLinkAction(mapping, action[name], 'cells');
 				this.updateCustomLinkAction(mapping, action[name], 'excludeCells');
+				this.updateCustomLinkAction(mapping, action[name], 'layers');
 			}
 		}
 	};
@@ -8201,28 +12703,87 @@
 	 * Handles each action in the action array of a custom link. This code
 	 * handles toggle actions for cell IDs.
 	 */
-	Graph.prototype.getCellsForAction = function(action, layers)
+	Graph.prototype.getCellsForAction = function(action, layers, layerCells)
 	{
-		var result = this.getCellsById(action.cells).concat(
-			this.getCellsForTags(action.tags, null, layers));
+		// `action.tagsMatch` opts into OR semantics (cell needs ANY of
+		// the listed tags). Default stays AND for back-compat with
+		// existing diagrams.
+		var tagMode = (action.tagsMatch === 'or') ? 'or' : 'and';
 
-		// Removes excluded cells
-		if (action.excludeCells != null)
+		// Union of cells from `cells` and `tags`. De-dup by id so a
+		// cell that matches both selectors doesn't get the action
+		// applied twice.
+		var seen = Object.create(null);
+		var union = [];
+		var merge = function(cells)
 		{
-			var temp = [];
-
-			for (var i = 0; i < result.length; i++)
+			for (var i = 0; i < cells.length; i++)
 			{
-				if (action.excludeCells.indexOf(result[i].id) < 0)
+				var id = cells[i].id;
+				if (!seen[id])
 				{
-					temp.push(result[i]);
+					seen[id] = true;
+					union.push(cells[i]);
 				}
 			}
+		};
 
-			result = temp;
+		merge(this.getCellsById(action.cells));
+		merge(this.getCellsForTags(action.tags, null, layers, false, tagMode));
+		// `layerCells` resolves the action.layers selector to the layer cells
+		// themselves rather than their descendants. The transient opacity
+		// path fades descendants; the model-visibility path toggles the layer
+		// cell's own `visible` (matching the Layers panel), which cascades to
+		// every descendant at render time.
+		merge(layerCells ? this.getLayerCells(action.layers) :
+			this.getCellsForLayers(action.layers));
+
+		// `descendants` adds every descendant of the resolved cells, looked
+		// up at execution time like `layers`, so an effect on a group or
+		// container reaches its contents — a group's own shape is invisible,
+		// so without it the effect shows nothing — including children added
+		// after the action was written, which an explicit list cannot
+		// follow. Without the flag only the listed cells are affected, so a
+		// container's frame can still be faded on its own.
+		if (action.descendants === true)
+		{
+			var listed = union.slice();
+
+			for (var i = 0; i < listed.length; i++)
+			{
+				merge(this.model.getDescendants(listed[i]));
+			}
 		}
 
-		return result;
+		// Final step: subtract every cell in `excludeCells` from the
+		// union. `'*'` in the exclude list means "exclude everything",
+		// which collapses the result to []. This mirrors the wildcard
+		// semantics on `cells`.
+		if (action.excludeCells != null && action.excludeCells.length > 0)
+		{
+			var excludeIds = Object.create(null);
+			var excludeAll = false;
+
+			for (var i = 0; i < action.excludeCells.length; i++)
+			{
+				if (action.excludeCells[i] === '*') { excludeAll = true; break; }
+				excludeIds[action.excludeCells[i]] = true;
+			}
+
+			if (excludeAll)
+			{
+				return [];
+			}
+
+			var filtered = [];
+			for (var i = 0; i < union.length; i++)
+			{
+				if (!excludeIds[union[i].id]) filtered.push(union[i]);
+			}
+			return filtered;
+		}
+
+		return union;
 	};
 	
 	/**
@@ -8232,7 +12793,7 @@
 	Graph.prototype.getCellsById = function(ids)
 	{
 		var result = [];
-		
+
 		if (ids != null)
 		{
 			for (var i = 0; i < ids.length; i++)
@@ -8240,7 +12801,7 @@
 				if (ids[i] == '*')
 				{
 					var parent = this.model.getRoot();
-					
+
 					result = result.concat(this.model.filterDescendants(function(cell)
 					{
 						return cell != parent;
@@ -8249,7 +12810,7 @@
 				else
 				{
 					var cell = this.model.getCell(ids[i]);
-					
+
 					if (cell != null)
 					{
 						result.push(cell);
@@ -8257,7 +12818,54 @@
 				}
 			}
 		}
-		
+
+		return result;
+	};
+
+	/**
+	 * Resolves an array of layer cell IDs to every descendant cell in
+	 * those layers. Layers are top-level children of the model root; we
+	 * skip the layer cell itself (so the action applies only to its
+	 * contents, not the implicit container). Used by getCellsForAction
+	 * to support "Select layers" on the cells selector.
+	 */
+	Graph.prototype.getCellsForLayers = function(layerIds)
+	{
+		var result = [];
+
+		if (Array.isArray(layerIds))
+		{
+			for (var i = 0; i < layerIds.length; i++)
+			{
+				var layer = this.model.getCell(layerIds[i]);
+				if (layer == null) continue;
+				result = result.concat(this.model.filterDescendants(
+					function(c) { return c != layer; }, layer));
+			}
+		}
+
+		return result;
+	};
+
+	/**
+	 * Returns the layer cells named by the given IDs (the cells themselves,
+	 * not their descendants). Used by the model-visibility action path so a
+	 * `layers` selector toggles each layer's own `visible` attribute —
+	 * matching the Layers panel — rather than flipping every descendant.
+	 */
+	Graph.prototype.getLayerCells = function(layerIds)
+	{
+		var result = [];
+
+		if (Array.isArray(layerIds))
+		{
+			for (var i = 0; i < layerIds.length; i++)
+			{
+				var layer = this.model.getCell(layerIds[i]);
+				if (layer != null) result.push(layer);
+			}
+		}
+
 		return result;
 	};
 
@@ -8278,6 +12886,18 @@
 	{
 		this.hiddenTags = tags;
 		this.fireEvent(new mxEventObject('hiddenTagsChanged'));
+	};
+
+	/**
+	 * Updates the view after the hidden tags changed. Unlike <refresh>, this
+	 * only creates and removes the states of the cells whose visibility
+	 * changed instead of repainting all cells.
+	 */
+	Graph.prototype.refreshHiddenTags = function()
+	{
+		this.view.revalidate();
+		this.sizeDidChange();
+		this.fireEvent(new mxEventObject(mxEvent.REFRESH));
 	};
 
 	/**
@@ -8337,17 +12957,18 @@
 	 * Returns the cells in the model (or given array) that have all of the
 	 * given tags in their tags property.
 	 */
-	Graph.prototype.getCellsForTags = function(tagList, cells, includeLayers, checkVisible)
+	Graph.prototype.getCellsForTags = function(tagList, cells, includeLayers, checkVisible, mode)
 	{
 		var result = [];
-		
+		var orMode = mode === 'or';
+
 		if (tagList != null)
 		{
 			cells = (cells != null) ? cells : this.model.getDescendants(this.model.getRoot());
-			
+
 			var tagCount = 0;
 			var lookup = {};
-			
+
 			for (var i = 0; i < tagList.length; i++)
 			{
 				if (tagList[i].length > 0)
@@ -8356,7 +12977,7 @@
 					tagCount++;
 				}
 			}
-			
+
 			for (var i = 0; i < cells.length; i++)
 			{
 				if ((includeLayers && this.model.getParent(cells[i]) == this.model.root) ||
@@ -8364,15 +12985,18 @@
 				{
 					var tags = this.getTagsForCell(cells[i]);
 					var match = false;
-	
+
 					if (tags.length > 0)
 					{
 						var tmp = tags.split(' ');
-						
-						if (tmp.length >= tagList.length)
+
+						// OR mode matches as soon as one tag overlaps. AND mode
+						// keeps the original requirement (every listed tag must
+						// be present), short-circuiting once the count hits.
+						if (orMode || tmp.length >= tagList.length)
 						{
 							var matchCount = 0;
-							
+
 							for (var j = 0; j < tmp.length && (matchCount < tagCount); j++)
 							{
 								if (lookup[tmp[j]] != null)
@@ -8380,11 +13004,11 @@
 									matchCount++;
 								}
 							}
-							
-							match = matchCount == tagCount;
+
+							match = orMode ? matchCount > 0 : matchCount == tagCount;
 						}
 					}
-					
+
 					if (match && ((checkVisible != true) || this.isCellVisible(cells[i])))
 					{
 						result.push(cells[i]);
@@ -8392,7 +13016,7 @@
 				}
 			}
 		}
-		
+
 		return result;
 	};
 
@@ -8694,8 +13318,8 @@
 						
 						if (tokens.length > 3)
 						{
-							w = parseFloat(tokens[2]) + size;
-							h = parseFloat(tokens[3]) + size;
+							var w = parseFloat(tokens[2]) + size;
+							var h = parseFloat(tokens[3]) + size;
 							
 							svgRoot.setAttribute('viewBox', tokens[0] + ' ' + tokens[1] + ' ' + w + ' ' + h);
 						}
@@ -8717,6 +13341,7 @@
 		{
 			if (visible)
 			{
+				// Scales with the zoom if the draw pane is in model coordinates
 				var cssColor = mxUtils.getLightDarkColor(
 					this.svgShadowColor, this.svgShadowOpacity);
 				elt.style.filter = 'drop-shadow(' +
@@ -8745,6 +13370,8 @@
 		{
 			this.fireEvent(new mxEventObject('shadowVisibleChanged'));
 		}
+		
+		return Math.ceil(this.svgShadowSize * this.svgShadowBlur);
 	};
 	
 	/**
@@ -8838,11 +13465,13 @@
 	mxStencilRegistry.libraries['ibmcloud'] = [STENCIL_PATH + '/ibm_cloud.xml'];
 	mxStencilRegistry.libraries['cabinets'] = [SHAPES_PATH + '/mxCabinets.js', STENCIL_PATH + '/cabinets.xml'];
 	mxStencilRegistry.libraries['archimate'] = [SHAPES_PATH + '/mxArchiMate.js'];
+	mxStencilRegistry.libraries['archimate4'] = [SHAPES_PATH + '/mxArchiMate3.js', SHAPES_PATH + '/mxArchiMate4.js'];
 	mxStencilRegistry.libraries['archimate3'] = [SHAPES_PATH + '/mxArchiMate3.js'];
 	mxStencilRegistry.libraries['sysml'] = [SHAPES_PATH + '/mxSysML.js'];
 	mxStencilRegistry.libraries['eip'] = [SHAPES_PATH + '/mxEip.js', STENCIL_PATH + '/eip.xml'];
 	mxStencilRegistry.libraries['networks'] = [SHAPES_PATH + '/mxNetworks.js', STENCIL_PATH + '/networks.xml'];
 	mxStencilRegistry.libraries['networks2'] = [SHAPES_PATH + '/mxNetworks2.js', STENCIL_PATH + '/networks2.xml'];
+	mxStencilRegistry.libraries['atlassian2'] = [SHAPES_PATH + '/mxAtlassian2.js', STENCIL_PATH + '/atlassian2.xml'];
 	mxStencilRegistry.libraries['aws3d'] = [SHAPES_PATH + '/mxAWS3D.js', STENCIL_PATH + '/aws3d.xml'];
 	mxStencilRegistry.libraries['aws4'] = [SHAPES_PATH + '/mxAWS4.js', STENCIL_PATH + '/aws4.xml'];
 	mxStencilRegistry.libraries['aws4b'] = [SHAPES_PATH + '/mxAWS4.js', STENCIL_PATH + '/aws4.xml'];
@@ -8922,75 +13551,78 @@
 	{
 		var graph = editorUi.editor.graph;
 		var div = document.createElement('div');
-		
+		// Flex column so the footer buttons stay pinned at the bottom and the
+		// content area scrolls if the dialog is capped by viewport max-height.
+		div.style.display = 'flex';
+		div.style.flexDirection = 'column';
+		div.style.minHeight = '0';
+
+		var scrollWrapper = document.createElement('div');
+		scrollWrapper.style.flex = '1 1 auto';
+		scrollWrapper.style.minHeight = '0';
+		scrollWrapper.style.overflowY = 'auto';
+		div.appendChild(scrollWrapper);
+
 		var title = document.createElement('h3');
-		title.style.width = '100%';
-		title.style.textAlign = 'center';
-		title.style.marginTop = '0px';
 		mxUtils.write(title, titleText || mxResources.get('print'));
-		div.appendChild(title);
+		scrollWrapper.appendChild(title);
 
 		var currentPage = 1;
 		var pageCount = 1;
 
 		// Pages
 		var pagesSection = document.createElement('div');
+		pagesSection.className = 'geDialogSection';
 		pagesSection.style.whiteSpace = 'nowrap';
-		
+
 		var allPagesRadio = document.createElement('input');
 		allPagesRadio.style.marginRight = '8px';
-		allPagesRadio.style.marginBottom = '8px';
 		allPagesRadio.setAttribute('type', 'radio');
 		allPagesRadio.setAttribute('name', 'pages-printdialog');
-		
-		pagesSection.appendChild(allPagesRadio);
+		allPagesRadio.setAttribute('id', 'gePrintDlgAllPages');
 
-		var span = document.createElement('span');
+		var allPagesRow = document.createElement('div');
+		allPagesRow.className = 'geDialogCheckRow';
+		allPagesRow.appendChild(allPagesRadio);
+		var span = document.createElement('label');
+		span.setAttribute('for', 'gePrintDlgAllPages');
 		mxUtils.write(span, mxResources.get('allPages'));
-		mxEvent.addListener(span, 'click', function()
-		{
-			allPagesRadio.checked = true;
-		});
-		pagesSection.appendChild(span);
-
-		mxUtils.br(pagesSection);
+		allPagesRow.appendChild(span);
+		pagesSection.appendChild(allPagesRow);
 
 		// Page range
-		var pagesRadio = allPagesRadio.cloneNode(true);
-		pagesSection.appendChild(pagesRadio);
-		
-		var span = document.createElement('span');
+		var pagesRadio = document.createElement('input');
+		pagesRadio.style.marginRight = '8px';
+		pagesRadio.setAttribute('type', 'radio');
+		pagesRadio.setAttribute('name', 'pages-printdialog');
+		pagesRadio.setAttribute('id', 'gePrintDlgPages');
+
+		var pagesRow = document.createElement('div');
+		pagesRow.className = 'geDialogCheckRow';
+		pagesRow.appendChild(pagesRadio);
+
+		var span = document.createElement('label');
+		span.setAttribute('for', 'gePrintDlgPages');
 		mxUtils.write(span, mxResources.get('pages') + ':');
-		pagesSection.appendChild(span);
-		mxEvent.addListener(span, 'click', function()
-		{
-			pagesRadio.checked = true;
-		});
-		
+		pagesRow.appendChild(span);
+
 		var pagesFromInput = document.createElement('input');
 		pagesFromInput.style.margin = '0 4px';
 		pagesFromInput.setAttribute('value', '1');
 		pagesFromInput.setAttribute('type', 'number');
 		pagesFromInput.setAttribute('min', '1');
 		pagesFromInput.style.width = '40px';
-		pagesSection.appendChild(pagesFromInput);
-		
+		pagesRow.appendChild(pagesFromInput);
+
 		var span = document.createElement('span');
 		mxUtils.write(span, mxResources.get('to'));
-		pagesSection.appendChild(span);
-		
-		var pagesToInput = pagesFromInput.cloneNode(true);
-		pagesSection.appendChild(pagesToInput);
+		pagesRow.appendChild(span);
 
-		mxEvent.addListener(pagesFromInput, 'focus', function()
-		{
-			pagesRadio.checked = true;
-		});
-		
-		mxEvent.addListener(pagesToInput, 'focus', function()
-		{
-			pagesRadio.checked = true;
-		});
+		var pagesToInput = pagesFromInput.cloneNode(true);
+		pagesRow.appendChild(pagesToInput);
+
+		Dialog.checkRadioOnInput(pagesFromInput, pagesRadio);
+		Dialog.checkRadioOnInput(pagesToInput, pagesRadio);
 		
 		function validatePageRange()
 		{
@@ -9044,32 +13676,29 @@
 			pagesRadio.checked = true;
 		});
 
+		currPage.className = 'geBtn';
 		currPage.setAttribute('title', mxResources.get('currentPage'));
 		currPage.style.marginLeft = '4px';
 		currPage.style.maxWidth = '100px';
-		currPage.style.overflow = 'hidden';
-		currPage.style.textOverflow = 'ellipsis';
-		currPage.style.whiteSpace = 'nowrap';
 
-		pagesSection.appendChild(currPage);
+		pagesRow.appendChild(currPage);
+		pagesSection.appendChild(pagesRow);
 		
 		if (pageCount > 1)
 		{
-			div.appendChild(pagesSection);
+			scrollWrapper.appendChild(pagesSection);
 		}
-		
+
 		// Selection only
 		var selectionSection = document.createElement('div');
-		selectionSection.style.borderBottom = '1px solid lightGray';
-		selectionSection.style.paddingBottom = '12px';
-		selectionSection.style.marginBottom = '12px';
-		selectionSection.style.whiteSpace = 'nowrap';
+		selectionSection.className = 'geDialogCheckRow';
 
 		var selectionOnlyRadio = document.createElement('input');
 		selectionOnlyRadio.setAttribute('name', 'pages-printdialog');
 		selectionOnlyRadio.setAttribute('type', (pageCount == 1) ? 'checkbox' : 'radio');
+		selectionOnlyRadio.setAttribute('id', 'gePrintDlgSelectionOnly');
 		selectionOnlyRadio.style.marginRight = '8px';
-		
+
 		if (graph.isSelectionEmpty())
 		{
 			selectionOnlyRadio.setAttribute('disabled', 'disabled');
@@ -9078,15 +13707,26 @@
 		if (graph.isEnabled())
 		{
 			selectionSection.appendChild(selectionOnlyRadio);
-		
-			var span = document.createElement('span');
+
+			var span = document.createElement('label');
+			span.setAttribute('for', 'gePrintDlgSelectionOnly');
 			mxUtils.write(span, mxResources.get('selectionOnly'));
 			selectionSection.appendChild(span);
 		}
 
-		if (graph.isEnabled() || pageCount > 1)
+		if (graph.isEnabled())
 		{
-			div.appendChild(selectionSection);
+			if (pageCount > 1)
+			{
+				pagesSection.appendChild(selectionSection);
+			}
+			else
+			{
+				var selectionWrapper = document.createElement('div');
+				selectionWrapper.className = 'geDialogSection';
+				selectionWrapper.appendChild(selectionSection);
+				scrollWrapper.appendChild(selectionWrapper);
+			}
 		}
 
 		if (!editorUi.isPagesEnabled() || editorUi.lastPrintPagesRadioChecked)
@@ -9102,26 +13742,27 @@
 			allPagesRadio.checked = true;
 		}
 
-		if (!graph.isSelectionEmpty())
-		{
-			mxEvent.addListener(span, 'click', function()
-			{
-				selectionOnlyRadio.checked = !selectionOnlyRadio.checked;
-			});
-		}
-		
+		// Less common options live in a collapsed Advanced section. The size
+		// section is the helper's content card, the options section is a
+		// second card appended to the collapsible wrapper.
+		var advanced = editorUi.addAdvancedSection(scrollWrapper);
+
+		// --- Size section ---
+		var sizeSection = advanced.content;
+
 		// Page view
 		var pageViewSection = document.createElement('div');
-		pageViewSection.style.whiteSpace = 'nowrap';
+		pageViewSection.className = 'geDialogCheckRow';
 
 		var pageViewRadio = document.createElement('input');
-		pageViewRadio.style.marginBottom = '8px';
 		pageViewRadio.style.marginRight = '8px';
 		pageViewRadio.setAttribute('type', 'radio');
 		pageViewRadio.setAttribute('name', 'printSize');
+		pageViewRadio.setAttribute('id', 'gePrintDlgPageView');
 		pageViewSection.appendChild(pageViewRadio);
 
-		var span = document.createElement('span');
+		var span = document.createElement('label');
+		span.setAttribute('for', 'gePrintDlgPageView');
 		mxUtils.write(span, mxResources.get('pageView'));
 		pageViewSection.appendChild(span);
 		mxEvent.addListener(pageViewSection, 'click', function()
@@ -9129,20 +13770,21 @@
 			pageViewRadio.checked = true;
 		});
 
-		div.appendChild(pageViewSection);
-		
+		sizeSection.appendChild(pageViewSection);
+
 		// Crop
 		var cropSection = document.createElement('div');
-		cropSection.style.whiteSpace = 'nowrap';
+		cropSection.className = 'geDialogCheckRow';
 
 		var cropRadio = document.createElement('input');
-		cropRadio.style.marginBottom = '8px';
 		cropRadio.style.marginRight = '8px';
 		cropRadio.setAttribute('type', 'radio');
 		cropRadio.setAttribute('name', 'printSize');
+		cropRadio.setAttribute('id', 'gePrintDlgCrop');
 		cropSection.appendChild(cropRadio);
 
-		var span = document.createElement('span');
+		var span = document.createElement('label');
+		span.setAttribute('for', 'gePrintDlgCrop');
 		mxUtils.write(span, mxResources.get('crop'));
 		cropSection.appendChild(span);
 		mxEvent.addListener(cropSection, 'click', function()
@@ -9150,24 +13792,18 @@
 			cropRadio.checked = true;
 		});
 
-		div.appendChild(cropSection);
+		sizeSection.appendChild(cropSection);
 
 		// Fit to ...
 		var fitSection = document.createElement('div');
-		fitSection.style.whiteSpace = 'nowrap';
+		fitSection.className = 'geDialogCheckRow';
+		fitSection.style.alignItems = 'flex-start';
 
 		var fitRadio = document.createElement('input');
-		fitRadio.style.marginBottom = '8px';
-		fitRadio.style.marginRight = '8px';
+		fitRadio.style.marginTop = '4px';
 		fitRadio.setAttribute('type', 'radio');
 		fitRadio.setAttribute('name', 'printSize');
-		
-		var spanFitRadio = document.createElement('div');
-		spanFitRadio.style.display = 'inline-block';
-		spanFitRadio.style.verticalAlign = 'top';
-		spanFitRadio.style.paddingTop = '2px';
-		spanFitRadio.appendChild(fitRadio);
-		fitSection.appendChild(spanFitRadio);
+		fitSection.appendChild(fitRadio);
 		
 		var table = document.createElement('table');
 		table.style.display = 'inline-block';
@@ -9258,155 +13894,177 @@
 		table.appendChild(tbody);
 		fitSection.appendChild(table);
 		
-		div.appendChild(fitSection);
+		sizeSection.appendChild(fitSection);
 
 		// Border and zoom
 		var optionsSection = document.createElement('div');
-		optionsSection.style.borderTop = '1px solid lightGray';
-		optionsSection.style.whiteSpace = 'nowrap';
-		optionsSection.style.paddingTop = '12px';
-		optionsSection.style.marginTop = '12px';
-		optionsSection.style.paddingLeft = '8px';
-		
-		mxUtils.write(optionsSection, mxResources.get('borderWidth') + ':');
+		optionsSection.className = 'geDialogSection';
+
+		var borderZoomRow = document.createElement('div');
+		borderZoomRow.className = 'geDialogFormRow';
+
+		var borderLabel = document.createElement('label');
+		borderLabel.className = 'geDialogFormLabel';
+		borderLabel.setAttribute('for', 'gePrintDlgBorder');
+		mxUtils.write(borderLabel, mxResources.get('borderWidth'));
+		borderZoomRow.appendChild(borderLabel);
+
 		var borderInput = document.createElement('input');
 		borderInput.setAttribute('type', 'number');
 		borderInput.setAttribute('min', '0');
+		borderInput.setAttribute('id', 'gePrintDlgBorder');
 		borderInput.style.width = '40px';
-		borderInput.style.marginLeft = '4px';
+		// PDF export (fn != null) defaults to no border, printing keeps the page
+		// margin. The shared lastPrintBorder only stores a value that differs
+		// from the default so an untouched print does not pin 27 for exports.
+		var defaultBorder = (fn != null) ? 0 : mxPrintPreview.prototype.pageMargin;
 		borderInput.value = (editorUi.lastPrintBorder != null) ?
-			editorUi.lastPrintBorder : mxPrintPreview.prototype.pageMargin;
-		optionsSection.appendChild(borderInput);
+			editorUi.lastPrintBorder : defaultBorder;
+		borderZoomRow.appendChild(borderInput);
 
-		var span = document.createElement('span');
-		span.style.marginLeft = '8px';
-		mxUtils.write(span, mxResources.get('zoom') + ':');
-		optionsSection.appendChild(span);
-		
+		var zoomLabel = document.createElement('label');
+		zoomLabel.setAttribute('for', 'gePrintDlgZoom');
+		zoomLabel.style.marginLeft = '12px';
+		zoomLabel.style.marginRight = '4px';
+		mxUtils.write(zoomLabel, mxResources.get('zoom'));
+		borderZoomRow.appendChild(zoomLabel);
+
 		var zoomInput = document.createElement('input');
+		zoomInput.setAttribute('id', 'gePrintDlgZoom');
 		zoomInput.style.width = '60px';
-		zoomInput.style.marginLeft = '4px';
 		zoomInput.value = (editorUi.lastPrintZoom != null) ?
 			editorUi.lastPrintZoom : '100%';
-		optionsSection.appendChild(zoomInput);
+		borderZoomRow.appendChild(zoomInput);
 
-		mxUtils.br(optionsSection);
+		optionsSection.appendChild(borderZoomRow);
 
 		// Grid
+		var gridRow = document.createElement('div');
+		gridRow.className = 'geDialogCheckRow';
+
 		var gridInput = document.createElement('input');
 		gridInput.setAttribute('type', 'checkbox');
-		gridInput.style.marginTop = '12px';
+		gridInput.setAttribute('id', 'gePrintDlgGrid');
+		gridInput.style.marginRight = '8px';
 		gridInput.checked = (editorUi.lastPrintGrid != null) ?
 			editorUi.lastPrintGrid : false;
-		optionsSection.appendChild(gridInput);
+		gridRow.appendChild(gridInput);
 
-		var span = document.createElement('span');
-		span.style.marginLeft = '4px';
-		span.style.marginRight = '8px';
+		var span = document.createElement('label');
+		span.setAttribute('for', 'gePrintDlgGrid');
 		mxUtils.write(span, mxResources.get('grid'));
-		optionsSection.appendChild(span);
+		gridRow.appendChild(span);
 
-		mxEvent.addListener(span, 'click', function(e)
-		{
-			gridInput.checked = true;
-			mxEvent.consume(e);
-		});
-		
+		optionsSection.appendChild(gridRow);
+
 		// Shadows enabled
+		var shadowsRow = document.createElement('div');
+		shadowsRow.className = 'geDialogCheckRow';
+
 		var shadowsInput = document.createElement('input');
 		shadowsInput.setAttribute('type', 'checkbox');
-		shadowsInput.style.marginTop = '12px';
+		shadowsInput.setAttribute('id', 'gePrintDlgShadows');
+		shadowsInput.style.marginRight = '8px';
 		shadowsInput.checked = (editorUi.lastPrintShadow != null) ?
 			editorUi.lastPrintShadow : false;
-		optionsSection.appendChild(shadowsInput);
+		shadowsRow.appendChild(shadowsInput);
 
-		var span = document.createElement('span');
-		span.style.marginLeft = '4px';
-		span.style.marginRight = '8px';
+		var span = document.createElement('label');
+		span.setAttribute('for', 'gePrintDlgShadows');
 		mxUtils.write(span, mxResources.get('shadows'));
-		optionsSection.appendChild(span);
+		shadowsRow.appendChild(span);
 
 		if (!editorUi.isOffline() || mxClient.IS_CHROMEAPP)
 		{
-			span.appendChild(editorUi.createHelpIcon(
-				'https://github.com/jgraph/drawio/discussions/5136'));
+			shadowsRow.appendChild(editorUi.createHelpIcon(
+				'https://www.drawio.com/docs/manual/export/print-diagram/#shadows-in-print-and-pdf-export'));
 		}
-
-		mxEvent.addListener(span, 'click', function(e)
-		{
-			if (mxEvent.getSource(e).nodeName != 'IMG')
-			{
-				shadowsInput.checked = true;
-				mxEvent.consume(e);
-			}
-		});
 
 		// Hides shadows option if not supported
 		if (!Editor.enableShadowOption)
 		{
-			shadowsInput.style.display = 'none';
-			span.style.display = 'none';
+			shadowsRow.style.display = 'none';
 		}
-		else if (fn != null)
-		{
-			mxUtils.br(optionsSection);
-		}
+
+		optionsSection.appendChild(shadowsRow);
 
 		// Transparent background
 		var transparentInput = document.createElement('input');
 		transparentInput.setAttribute('type', 'checkbox');
-		transparentInput.style.marginTop = '10px';
+		transparentInput.setAttribute('id', 'gePrintDlgTransparent');
+		transparentInput.style.marginRight = '8px';
 		transparentInput.checked = (editorUi.lastPrintTransparent != null) ?
 			editorUi.lastPrintTransparent : false;
 
 		// Export
 		if (fn != null)
 		{
-			optionsSection.appendChild(transparentInput);
+			var transparentRow = document.createElement('div');
+			transparentRow.className = 'geDialogCheckRow';
+			transparentRow.appendChild(transparentInput);
 
-			var span = document.createElement('span');
-			span.style.marginLeft = '4px';
+			var span = document.createElement('label');
+			span.setAttribute('for', 'gePrintDlgTransparent');
 			mxUtils.write(span, mxResources.get('transparentBackground'));
-			optionsSection.appendChild(span);
+			transparentRow.appendChild(span);
 
-			mxEvent.addListener(span, 'click', function(e)
-			{
-				transparentInput.checked = true;
-				mxEvent.consume(e);
-			});
+			optionsSection.appendChild(transparentRow);
 		}
 
 		// Include diagram
 		var includeInput = document.createElement('input');
 		includeInput.setAttribute('type', 'checkbox');
-		includeInput.style.marginTop = '10px';
+		includeInput.setAttribute('id', 'gePrintDlgInclude');
+		includeInput.style.marginRight = '8px';
 		includeInput.checked = (editorUi.lastPrintInclude != null) ?
 			editorUi.lastPrintInclude : Editor.defaultIncludeDiagram;
 
 		if (fn != null && !mxClient.IS_CHROMEAPP &&
 			editorUi.getServiceName() == 'draw.io')
 		{
-			mxUtils.br(optionsSection);
-			optionsSection.appendChild(includeInput);
+			var includeRow = document.createElement('div');
+			includeRow.className = 'geDialogCheckRow';
+			includeRow.appendChild(includeInput);
 
-			var span = document.createElement('span');
-			span.style.marginLeft = '4px';
+			var span = document.createElement('label');
+			span.setAttribute('for', 'gePrintDlgInclude');
 			mxUtils.write(span, mxResources.get('includeCopyOfMyDiagram'));
-			optionsSection.appendChild(span);
+			includeRow.appendChild(span);
 
-			mxEvent.addListener(span, 'click', function(e)
-			{
-				includeInput.checked = true;
-				mxEvent.consume(e);
-			});
+			optionsSection.appendChild(includeRow);
+		}
+
+		// Notes as sticky note annotations, added by the local export
+		// pipeline which only exists in the desktop app (tooltips and
+		// links are always exported)
+		var iconsInput = document.createElement('input');
+		iconsInput.setAttribute('type', 'checkbox');
+		iconsInput.setAttribute('id', 'gePrintDlgIcons');
+		iconsInput.style.marginRight = '8px';
+		iconsInput.checked = (editorUi.lastPrintIcons != null) ?
+			editorUi.lastPrintIcons : false;
+
+		if (fn != null && EditorUi.isElectronApp)
+		{
+			var iconsRow = document.createElement('div');
+			iconsRow.className = 'geDialogCheckRow';
+			iconsRow.appendChild(iconsInput);
+
+			var span = document.createElement('label');
+			span.setAttribute('for', 'gePrintDlgIcons');
+			mxUtils.write(span, mxResources.get('notes'));
+			iconsRow.appendChild(span);
+
+			optionsSection.appendChild(iconsRow);
 		}
 
 
-		div.appendChild(optionsSection);
+		advanced.wrapper.appendChild(optionsSection);
 
 		// Buttons
 		var buttons = document.createElement('div');
-		buttons.style.marginTop = '30px';
+		buttons.style.flex = '0 0 auto';
+		buttons.style.marginTop = '16px';
 		buttons.style.textAlign = 'right';
 		buttons.style.whiteSpace = 'nowrap';
 		
@@ -9431,10 +14089,13 @@
 
 			zoomInput.value = Math.max(1, Math.min(1600, parseInt(zoomInput.value))) + '%';
 			editorUi.lastPrintZoom = zoomInput.value;
-			editorUi.lastPrintBorder = borderInput.value;
+			editorUi.lastPrintBorder = (parseInt(borderInput.value) !=
+				defaultBorder) ? borderInput.value : null;
 			editorUi.lastPrintGrid = gridInput.checked;
+			editorUi.lastPrintShadow = shadowsInput.checked;
 			editorUi.lastPrintTransparent = transparentInput.checked;
 			editorUi.lastPrintInclude = includeInput.checked;
+			editorUi.lastPrintIcons = iconsInput.checked;
 			editorUi.lastPrintSheetsAcross = sheetsAcrossInput.value;
 			editorUi.lastPrintSheetsDown = sheetsDownInput.value;
 
@@ -9445,6 +14106,7 @@
 			args.shadows = shadowsInput.checked;
 			args.transparent = transparentInput.checked;
 			args.includeCopy = includeInput.checked;
+			args.icons = iconsInput.checked && EditorUi.isElectronApp;
 			args.sheetsAcross = parseInt(sheetsAcrossInput.value);
 			args.sheetsDown = parseInt(sheetsDownInput.value);
 			args.pagesFrom = parseInt(pagesFromInput.value);
@@ -9475,20 +14137,50 @@
 		{
 			buttons.appendChild(cancelBtn);
 		}
+
+		// Async preview or print with spinner
+		function doPreview(print)
+		{
+			try
+			{
+				editorUi.hideDialog();
+
+				// Only the print/preview path (fn == null) renders synchronously
+				// here and needs the spinner. The export path (fn != null) issues
+				// its own request with its own spinner (e.g. saveRequest), which
+				// no-ops and silently drops the request if a spinner is already
+				// active, so it must not run under updatingPreview
+				if (fn != null)
+				{
+					preview(print);
+				}
+				else if (editorUi.spinner.spin(document.body, mxResources.get('updatingPreview')))
+				{
+					window.setTimeout(function()
+					{
+						try
+						{
+							preview(print);
+							editorUi.spinner.stop();
+						}
+						catch (e)
+						{
+							editorUi.handleError(e);
+						}
+					}, 0);
+				}
+			}
+			catch (e)
+			{
+				editorUi.handleError(e);
+			}
+		};
 		
 		if (PrintDialog.previewEnabled && fn == null)
 		{
 			var previewBtn = mxUtils.button(mxResources.get('preview'), function()
 			{
-				try
-				{
-					editorUi.hideDialog();
-					preview(false);
-				}
-				catch (e)
-				{
-					editorUi.handleError(e);
-				}
+				doPreview(false);
 			});
 
 			previewBtn.className = 'geBtn';
@@ -9499,15 +14191,7 @@
 			(!PrintDialog.previewEnabled) ? 'ok' : 'print';
 		var printBtn = mxUtils.button(mxResources.get(btnTitle), function()
 		{
-			try
-			{
-				editorUi.hideDialog();
-				preview(true);
-			}
-			catch (e)
-			{
-				editorUi.handleError(e);
-			}
+			doPreview(true);
 		});
 
 		printBtn.className = 'geBtn gePrimaryBtn';
@@ -9609,6 +14293,26 @@
             	{
             		this.page.viewState.shadowVisible = this.shadowVisible;
             	}
+
+				// Swaps the measure scale for undo like on the current page
+				if (this.measureScale != null)
+				{
+					var tmp = Graph.parseMeasureScale(this.page.viewState.measureScale);
+					this.page.viewState.measureScale = this.measureScale;
+					this.measureScale = tmp;
+				}
+
+				// Swaps the gradient of the background for undo like on the current page
+				if (this.gradient != null)
+				{
+					var gradient = Graph.parseBackgroundGradient(
+						this.gradient.color, this.gradient.direction);
+					var tmp = {color: this.page.viewState.backgroundGradient,
+						direction: this.page.viewState.backgroundGradientDirection};
+					this.page.viewState.backgroundGradient = gradient.color;
+					this.page.viewState.backgroundGradientDirection = gradient.direction;
+					this.gradient = tmp;
+				}
             }   
         }
         else
@@ -9635,4 +14339,958 @@
             }
         }
     };
+
+	/**
+	 * Step-based animation engine. Plays a sequence of show/hide/flow/wait/
+	 * setOpacity steps on a graph by manipulating DOM opacity, leaving the
+	 * model and each cell's original opacity/label styles untouched.
+	 *
+	 * Step grammar (one per line, blank lines and lines starting with # ignored):
+	 *
+	 *     show CELL [fade|pop|wipe] [DURATION]   reveal cell (default effect: wipe)
+	 *     hide CELL [DURATION]                   fade cell out
+	 *     flow CELL [start|stop]                 toggle flow animation on an edge
+	 *     wait MS                                pause for MS milliseconds
+	 *     setOpacity CELL VALUE [DURATION]       transition cell opacity to VALUE (0–1)
+	 *
+	 * DURATION is optional milliseconds; when omitted, fades and setOpacity
+	 * default to Editor.animationFadeDelay (400 ms) and wipe/pop default to
+	 * the executeAnimations 30×30 = 900 ms preset.
+	 *
+	 * CELL is the cell id (or "*" / "all" for every shape). wipe extends
+	 * vertices left-to-right and edges along their path. fade cross-fades
+	 * opacity. pop scales in with a damped spring overshoot. setOpacity is
+	 * essentially fadeIn/fadeOut with a configurable target — animates from
+	 * each cell's current opacity to VALUE.
+	 */
+	Editor.parseAnimationScript = function(script)
+	{
+		var steps = [];
+
+		if (script == null)
+		{
+			return steps;
+		}
+
+		// Parses a non-negative numeric token. Returns the value, or undefined
+		// if the token is missing or not a valid number.
+		var parseNumber = function(tok)
+		{
+			if (tok == null)
+			{
+				return undefined;
+			}
+
+			var n = parseFloat(tok);
+
+			return (!isNaN(n) && n >= 0) ? n : undefined;
+		};
+
+		var SHOW_EFFECTS = {fade: true, pop: true, wipe: true};
+
+		var lines = script.split('\n');
+
+		for (var i = 0; i < lines.length; i++)
+		{
+			var line = mxUtils.trim(lines[i]);
+
+			if (line == '' || line.charAt(0) == '#')
+			{
+				continue;
+			}
+
+			var tokens = line.split(/\s+/);
+			var step = {action: tokens[0], cell: tokens[1], arg: tokens[2]};
+
+			if (step.action == 'wait')
+			{
+				step.delay = parseFloat(step.cell);
+
+				if (isNaN(step.delay) || step.delay < 0)
+				{
+					step.delay = 1000;
+				}
+			}
+			else if (step.action == 'setOpacity')
+			{
+				// setOpacity CELL VALUE [DURATION]
+				step.opacity = parseFloat(tokens[2]);
+
+				if (isNaN(step.opacity))
+				{
+					step.opacity = 1;
+				}
+
+				step.opacity = Math.max(0, Math.min(1, step.opacity));
+				step.duration = parseNumber(tokens[3]);
+				step.arg = undefined;
+			}
+			else if (step.action == 'show')
+			{
+				// show CELL [fade|pop|wipe] [DURATION]
+				// The third token can be an effect name OR a duration. If it
+				// parses as a number and isn't a known effect, treat it as a
+				// duration with the default (wipe) effect.
+				if (step.arg != null && !SHOW_EFFECTS[step.arg])
+				{
+					var asDur = parseNumber(step.arg);
+
+					if (asDur != null)
+					{
+						step.duration = asDur;
+						step.arg = undefined;
+					}
+				}
+
+				if (step.duration == null)
+				{
+					step.duration = parseNumber(tokens[3]);
+				}
+			}
+			else if (step.action == 'hide')
+			{
+				// hide CELL [DURATION]
+				step.duration = parseNumber(tokens[2]);
+				step.arg = undefined;
+			}
+
+			steps.push(step);
+		}
+
+		return steps;
+	};
+
+	/**
+	 * Default fade duration in ms used when fading hidden cells back in or out.
+	 */
+	Editor.animationFadeDelay = 400;
+
+	/**
+	 * True when two steps differ only by their cell reference and can run as
+	 * a single parallel batch (e.g. three "Fade In" picks on a multi-cell
+	 * selection). wait/flow steps don't batch — flow is instant anyway and
+	 * waits have no cell to fan out. Shared by the engine (batching) and the
+	 * dialog (UI grouping) so both stay in sync.
+	 */
+	Editor.canBatchAnimationSteps = function(a, b)
+	{
+		if (a.action != b.action) return false;
+		if (a.action == 'wait') return false;
+		if ((a.arg || '') != (b.arg || '')) return false;
+		if ((a.opacity != null ? a.opacity : '') != (b.opacity != null ? b.opacity : '')) return false;
+		if ((a.duration != null ? a.duration : '') != (b.duration != null ? b.duration : '')) return false;
+		return true;
+	};
+
+	/**
+	 * Converts a parsed legacy step (from parseAnimationScript) to a single
+	 * JSON action object using the keys already supported by
+	 * Graph.executeCustomActions. Returns null for unknown actions.
+	 *
+	 * The mapping preserves semantics:
+	 *   show CELL fade  → fadeIn      (forces 0 → 1)
+	 *   show CELL pop   → popIn
+	 *   show CELL       → wipeIn      (default wipe effect)
+	 *   hide CELL       → fadeOut     (forces 1 → 0)
+	 *   setOpacity X V  → fadeTo with value: V  (smooth from current → V)
+	 *   wait MS         → wait: MS
+	 *   flow CELL start → flow with start: true
+	 */
+	Editor.convertLegacyAnimationStep = function(step)
+	{
+		if (step.action == 'wait')
+		{
+			return {wait: step.delay};
+		}
+
+		var cellRef = (step.cell == 'all') ? '*' : step.cell;
+
+		if (cellRef == null)
+		{
+			return null;
+		}
+
+		var sel = {cells: [cellRef]};
+
+		// The legacy engine defaulted fade/setOpacity to 400 ms (Editor.
+		// animationFadeDelay); the new action handlers fall back to
+		// fadeNodes' built-in 1000 ms. Set the duration explicitly during
+		// conversion so old animations play at the same speed they used to.
+		if (step.duration != null)
+		{
+			sel.delay = step.duration;
+		}
+		else if (step.action == 'show' && step.arg == 'fade')
+		{
+			sel.delay = Editor.animationFadeDelay;
+		}
+		else if (step.action == 'hide' || step.action == 'setOpacity')
+		{
+			sel.delay = Editor.animationFadeDelay;
+		}
+
+		if (step.action == 'show')
+		{
+			if (step.arg == 'fade') return {fadeIn:  sel};
+			if (step.arg == 'pop')  return {popIn:   sel};
+			return {wipeIn: sel};
+		}
+
+		if (step.action == 'hide')
+		{
+			return {fadeOut: sel};
+		}
+
+		if (step.action == 'setOpacity')
+		{
+			sel.value = step.opacity;
+			return {fadeTo: sel};
+		}
+
+		if (step.action == 'flow')
+		{
+			var out = {cells: [cellRef]};
+
+			if (step.arg == 'start') out.start = true;
+			else if (step.arg == 'stop') out.start = false;
+
+			return {flow: out};
+		}
+
+		return null;
+	};
+
+	/**
+	 * Converts an old text-format animation script to the new JSON action
+	 * structure {animation: {steps: [...]}}. Prepends an explicit
+	 * {opacity: {cells: ["*"], value: 0}} step to recreate the implicit
+	 * hide-initial behavior the old engine had on by default — users who
+	 * don't want it can delete that first step in the editor.
+	 *
+	 * Consecutive non-`wait` steps are merged into a single step so they
+	 * run in parallel. This matches the original plugin's semantics: its
+	 * dispatcher fired show / hide / flow synchronously (no per-step
+	 * await), so consecutive shows visually overlapped and only `wait`
+	 * blocked the chain. The new JSON dispatcher awaits each step's
+	 * completion, so without merging, a legacy script
+	 * `show A fade; show B fade; wait 500` would play in ~1300 ms instead
+	 * of the legacy ~500 ms.
+	 */
+	Editor.convertLegacyAnimation = function(text)
+	{
+		var legacy = Editor.parseAnimationScript(text);
+		var steps = [{opacity: {cells: ['*'], value: 0}}];
+		var current = null;
+
+		// Flush the in-progress merge bucket onto the steps array.
+		var flush = function()
+		{
+			if (current != null)
+			{
+				steps.push(current);
+				current = null;
+			}
+		};
+
+		// Returns true if two converted action params can share a step —
+		// same `delay`, `value`, `start` (anything that affects how the
+		// action plays). When they differ, the steps stay separate to
+		// preserve the original per-step behavior.
+		var paramsMatch = function(a, b)
+		{
+			return a.delay === b.delay &&
+				a.value === b.value &&
+				a.start === b.start;
+		};
+
+		// Adds one converted step to the merge bucket. If the new step
+		// shares an action key with the bucket AND their params match
+		// (e.g. both are `fadeIn` with delay 400), the cells are
+		// appended to the existing key's cells array. Different action
+		// keys (e.g. `fadeIn` + `wipeIn`) coexist in the same merged
+		// step — both run in parallel via the multi-key dispatch in
+		// executeCustomActions. Conflicting params (e.g. two `fadeIn`s
+		// with different delays) flush the bucket so each preserves
+		// its own timing.
+		var merge = function(converted)
+		{
+			if (current == null) current = {};
+
+			for (var key in converted)
+			{
+				var incoming = converted[key];
+
+				if (current[key] != null && incoming != null &&
+					Array.isArray(current[key].cells) &&
+					Array.isArray(incoming.cells) &&
+					paramsMatch(current[key], incoming))
+				{
+					// Same key + matching params — extend cells.
+					for (var i = 0; i < incoming.cells.length; i++)
+					{
+						current[key].cells.push(incoming.cells[i]);
+					}
+				}
+				else if (current[key] != null)
+				{
+					// Same key but params differ — flush and start a
+					// new bucket so the previous timing is preserved.
+					flush();
+					current = {};
+					current[key] = incoming;
+				}
+				else
+				{
+					current[key] = incoming;
+				}
+			}
+		};
+
+		for (var i = 0; i < legacy.length; i++)
+		{
+			var converted = Editor.convertLegacyAnimationStep(legacy[i]);
+
+			if (converted == null) continue;
+
+			// `wait` blocks the chain — it always lives in its own step.
+			if (converted.wait != null)
+			{
+				flush();
+				steps.push(converted);
+			}
+			else
+			{
+				merge(converted);
+			}
+		}
+
+		flush();
+
+		return {animation: {steps: steps}};
+	};
+
+	/**
+	 * Returns the normalized {steps: [...], loop} structure for an animation
+	 * value stored on a cell, page root, or custom-link action. Accepts:
+	 *   - a {steps: [...]} object (already normalized)
+	 *   - a {animation: {steps: [...]}} action object (unwrapped)
+	 *   - a JSON string of either of the above
+	 *   - a legacy text script (auto-converted via convertLegacyAnimation)
+	 *   - null / empty value (returns {steps: []})
+	 *
+	 * `loop` is always normalized to a boolean — defaults to true when the
+	 * field is missing (matches the legacy plugin's chromeless behavior).
+	 */
+	Editor.parseAnimationData = function(value)
+	{
+		var normalize = function(data)
+		{
+			if (data == null) data = {};
+			if (!Array.isArray(data.steps)) data.steps = [];
+			// Coerce to boolean — handles JSON 0/1, "true"/"false" strings,
+			// missing field (defaults to true). `enabled` gates chromeless
+			// autoplay; `loop` toggles repeat playback.
+			data.loop = (data.loop == null) ? true : !!data.loop;
+			data.enabled = (data.enabled == null) ? true : !!data.enabled;
+			return data;
+		};
+
+		if (value == null || value === '')
+		{
+			return normalize({steps: []});
+		}
+
+		if (typeof value == 'string')
+		{
+			var trimmed = mxUtils.trim(value);
+
+			// A leading { or [ means the text is meant as JSON. If it then
+			// fails to parse it is malformed JSON, NOT a legacy script — so
+			// let the SyntaxError propagate instead of silently routing it
+			// to convertLegacyAnimation, which would discard the user's
+			// steps and leave only its hide-all prepend. Callers reading
+			// from storage guard against the throw; the dialog textarea
+			// handler catches it and keeps the last valid data in place.
+			if (trimmed.charAt(0) == '{' || trimmed.charAt(0) == '[')
+			{
+				return Editor.parseAnimationData(JSON.parse(trimmed));
+			}
+
+			// Legacy text format (never starts with { or [).
+			return normalize(Editor.convertLegacyAnimation(value).animation);
+		}
+
+		if (value.animation != null && value.animation.steps != null)
+		{
+			return normalize(value.animation);
+		}
+
+		if (Array.isArray(value.steps))
+		{
+			return normalize(value);
+		}
+
+		return normalize({steps: []});
+	};
+
+	/**
+	 * Animation runner. Plays a step-based animation by delegating each step
+	 * to the existing Graph.executeCustomActions infrastructure — which
+	 * already supports parallel cell batches, sequential waits, and
+	 * cells/tags/excludeCells selectors.
+	 *
+	 * The player adds three things on top of executeCustomActions:
+	 *   1. Snapshot/restore of DOM opacity so stop() and loops are clean
+	 *   2. Loop support (re-run from step 0 when done)
+	 *   3. Accepts legacy text scripts (auto-converted on load)
+	 */
+	Editor.AnimationPlayer = function(graph, data)
+	{
+		this.graph = graph;
+		this.data = Editor.parseAnimationData(data);
+		this.running = false;
+		this.cancelled = false;
+		this.snapshot = null;
+	};
+
+	/**
+	 * Wildcard cell reference that matches every vertex and edge in the
+	 * model. Stored as the string "*" in JSON `cells` arrays — the existing
+	 * Graph.getCellsById already handles this wildcard. Kept exported for
+	 * legacy callers that referenced it directly.
+	 */
+	Editor.ANIMATION_ALL = '*';
+
+	/**
+	 * Returns every vertex and edge in the model. Used by the dialog when
+	 * resolving "select all referenced cells" against the wildcard.
+	 */
+	Editor.collectAnimatableCells = function(model)
+	{
+		var cells = [];
+
+		for (var id in model.cells)
+		{
+			var cell = model.cells[id];
+
+			if (model.isVertex(cell) || model.isEdge(cell))
+			{
+				cells.push(cell);
+			}
+		}
+
+		return cells;
+	};
+
+	/**
+	 * Walks every step in this.data.steps and returns the union of cells they
+	 * touch (resolving wildcard / tag / excludeCells via getCellsForAction).
+	 * Used to snapshot DOM opacity before play so the diagram can be restored
+	 * cleanly on stop or between loop iterations. With terminalEdges, the
+	 * edges connected to the targets of toggle / show / hide are added.
+	 */
+	Editor.AnimationPlayer.prototype.collectReferencedCells = function(terminalEdges)
+	{
+		var steps = this.data.steps || [];
+		var seen = {};
+		var cells = [];
+
+		for (var i = 0; i < steps.length; i++)
+		{
+			var step = steps[i];
+
+			for (var key in step)
+			{
+				// Skip top-level scalars (wait) and non-cell action keys
+				if (key == 'wait' || key == 'open')
+				{
+					continue;
+				}
+
+				var sel = step[key];
+
+				if (typeof sel === 'object' && sel != null)
+				{
+					var refs = this.graph.getCellsForAction(sel, true);
+
+					// Transient visibility steps also hide the connected
+					// edges (updateTransientTerminalEdges), so the opacity
+					// snapshot must cover those as well.
+					if (terminalEdges && (key == 'toggle' ||
+						key == 'show' || key == 'hide'))
+					{
+						refs = this.graph.addAllEdges(refs);
+					}
+
+					for (var j = 0; j < refs.length; j++)
+					{
+						if (!seen[refs[j].id])
+						{
+							seen[refs[j].id] = true;
+							cells.push(refs[j]);
+						}
+					}
+				}
+			}
+		}
+
+		return cells;
+	};
+
+	/**
+	 * Snapshots the DOM opacity of every cell referenced by any step so
+	 * stop() and the next loop iteration can restore it exactly. An existing
+	 * snapshot is extended, not replaced: nodes already recorded keep their
+	 * first value, so a dialog preview session that snapshots again for
+	 * steps added or retargeted since it started restores those cells too
+	 * instead of leaving them faded (Kym, 2026-09-02).
+	 */
+	Editor.AnimationPlayer.prototype.snapshotOpacity = function()
+	{
+		var cells = this.collectReferencedCells(true);
+		var nodes = this.graph.getNodesForCells(cells);
+		var recorded = new Set();
+
+		if (this.snapshot == null)
+		{
+			this.snapshot = [];
+		}
+		else
+		{
+			for (var i = 0; i < this.snapshot.length; i++)
+			{
+				recorded.add(this.snapshot[i].node);
+			}
+		}
+
+		for (var i = 0; i < nodes.length; i++)
+		{
+			if (!recorded.has(nodes[i]))
+			{
+				recorded.add(nodes[i]);
+				this.snapshot.push({
+					node: nodes[i],
+					opacity: nodes[i].style.opacity
+				});
+			}
+		}
+	};
+
+	/**
+	 * Restores DOM opacity from the most recent snapshot, clearing any
+	 * leftover CSS transitions so the restore is instant.
+	 */
+	Editor.AnimationPlayer.prototype.restoreOpacity = function()
+	{
+		if (this.snapshot == null) return;
+
+		for (var i = 0; i < this.snapshot.length; i++)
+		{
+			Graph.setTransitionForNodes([this.snapshot[i].node], null);
+			this.snapshot[i].node.style.opacity = this.snapshot[i].opacity;
+			delete this.snapshot[i].node.terminalHiddenOpacity;
+		}
+
+		this.snapshot = null;
+	};
+
+	/**
+	 * Plays the animation by dispatching its steps as a custom-action chain.
+	 *
+	 * Options:
+	 *   loop   restart from step 0 on completion
+	 *   done   callback fired when playback ends (not called between loops)
+	 */
+	Editor.AnimationPlayer.prototype.play = function(opts)
+	{
+		if (this.running)
+		{
+			return;
+		}
+
+		// Don't start on a torn-down graph (e.g. a queued autostart that
+		// fires after the view was disposed).
+		if (this.graph == null || this.graph.isGraphTornDown())
+		{
+			return;
+		}
+
+		opts = opts || {};
+		this.running = true;
+		this.cancelled = false;
+
+		// A chain still executing here belongs to a player that was just
+		// stopped (e.g. the previous page's animation on a page switch) and
+		// unwinds on its pending fade/wait timer. Clearing the stop flag
+		// would let it play its remaining steps, and the first step below would hit
+		// the "already executing" branch of executeCustomActions, which
+		// drops the call without calling done, leaving this player hung
+		// forever. iter() waits for that chain to finish instead.
+		if (!this.graph.executingCustomActions)
+		{
+			this.graph.stoppingCustomActions = false;
+		}
+
+		// Make sure cell states exist before we touch their DOM. In
+		// chromeless autoplay, `mxEvent.ROOT` fires synchronously when
+		// the file's root is set — but `view.validate()` runs later, so
+		// at the time the player starts there are no cell states yet
+		// and `getNodesForCells([...])` returns [] for everything. The
+		// first opacity step (legacy converter's implicit "hide all"
+		// prepend) would then no-op, the cells would render at full
+		// opacity, and the user would see the initial visible state
+		// before any fade kicks in. Force validation first so cell
+		// states + shape nodes exist when we snapshot and dispatch.
+		this.graph.view.validate();
+
+		var self = this;
+		var steps = this.data.steps || [];
+
+		// Run steps one batch at a time so progress callbacks
+		// (`opts.onStep`) can fire per batch. A batch is one step plus any
+		// subsequent `immediate: true` steps — they need to dispatch in the
+		// same `executeCustomActions` call for the do/while batching to
+		// pick them up. If we passed only `[steps[idx]]` per call (the
+		// previous behaviour), the next step's `immediate` flag would
+		// never be inspected and the chain would always run sequentially.
+		var runStep = function(idx, done)
+		{
+			// Graph torn down mid-playback — halt without continuing the
+			// chain (don't call done, which could restart the loop).
+			if (self.graph == null || self.graph.isGraphTornDown())
+			{
+				self.running = false;
+				return;
+			}
+
+			if (self.cancelled || idx >= steps.length)
+			{
+				done();
+				return;
+			}
+
+			// Walk forward to find the end of the immediate batch.
+			// `immediate` on `steps[idx]` itself is ignored (no previous
+			// step to be parallel with) — same semantics as the
+			// `actions[0]` case in `executeCustomActions`.
+			var endIdx = idx + 1;
+			while (endIdx < steps.length &&
+				steps[endIdx].immediate === true &&
+				!self.cancelled)
+			{
+				endIdx++;
+			}
+
+			if (typeof opts.onStep == 'function')
+			{
+				// Pass both the start and the exclusive end so the
+				// dialog can highlight the whole parallel batch at
+				// once. Single-step (sequential) calls pass
+				// (idx, idx+1) — same effect as the legacy single-arg
+				// form, which the dialog accepts as a fallback.
+				try { opts.onStep(idx, endIdx); } catch (e) {}
+			}
+
+			self.graph.executeCustomActions(
+				Graph.flattenAnimationActions(steps.slice(idx, endIdx)),
+				function() { runStep(endIdx, done); },
+				null);
+		};
+
+		var iter = function()
+		{
+			// Stop the loop if the graph was torn down mid-playback —
+			// snapshotOpacity / runStep would otherwise touch a dead view.
+			if (self.graph == null || self.graph.isGraphTornDown())
+			{
+				self.running = false;
+				return;
+			}
+
+			if (self.cancelled)
+			{
+				self.restoreOpacity();
+				self.running = false;
+				return;
+			}
+
+			// Waits for a previous chain to finish unwinding (see above).
+			// It resets both flags when it ends.
+			if (self.graph.executingCustomActions)
+			{
+				window.setTimeout(iter, 20);
+				return;
+			}
+
+			// A caller that seeded a snapshot owns the restore: the dialog's
+			// Preview button seeds an empty one so the restore-on-done below
+			// is a no-op and the canvas stays at the final state until Reset
+			// (the session snapshot restores it). Snapshotting here anyway
+			// undid every opacity effect the moment the last step finished.
+			// The loop restore nulls the snapshot, so a looping player still
+			// snapshots afresh on each pass.
+			if (self.snapshot == null)
+			{
+				self.snapshotOpacity();
+			}
+
+			runStep(0, function()
+			{
+				if (self.cancelled)
+				{
+					self.restoreOpacity();
+					self.running = false;
+					return;
+				}
+
+				// Clear any step highlight (-1 means "no step active")
+				if (typeof opts.onStep == 'function')
+				{
+					try { opts.onStep(-1); } catch (e) {}
+				}
+
+				if (opts.loop)
+				{
+					// Refresh redraws edges so flow animations restart cleanly
+					self.graph.refresh();
+					self.restoreOpacity();
+					window.setTimeout(iter, 0);
+				}
+				else
+				{
+					self.running = false;
+					self.restoreOpacity();
+					if (opts.done != null) opts.done();
+				}
+			});
+		};
+
+		// In chromeless autostart, play() runs synchronously from the
+		// mxEvent.ROOT handler that fires inside file.open() — i.e.
+		// BEFORE the lightbox's initial fit (lightboxFit/chromelessResize
+		// run later in EditorUi.fileLoaded). Running the first step now
+		// would let that fit clobber a leading `viewbox`/`scroll` step
+		// (the "first step is skipped" symptom). Deferring the first tick
+		// lets the synchronous fileLoaded flow — including the fit —
+		// finish first. iter() guards on `cancelled`, so a stop() before
+		// the tick fires is safe.
+		if (opts.defer)
+		{
+			window.setTimeout(iter, 0);
+		}
+		else
+		{
+			iter();
+		}
+	};
+
+	/**
+	 * Stops playback. The currently-running custom-action chain notices
+	 * stoppingCustomActions and unwinds with short-circuited delays; the
+	 * iter() callback then runs restoreOpacity.
+	 */
+	Editor.AnimationPlayer.prototype.stop = function()
+	{
+		this.cancelled = true;
+
+		if (this.graph != null)
+		{
+			this.graph.stoppingCustomActions = true;
+		}
+
+		// Stop flow animations on every edge we may have touched. Edges keep
+		// their CSS class until explicitly removed — restoreOpacity only
+		// resets opacity, not stroke-dasharray / class.
+		var edges = [];
+		var refs = this.collectReferencedCells();
+
+		for (var i = 0; i < refs.length; i++)
+		{
+			if (this.graph.getModel().isEdge(refs[i]))
+			{
+				edges.push(refs[i]);
+			}
+		}
+
+		if (edges.length > 0)
+		{
+			Editor.toggleFlowAnimation(this.graph, edges, 'stop');
+		}
+	};
+
+	/**
+	 * Toggles SVG flow animation on the path elements for the given edges.
+	 * The path is given the mxEdgeFlow CSS class which renders a moving
+	 * dash via CSS keyframes.
+	 */
+	Editor.toggleFlowAnimation = function(graph, cells, status)
+	{
+		status = status || 'toggle';
+
+		for (var i = 0; i < cells.length; i++)
+		{
+			if (!graph.getModel().isEdge(cells[i]))
+			{
+				continue;
+			}
+
+			var state = graph.view.getState(cells[i]);
+
+			if (state == null || state.shape == null)
+			{
+				continue;
+			}
+
+			// Shape-aware path selection (skips the hidden hit/tolerance
+			// paths, finds the rough.js stroke of sketch=1 edges and honors
+			// shape overrides like PipeShape) - the previous hardcoded
+			// paths[1] hit the invisible plain hit path on sketch edges.
+			var path = (state.shape.getFlowAnimationPath != null) ?
+				state.shape.getFlowAnimationPath() : null;
+
+			if (path == null)
+			{
+				continue;
+			}
+
+			var hasFlow = path.getAttribute('class') == 'mxEdgeFlow';
+			var enable = (status == 'start') ||
+				(status == 'toggle' && !hasFlow);
+			var disable = (status == 'stop') ||
+				(status == 'toggle' && hasFlow);
+			var dashed = mxUtils.getValue(state.style,
+				mxConstants.STYLE_DASHED, '0') == '1';
+
+			if (disable)
+			{
+				path.removeAttribute('class');
+
+				if (!dashed)
+				{
+					path.removeAttribute('stroke-dasharray');
+				}
+			}
+			else if (enable)
+			{
+				path.setAttribute('class', 'mxEdgeFlow');
+
+				if (!dashed)
+				{
+					path.setAttribute('stroke-dasharray', '8');
+				}
+			}
+		}
+	};
+
+	/**
+	 * Plays the animation attached to the given page's model root. The value
+	 * can be either the new JSON format ({steps:[...]} or {animation:{...}})
+	 * or the legacy text format — parseAnimationData sniffs and converts.
+	 * Returns a new AnimationPlayer, or null if nothing is attached.
+	 *
+	 * `loop` defaults to whatever the data carries (legacy text animations
+	 * and JSON without an explicit `loop` field default to true — the
+	 * legacy chromeless animation plugin always looped). Callers can
+	 * override either way via `opts.loop`.
+	 */
+	Editor.playAnimationOnGraph = function(graph, opts)
+	{
+		var root = graph.getModel().getRoot();
+		var raw = null;
+
+		if (root.value != null && typeof(root.value) == 'object')
+		{
+			raw = root.value.getAttribute('animation');
+		}
+
+		if (raw == null || raw == '')
+		{
+			return null;
+		}
+
+		var data;
+
+		try
+		{
+			data = Editor.parseAnimationData(raw);
+		}
+		catch (e)
+		{
+			// Malformed JSON in the stored attribute (e.g. hand-edited
+			// XML) — treat as no animation rather than throwing on load.
+			return null;
+		}
+
+		if (!data.steps || data.steps.length == 0)
+		{
+			return null;
+		}
+
+		// `enabled: false` is the dialog's "keep the script but don't
+		// autoplay" toggle — equivalent to deleting the steps for runtime
+		// purposes, but preserves them on disk so the user can flip the
+		// toggle back on later without re-authoring.
+		if (data.enabled === false)
+		{
+			return null;
+		}
+
+		// Default loop from the data unless the caller forced a value.
+		// data.loop is normalized to boolean by parseAnimationData (true
+		// when missing) so this is a simple precedence chain.
+		var playOpts = {};
+
+		if (opts != null)
+		{
+			for (var k in opts) playOpts[k] = opts[k];
+		}
+
+		if (playOpts.loop == null)
+		{
+			playOpts.loop = data.loop;
+		}
+
+		// This is the chromeless/file-attached autostart path, which runs
+		// from the mxEvent.ROOT handler before the lightbox's initial fit.
+		// Defer the first step so the fit can't clobber a leading viewbox/
+		// scroll step (see AnimationPlayer.play). Callers can override.
+		if (playOpts.defer == null)
+		{
+			playOpts.defer = true;
+		}
+
+		var player = new Editor.AnimationPlayer(graph, data);
+		player.play(playOpts);
+
+		return player;
+	};
+
+	/**
+	 * Installs the CSS keyframes required by the flow animation.
+	 */
+	Editor.installAnimationStyles = function()
+	{
+		if (Editor.animationStylesInstalled)
+		{
+			return;
+		}
+
+		Editor.animationStylesInstalled = true;
+
+		try
+		{
+			var style = document.createElement('style');
+			style.type = 'text/css';
+			style.appendChild(document.createTextNode(
+				'.mxEdgeFlow { animation: mxEdgeFlow 0.5s linear infinite; }' +
+				'@keyframes mxEdgeFlow { to { stroke-dashoffset: -16; } }'));
+			document.getElementsByTagName('head')[0].appendChild(style);
+		}
+		catch (e)
+		{
+			// ignore
+		}
+	};
+
+	Editor.installAnimationStyles();
 })();

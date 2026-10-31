@@ -83,7 +83,7 @@ mxElbowEdgeHandler.prototype.createBends = function()
 
 /**
  * Function: createVirtualBends
- * 
+ *
  * Returns null.
  */
 mxElbowEdgeHandler.prototype.createVirtualBends = function()
@@ -169,8 +169,8 @@ mxElbowEdgeHandler.prototype.convertPoint = function(point, gridEnabled)
 		point.y = this.graph.snap(point.y);
 	}
 	
-	point.x = Math.round(point.x / scale - tr.x - origin.x);
-	point.y = Math.round(point.y / scale - tr.y - origin.y);
+	point.x = this.roundLength(point.x / scale - tr.x - origin.x);
+	point.y = this.roundLength(point.y / scale - tr.y - origin.y);
 	
 	return point;
 };
@@ -232,7 +232,9 @@ mxElbowEdgeHandler.prototype.redrawInnerBends = function(p0, pe)
 
 	this.bends[1].bounds = bounds;
 	this.bends[1].redraw();
-	
+
+	this.setInnerBendsOpacity(this.bends, 1, 2);
+
 	if (this.manageLabelHandle)
 	{
 		this.checkLabelHandle(this.bends[1].bounds);

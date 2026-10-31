@@ -28,6 +28,14 @@ mxUtils.extend(mxRackContainer, mxShape);
 
 mxRackContainer.prototype.unitSize = 20;
 
+/**
+ * Variable: maxUnits
+ *
+ * Maximum number of numbered units in the racks. Also limits the number of
+ * ducts in cable ducts and routing banks. Default is 1000.
+ */
+mxRackContainer.prototype.maxUnits = 1000;
+
 mxRackContainer.prototype.cst = 
 {
 		SHAPE_RACK_CONTAINER : 'mxgraph.rackGeneral.container',
@@ -50,6 +58,19 @@ mxRackContainer.prototype.customProperties = [
 	},
 	{name: 'rackUnitSize', dispName: 'Unit size', type: 'int'}
 ];
+
+/**
+ * Function: getUnitSize
+ * 
+ * Returns the unit size of the rack.
+ */
+mxRackContainer.prototype.getUnitSize = function()
+{
+	var unitSize = parseFloat(mxUtils.getValue(this.style, 'rackUnitSize', mxRackContainer.prototype.unitSize));
+
+	// Ignores invalid and tiny unit sizes to limit the number of units
+	return (unitSize >= 1) ? unitSize : mxRackContainer.prototype.unitSize;
+};
 
 /**
  * Function: paintVertexShape
@@ -118,7 +139,7 @@ mxRackContainer.prototype.sideText = function(c, w, h, fontSize)
 {
 	var fontColor = mxUtils.getValue(this.style, mxRackContainer.prototype.cst.TEXT_COLOR, '#666666');
 	var displayNumbers = mxUtils.getValue(this.style, mxRackContainer.prototype.cst.NUMBER_DISPLAY, mxRackContainer.prototype.cst.DIR_ASC);
-	var unitSize = parseFloat(mxUtils.getValue(this.style, 'rackUnitSize', mxRackContainer.prototype.unitSize));
+	var unitSize = this.getUnitSize();
 	this.unitSize = unitSize;
 	
 	c.setFontSize(fontSize);
@@ -126,8 +147,9 @@ mxRackContainer.prototype.sideText = function(c, w, h, fontSize)
 
 	// Calculate number of units
 	var units = Math.floor((Math.abs(h) - 42) / unitSize);
+	var count = Math.min(units, mxRackContainer.prototype.maxUnits);
 
-	for (var i = 0; i < units; i++)
+	for (var i = 0; i < count; i++)
 	{
 		var displayNumber = (displayNumbers === mxRackContainer.prototype.cst.DIR_DESC) ? (i + 1).toString() : (units - i).toString();
 		c.text(-fontSize, 21 + unitSize * 0.5 + i * unitSize, 0, 0, displayNumber, mxConstants.ALIGN_CENTER, mxConstants.ALIGN_MIDDLE, 0, null, 0, 0, 0);
@@ -135,7 +157,7 @@ mxRackContainer.prototype.sideText = function(c, w, h, fontSize)
 
 	c.begin();
 
-	for (var i = 0; i < units + 1; i++)
+	for (var i = 0; i < count + 1; i++)
 	{
 		c.moveTo(-2 * fontSize, 21 + i * unitSize);
 		c.lineTo(0, 21 + i * unitSize);
@@ -256,7 +278,7 @@ mxRackHorCableDuct.prototype.foreground = function(c, w, h)
 	// Divide the space equally with 33 between each duct
 	var spaceBuffer = 20;
 	var unitSpacing = 33;
-	var unitsAcross = Math.floor((w - spaceBuffer) / unitSpacing);
+	var unitsAcross = Math.min(Math.floor((w - spaceBuffer) / unitSpacing), mxRackContainer.prototype.maxUnits);
 	var buffer = spaceBuffer / 2 + Math.floor(((w - spaceBuffer) - unitsAcross * unitSpacing) / 2);
 
 	if (unitsAcross > 0)
@@ -311,14 +333,45 @@ mxRackHorRoutingBank.prototype.background = function(c, w, h)
 	c.fillAndStroke();
 };
 
+/**
+ * Function: getUnitSize
+ * 
+ * Returns the unit size of the parent rack or the default unit size.
+ */
+mxRackHorRoutingBank.prototype.getUnitSize = function()
+{
+	var unitSize = mxRackContainer.prototype.unitSize;
+
+	if (this.state != null)
+	{
+		var parent = this.state.view.getState(this.state.view.graph.model.getParent(this.state.cell));
+
+		if (parent != null && parent.shape != null && typeof parent.shape.getUnitSize === 'function')
+		{
+			unitSize = parent.shape.getUnitSize();
+		}
+		else if (parent != null)
+		{
+			unitSize = parseFloat(mxUtils.getValue(parent.style, 'rackUnitSize', unitSize));
+		}
+	}
+
+	// Ignores invalid and tiny unit sizes to limit the number of ducts
+	return (unitSize >= 1) ? unitSize : mxRackContainer.prototype.unitSize;
+};
+
 mxRackHorRoutingBank.prototype.foreground = function(c, w, h)
 {
 	// Divide the space equally with 33 between each duct
 	var spaceBuffer = 20;
 	var unitSpacing = 22;
 	var rectWidth = 16;
-	var unitsAcross = Math.floor((w - spaceBuffer - rectWidth) / unitSpacing);
-	var unitsDown = Math.floor(h / mxRackContainer.unitSize);
+	var unitSize = this.getUnitSize();
+	var maxUnits = mxRackContainer.prototype.maxUnits;
+	var unitsAcross = Math.min(Math.floor((w - spaceBuffer - rectWidth) / unitSpacing), maxUnits);
+
+	// Tolerates rounding errors of scaled and snapped heights and limits the number of ducts
+	var unitsDown = Math.min(Math.floor(h / unitSize + 0.001), Math.ceil(maxUnits / (unitsAcross + 1)));
 
 	if (unitsAcross > 0 && unitsDown > 0)
 	{
@@ -328,7 +381,7 @@ mxRackHorRoutingBank.prototype.foreground = function(c, w, h)
 
 			for (var j = 0; j <= unitsAcross; j++)
 			{
-				c.rect(buffer, 4 + (i * mxRackContainer.unitSize), rectWidth, 6.8);
+				c.rect(buffer, 4 + (i * unitSize), rectWidth, 6.8);
 				c.stroke();
 				
 				buffer += unitSpacing;
@@ -351,14 +404,18 @@ function mxRackNeatPatch(bounds, fill, stroke, strokewidth)
 */
 mxUtils.extend(mxRackNeatPatch, mxShape);
 
-mxRackNeatPatch.prototype.cst = 
+mxRackNeatPatch.prototype.cst =
 {
 		SHAPE_RACK_NEAT_PATCH : 'mxgraph.rackGeneral.neatPatch'
 };
 
+mxRackNeatPatch.prototype.customProperties = [
+	{name: 'bodyColor', dispName: 'Body Color', defVal: '#666666', type: 'color', primary:true}
+];
+
 /**
 * Function: paintVertexShape
-* 
+*
 * Paints the vertex shape.
 */
 mxRackNeatPatch.prototype.paintVertexShape = function(c, x, y, w, h)
@@ -371,7 +428,7 @@ mxRackNeatPatch.prototype.paintVertexShape = function(c, x, y, w, h)
 
 mxRackNeatPatch.prototype.background = function(c, w, h)
 {
-	c.setFillColor('#666666');
+	c.setFillColor(mxUtils.getValue(this.style, 'bodyColor', '#666666'));
 	c.rect(0, 0, w, h);
 	c.fillAndStroke();
 };
@@ -479,19 +536,20 @@ mxRackRackNumbering.prototype.sideText = function(c, w, h, unitNum, unitH, fontS
 {
 	var fontColor = mxUtils.getValue(this.style, mxRackRackNumbering.prototype.cst.TEXT_COLOR, '#666666');
 	var numDir = mxUtils.getValue(this.style, mxRackRackNumbering.prototype.cst.NUM_DIR, mxRackRackNumbering.prototype.cst.DIR_DESC);
+	var count = Math.min(unitNum, mxRackContainer.prototype.maxUnits);
 	c.setFontSize(fontSize);
 	c.setFontColor(fontColor);
 
 	if (numDir === mxRackRackNumbering.prototype.cst.DIR_ASC)
 	{
-		for (var i = 0; i < unitNum; i++)
+		for (var i = 0; i < count; i++)
 		{
 			c.text(fontSize, unitH * 0.5 + i * unitH, 0, 0, (i + 1).toString(), mxConstants.ALIGN_CENTER, mxConstants.ALIGN_MIDDLE, 0, null, 0, 0, 0);
 		};
 	}
 	else
 	{
-		for (var i = 0; i < unitNum; i++)
+		for (var i = 0; i < count; i++)
 		{
 			c.text(fontSize, h - unitH * 0.5 - i * unitH, 0, 0, (i + 1).toString(), mxConstants.ALIGN_CENTER, mxConstants.ALIGN_MIDDLE, 0, null, 0, 0, 0);
 		};
@@ -501,7 +559,7 @@ mxRackRackNumbering.prototype.sideText = function(c, w, h, unitNum, unitH, fontS
 
 	c.begin();
 
-	for (var i = 0; i < unitNum + 1; i++)
+	for (var i = 0; i < count + 1; i++)
 	{
 		c.moveTo(0, i * unitH);
 		c.lineTo(fontSize * 3, i * unitH);
@@ -562,6 +620,19 @@ mxRackRackCabinet.prototype.customProperties = [
 
 
 /**
+ * Function: getUnitSize
+ * 
+ * Returns the unit size of the rack.
+ */
+mxRackRackCabinet.prototype.getUnitSize = function()
+{
+	var unitSize = parseFloat(mxUtils.getValue(this.style, mxRackRackCabinet.prototype.cst.UNIT_HEIGHT, '14.8'));
+
+	// Ignores invalid and tiny unit sizes to limit the number of units
+	return (unitSize >= 1) ? unitSize : 14.8;
+};
+
+/**
  * Function: paintVertexShape
  * 
  * Paints the vertex shape.
@@ -569,7 +640,7 @@ mxRackRackCabinet.prototype.customProperties = [
 mxRackRackCabinet.prototype.paintVertexShape = function(c, x, y, w, h)
 {
 	var unitNum = parseFloat(mxUtils.getValue(this.style, mxRackRackCabinet.prototype.cst.UNIT_NUM, '12'));
-	var unitH = parseFloat(mxUtils.getValue(this.style, mxRackRackCabinet.prototype.cst.UNIT_HEIGHT, '14.8'));
+	var unitH = this.getUnitSize();
 	var fontSize = parseFloat(mxUtils.getValue(this.style, mxRackRackCabinet.prototype.cst.TEXT_SIZE, '12'));
 	var numDisp = mxUtils.getValue(this.style, mxRackRackCabinet.prototype.cst.NUMBER_DISPLAY, mxRackRackCabinet.prototype.cst.ON);
 
@@ -625,19 +696,20 @@ mxRackRackCabinet.prototype.sideText = function(c, h, unitNum, unitH, fontSize, 
 {
 	var fontColor = mxUtils.getValue(this.style, mxRackRackCabinet.prototype.cst.TEXT_COLOR, '#666666');
 	var startUnit = mxUtils.getValue(this.style, 'startUnit', 1);
+	var count = Math.min(unitNum, mxRackContainer.prototype.maxUnits);
 	c.setFontSize(fontSize);
 	c.setFontColor(fontColor);
 
 	if (numDisp === mxRackRackCabinet.prototype.cst.DIR_ASC)
 	{
-		for (var i = 0; i < unitNum; i++)
+		for (var i = 0; i < count; i++)
 		{
 			c.text(-fontSize, 21 + unitH * 0.5 + i * unitH, 0, 0, (i + startUnit).toString(), mxConstants.ALIGN_CENTER, mxConstants.ALIGN_MIDDLE, 0, null, 0, 0, 0);
 		};
 	}
-	else if (numDisp === mxRackRackCabinet.prototype.cst.DIR_DESC || numDisp === mxRackRackCabinet.prototype.cst.DIR_ON)
+	else if (numDisp === mxRackRackCabinet.prototype.cst.DIR_DESC || numDisp === mxRackRackCabinet.prototype.cst.ON)
 	{
-		for (var i = 0; i < unitNum; i++)
+		for (var i = 0; i < count; i++)
 		{
 			c.text(-fontSize, h - 21 - unitH * 0.5 - i * unitH, 0, 0, (i + startUnit).toString(), mxConstants.ALIGN_CENTER, mxConstants.ALIGN_MIDDLE, 0, null, 0, 0, 0);
 		};
@@ -647,7 +719,7 @@ mxRackRackCabinet.prototype.sideText = function(c, h, unitNum, unitH, fontSize, 
 
 	c.begin();
 
-	for (var i = 0; i < unitNum + 1; i++)
+	for (var i = 0; i < count + 1; i++)
 	{
 		c.moveTo(-2 * fontSize, 21 + i * unitH);
 		c.lineTo(0, 21 + i * unitH);
@@ -709,6 +781,19 @@ mxRackRackCabinet2.prototype.customProperties = [
 
 
 /**
+ * Function: getUnitSize
+ * 
+ * Returns the unit size of the rack.
+ */
+mxRackRackCabinet2.prototype.getUnitSize = function()
+{
+	var unitSize = parseFloat(mxUtils.getValue(this.style, mxRackRackCabinet2.prototype.cst.UNIT_HEIGHT, '14.8'));
+
+	// Ignores invalid and tiny unit sizes to limit the number of units
+	return (unitSize >= 1) ? unitSize : 14.8;
+};
+
+/**
  * Function: paintVertexShape
  * 
  * Paints the vertex shape.
@@ -716,7 +801,7 @@ mxRackRackCabinet2.prototype.customProperties = [
 mxRackRackCabinet2.prototype.paintVertexShape = function(c, x, y, w, h)
 {
 	var unitNum = parseFloat(mxUtils.getValue(this.style, mxRackRackCabinet2.prototype.cst.UNIT_NUM, '12'));
-	var unitH = parseFloat(mxUtils.getValue(this.style, mxRackRackCabinet2.prototype.cst.UNIT_HEIGHT, '14.8'));
+	var unitH = this.getUnitSize();
 	var fontSize = parseFloat(mxUtils.getValue(this.style, mxRackRackCabinet2.prototype.cst.TEXT_SIZE, '12'));
 	var numDisp = mxUtils.getValue(this.style, mxRackRackCabinet2.prototype.cst.NUMBER_DISPLAY, mxRackRackCabinet2.prototype.cst.ON);
 
@@ -775,19 +860,20 @@ mxRackRackCabinet2.prototype.sideText = function(c, h, unitNum, unitH, fontSize,
 {
 	var fontColor = mxUtils.getValue(this.style, mxRackRackCabinet2.prototype.cst.TEXT_COLOR, '#666666');
 	var startUnit = mxUtils.getValue(this.style, 'startUnit', 1);
+	var count = Math.min(unitNum, mxRackContainer.prototype.maxUnits);
 	c.setFontSize(fontSize);
 	c.setFontColor(fontColor);
 
 	if (numDisp === mxRackRackCabinet2.prototype.cst.DIR_ASC)
 	{
-		for (var i = 0; i < unitNum; i++)
+		for (var i = 0; i < count; i++)
 		{
 			c.text(-fontSize, 21 + unitH * 0.5 + i * unitH, 0, 0, (i + startUnit).toString(), mxConstants.ALIGN_CENTER, mxConstants.ALIGN_MIDDLE, 0, null, 0, 0, 0);
 		};
 	}
-	else if (numDisp === mxRackRackCabinet2.prototype.cst.DIR_DESC || numDisp === mxRackRackCabinet2.prototype.cst.DIR_ON)
+	else if (numDisp === mxRackRackCabinet2.prototype.cst.DIR_DESC || numDisp === mxRackRackCabinet2.prototype.cst.ON)
 	{
-		for (var i = 0; i < unitNum; i++)
+		for (var i = 0; i < count; i++)
 		{
 			c.text(-fontSize, h - 21 - unitH * 0.5 - i * unitH, 0, 0, (i + startUnit).toString(), mxConstants.ALIGN_CENTER, mxConstants.ALIGN_MIDDLE, 0, null, 0, 0, 0);
 		};
@@ -797,7 +883,7 @@ mxRackRackCabinet2.prototype.sideText = function(c, h, unitNum, unitH, fontSize,
 
 	c.begin();
 
-	for (var i = 0; i < unitNum + 1; i++)
+	for (var i = 0; i < count + 1; i++)
 	{
 		c.moveTo(-2 * fontSize, 21 + i * unitH);
 		c.lineTo(0, 21 + i * unitH);
@@ -842,9 +928,33 @@ mxRackRackCabinet3.prototype.cst =
 		TEXT_SIZE : 'textSize'
 };
 
+// Updates the child layout margins so that the 33px allowance for the
+// numbering column (9px frame + 24px numbers) is on the numbered side
+mxRackRackCabinet3.updateNumberMargins = function(graph, dirLeft, numDisp)
+{
+	var cells = graph.getSelectionCells();
+
+	for (var i = 0; i < cells.length; i++)
+	{
+		var style = graph.getCellStyle(cells[i]);
+		var left = (dirLeft != null) ? dirLeft != '0' :
+			mxUtils.getValue(style, 'rackUnitDirLeft', 1) != 0;
+		var margin = (((numDisp != null) ? numDisp :
+			mxUtils.getValue(style, 'numDisp', 'descend')) == 'off') ? 9 : 33;
+
+		graph.setCellStyles('marginLeft', (left) ? margin : 9, [cells[i]]);
+		graph.setCellStyles('marginRight', (left) ? 9 : margin, [cells[i]]);
+	}
+};
+
 mxRackRackCabinet3.prototype.customProperties = [
 	{name: 'startUnit', dispName: 'Starting unit', type: 'int', defVal: 1},
-	{name: 'rackUnitDirLeft', dispName: 'Numbering on left', type: 'boolean', defVal: true},
+	{name: 'rackUnitDirLeft', dispName: 'Numbering on left', type: 'boolean', defVal: true,
+		onChange: function(graph, newValue)
+		{
+			mxRackRackCabinet3.updateNumberMargins(graph, newValue, null);
+		}
+	},
 	{name: 'rackUnitSize', dispName: 'Unit height', type: 'float', defVal: 14.8},
 	{name: 'fillColor2', dispName: 'Panel Color', type: 'color', defVal: '#ffffff', primary: true},
 	{name: 'textColor', dispName: 'Number text color', type: 'color', defVal: '#666666', primary: true},
@@ -853,11 +963,24 @@ mxRackRackCabinet3.prototype.customProperties = [
 		enumList: [{val: 'off', dispName: 'Off'}, {val: 'ascend', dispName: 'Ascending'}, {val: 'descend', dispName: 'Descending'}],
 		onChange: function(graph, newValue)
 		{
-			graph.setCellStyles('marginLeft', (newValue == 'off') ? 9 : 33, graph.getSelectionCells());
+			mxRackRackCabinet3.updateNumberMargins(graph, null, newValue);
 		}
 	}
 ];
 
+
+/**
+ * Function: getUnitSize
+ * 
+ * Returns the unit size of the rack.
+ */
+mxRackRackCabinet3.prototype.getUnitSize = function()
+{
+	var unitSize = parseFloat(mxUtils.getValue(this.style, mxRackRackCabinet3.prototype.cst.UNIT_HEIGHT, '14.8'));
+
+	// Ignores invalid and tiny unit sizes to limit the number of units
+	return (unitSize >= 1) ? unitSize : 14.8;
+};
 
 /**
  * Function: paintVertexShape
@@ -866,7 +989,7 @@ mxRackRackCabinet3.prototype.customProperties = [
  */
 mxRackRackCabinet3.prototype.paintVertexShape = function(c, x, y, w, h)
 {
-	var unitH = parseFloat(mxUtils.getValue(this.style, mxRackRackCabinet3.prototype.cst.UNIT_HEIGHT, '14.8'));
+	var unitH = this.getUnitSize();
 	var unitNum = Math.round((h - 42) / unitH);
 	var fontSize = parseFloat(mxUtils.getValue(this.style, mxRackRackCabinet3.prototype.cst.TEXT_SIZE, '12'));
 	var numDisp = mxUtils.getValue(this.style, mxRackRackCabinet3.prototype.cst.NUMBER_DISPLAY, mxRackRackCabinet3.prototype.cst.ON);
@@ -935,6 +1058,7 @@ mxRackRackCabinet3.prototype.sideText = function(c, h, w, unitNum, unitH, fontSi
 {
 	var fontColor = mxUtils.getValue(this.style, mxRackRackCabinet3.prototype.cst.TEXT_COLOR, '#666666');
 	var startUnit = mxUtils.getValue(this.style, 'startUnit', 1);
+	var count = Math.min(unitNum, mxRackContainer.prototype.maxUnits);
 	c.setFontSize(fontSize);
 	c.setFontColor(fontColor);
 	var x = 0;
@@ -945,14 +1069,14 @@ mxRackRackCabinet3.prototype.sideText = function(c, h, w, unitNum, unitH, fontSi
 
 	if (numDisp === mxRackRackCabinet3.prototype.cst.DIR_ASC)
 	{
-		for (var i = 0; i < unitNum; i++)
+		for (var i = 0; i < count; i++)
 		{
 			c.text(x - fontSize, 21 + unitH * 0.5 + i * unitH, 0, 0, (i + startUnit).toString(), mxConstants.ALIGN_CENTER, mxConstants.ALIGN_MIDDLE, 0, null, 0, 0, 0);
 		};
 	}
-	else if (numDisp === mxRackRackCabinet3.prototype.cst.DIR_DESC || numDisp === mxRackRackCabinet3.prototype.cst.DIR_ON)
+	else if (numDisp === mxRackRackCabinet3.prototype.cst.DIR_DESC || numDisp === mxRackRackCabinet3.prototype.cst.ON)
 	{
-		for (var i = 0; i < unitNum; i++)
+		for (var i = 0; i < count; i++)
 		{
 			c.text(x - fontSize, h - 21 - unitH * 0.5 - i * unitH, 0, 0, (i + startUnit).toString(), mxConstants.ALIGN_CENTER, mxConstants.ALIGN_MIDDLE, 0, null, 0, 0, 0);
 		};
@@ -962,7 +1086,7 @@ mxRackRackCabinet3.prototype.sideText = function(c, h, w, unitNum, unitH, fontSi
 
 	c.begin();
 
-	for (var i = 0; i < unitNum + 1; i++)
+	for (var i = 0; i < count + 1; i++)
 	{
 		c.moveTo(x - 2 * fontSize, 21 + i * unitH);
 		c.lineTo(x, 21 + i * unitH);
@@ -1473,14 +1597,18 @@ function mxRackChannelBase(bounds, fill, stroke, strokewidth)
  */
 mxUtils.extend(mxRackChannelBase, mxShape);
 
-mxRackChannelBase.prototype.cst = 
+mxRackChannelBase.prototype.cst =
 {
 		SHAPE_RACK_CHANNEL_BASE : 'mxgraph.rackGeneral.channelBase'
 };
 
+mxRackChannelBase.prototype.customProperties = [
+	{name: 'footColor', dispName: 'Foot Color', defVal: '#000000', type: 'color', primary:true}
+];
+
 /**
  * Function: paintVertexShape
- * 
+ *
  * Paints the vertex shape.
  */
 mxRackChannelBase.prototype.paintVertexShape = function(c, x, y, w, h)
@@ -1506,7 +1634,7 @@ mxRackChannelBase.prototype.background = function(c, w, h)
 
 mxRackChannelBase.prototype.foreground = function(c, w, h)
 {
-	c.setFillColor('#000000');
+	c.setFillColor(mxUtils.getValue(this.style, 'footColor', '#000000'));
 	c.rect(10, h - 15, 5, 15);
 	c.fillAndStroke();
 	c.rect(w - 15, h - 15, 5, 15);

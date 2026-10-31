@@ -110,18 +110,16 @@ mxShapeAndroidTabBar.prototype.background = function(c, w, h, buttonNum, buttonW
 	//draw the button separators
 	c.setStrokeColor(separatorColor);
 	c.begin();
+	// Sum of the widths of the buttons before the separator
+	var sumWidth = 0;
+
 	for (var i = 1; i < buttonNum; i++)
 	{
+		sumWidth += buttonWidths[i - 1] + 2 * labelOffset;
+
 		if (i !== selectedButton && i !== (selectedButton + 1))
 		{
-			var currWidth = 0;
-
-			for (var j = 0; j < i; j++)
-			{
-				currWidth += buttonWidths[j] + 2 * labelOffset;
-			}
-
-			currWidth = currWidth * w / minW;
+			var currWidth = sumWidth * w / minW;
 			c.moveTo(currWidth, h * 0.2);
 			c.lineTo(currWidth, h * 0.8);
 		}
@@ -241,9 +239,13 @@ function mxShapeAndroidStatusBar(bounds, fill, stroke, strokewidth)
 */
 mxUtils.extend(mxShapeAndroidStatusBar, mxShape);
 
+mxShapeAndroidStatusBar.prototype.customProperties = [
+	{name: 'batteryColor', dispName: 'Battery Color', defVal: '#444444', type: 'color', primary:true}
+];
+
 /**
 * Function: paintVertexShape
-* 
+*
 * Paints the vertex shape.
 */
 mxShapeAndroidStatusBar.prototype.paintVertexShape = function(c, x, y, w, h)
@@ -269,7 +271,7 @@ mxShapeAndroidStatusBar.prototype.foreground = function(c, x, y, w, h)
 	c.setFontSize(mxUtils.getValue(this.style, mxConstants.STYLE_FONTSIZE, '5'));
 	c.text(w - 30, h * 0.5 + 1, 0, 0, '12:00', mxConstants.ALIGN_LEFT, mxConstants.ALIGN_MIDDLE, 0, null, 0, 0, 0);
 
-	c.setFillColor('#444444');
+	c.setFillColor(mxUtils.getValue(this.style, 'batteryColor', '#444444'));
 	c.begin();
 	c.moveTo(w - 37, h * 0.5 + 6);
 	c.lineTo(w - 37, h * 0.5 - 5);
@@ -720,9 +722,13 @@ function mxShapeAndroidIndeterminateSpinner(bounds, fill, stroke, strokewidth)
 */
 mxUtils.extend(mxShapeAndroidIndeterminateSpinner, mxShape);
 
+mxShapeAndroidIndeterminateSpinner.prototype.customProperties = [
+	{name: 'spinnerColor', dispName: 'Spinner Color', defVal: '#ffffff', type: 'color', primary:true}
+];
+
 /**
 * Function: paintVertexShape
-* 
+*
 * Paints the vertex shape.
 */
 mxShapeAndroidIndeterminateSpinner.prototype.paintVertexShape = function(c, x, y, w, h)
@@ -733,7 +739,37 @@ mxShapeAndroidIndeterminateSpinner.prototype.paintVertexShape = function(c, x, y
 
 mxShapeAndroidIndeterminateSpinner.prototype.background = function(c, x, y, w, h)
 {
-	c.setGradient('#aaaaaa', '#dddddd', w * 0.325, 0, w * 0.675, h * 0.5, mxConstants.DIRECTION_SOUTH, 1, 1);
+	var spinnerColor = mxUtils.getValue(this.style, 'spinnerColor', 'none');
+	var darkStop, midStop, brightStop;
+
+	if (spinnerColor !== 'none')
+	{
+		// Derive shaded variants from spinnerColor.
+		// 0.67 and 0.87 chosen so a white input reproduces the original #aaaaaa / #dddddd.
+		var hex = spinnerColor.charAt(0) === '#' ? spinnerColor.substr(1) : spinnerColor;
+		if (hex.length === 3) hex = hex.charAt(0) + hex.charAt(0) + hex.charAt(1) + hex.charAt(1) + hex.charAt(2) + hex.charAt(2);
+		var r = parseInt(hex.substr(0, 2), 16);
+		var g = parseInt(hex.substr(2, 2), 16);
+		var b = parseInt(hex.substr(4, 2), 16);
+		var shade = function(factor)
+		{
+			var sr = Math.floor(r * factor);
+			var sg = Math.floor(g * factor);
+			var sb = Math.floor(b * factor);
+			return '#' + ('0' + sr.toString(16)).slice(-2) + ('0' + sg.toString(16)).slice(-2) + ('0' + sb.toString(16)).slice(-2);
+		};
+		darkStop = shade(0.67);
+		midStop = shade(0.87);
+		brightStop = spinnerColor;
+	}
+	else
+	{
+		darkStop = '#aaaaaa';
+		midStop = '#dddddd';
+		brightStop = '#ffffff';
+	}
+
+	c.setGradient(darkStop, midStop, w * 0.325, 0, w * 0.675, h * 0.5, mxConstants.DIRECTION_SOUTH, 1, 1);
 	c.begin();
 	c.moveTo(w * 0.5, h * 0.1);
 	c.arcTo(w * 0.4, h * 0.4, 0, 0, 0, w * 0.5, h * 0.9);
@@ -742,7 +778,7 @@ mxShapeAndroidIndeterminateSpinner.prototype.background = function(c, x, y, w, h
 	c.close();
 	c.fill();
 
-	c.setGradient('#ffffff', '#dddddd', w * 0.325, 0, w * 0.675, h * 0.5, mxConstants.DIRECTION_SOUTH, 1, 1);
+	c.setGradient(brightStop, midStop, w * 0.325, 0, w * 0.675, h * 0.5, mxConstants.DIRECTION_SOUTH, 1, 1);
 	c.begin();
 	c.moveTo(w * 0.5, h * 0.1);
 	c.arcTo(w * 0.4, h * 0.4, 0, 0, 1, w * 0.5, h * 0.9);

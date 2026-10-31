@@ -25,47 +25,11 @@ var mxClient =
 	VERSION: '@MXGRAPH-VERSION@',
 
 	/**
-	 * Variable: IS_IE
-	 *
-	 * True if the current browser is Internet Explorer 10 or below. Use <mxClient.IS_IE11>
-	 * to detect IE 11.
-	 */
-	IS_IE: navigator.userAgent != null && navigator.userAgent.indexOf('MSIE') >= 0,
-
-	/**
-	 * Variable: IS_IE11
-	 *
-	 * True if the current browser is Internet Explorer 11.x.
-	 */
-	IS_IE11: navigator.userAgent != null && !!navigator.userAgent.match(/Trident\/7\./),
-
-	/**
 	 * Variable: IS_EDGE
 	 *
 	 * True if the current browser is Microsoft Edge.
 	 */
 	IS_EDGE: navigator.userAgent != null && !!navigator.userAgent.match(/Edge\//),
-
-	/**
-	 * Variable: IS_EM
-	 * 
-	 * True if the browser is IE11 in enterprise mode (IE8 standards mode).
-	 */
-	IS_EM: 'spellcheck' in document.createElement('textarea') && document.documentMode == 8,
-
-	/**
-	 * Variable: VML_PREFIX
-	 * 
-	 * Prefix for VML namespace in node names. Default is 'v'.
-	 */
-	VML_PREFIX: 'v',
-
-	/**
-	 * Variable: OFFICE_PREFIX
-	 * 
-	 * Prefix for VML office namespace in node names. Default is 'o'.
-	 */
-	OFFICE_PREFIX: 'o',
 
 	/**
 	 * Variable: IS_NS
@@ -525,7 +489,7 @@ if (typeof(mxLanguage) != 'undefined' && mxLanguage != null)
 }
 else
 {
-	mxClient.language = (mxClient.IS_IE) ? navigator.userLanguage : navigator.language;
+	mxClient.language = navigator.language;
 }
 
 /**
@@ -647,26 +611,9 @@ if (mxForceIncludes || !(typeof module === 'object' && module.exports != null))
 	mxClient.include(mxClient.basePath + '/shape/mxSwimlane.js');
 	mxClient.include(mxClient.basePath + '/layout/mxGraphLayout.js');
 	mxClient.include(mxClient.basePath + '/layout/mxStackLayout.js');
-	mxClient.include(mxClient.basePath + '/layout/mxPartitionLayout.js');
-	mxClient.include(mxClient.basePath + '/layout/mxCompactTreeLayout.js');
-	mxClient.include(mxClient.basePath + '/layout/mxRadialTreeLayout.js');
-	mxClient.include(mxClient.basePath + '/layout/mxFastOrganicLayout.js');
 	mxClient.include(mxClient.basePath + '/layout/mxCircleLayout.js');
 	mxClient.include(mxClient.basePath + '/layout/mxParallelEdgeLayout.js');
 	mxClient.include(mxClient.basePath + '/layout/mxCompositeLayout.js');
-	mxClient.include(mxClient.basePath + '/layout/mxEdgeLabelLayout.js');
-	mxClient.include(mxClient.basePath + '/layout/hierarchical/model/mxGraphAbstractHierarchyCell.js');
-	mxClient.include(mxClient.basePath + '/layout/hierarchical/model/mxGraphHierarchyNode.js');
-	mxClient.include(mxClient.basePath + '/layout/hierarchical/model/mxGraphHierarchyEdge.js');
-	mxClient.include(mxClient.basePath + '/layout/hierarchical/model/mxGraphHierarchyModel.js');
-	mxClient.include(mxClient.basePath + '/layout/hierarchical/model/mxSwimlaneModel.js');
-	mxClient.include(mxClient.basePath + '/layout/hierarchical/stage/mxHierarchicalLayoutStage.js');
-	mxClient.include(mxClient.basePath + '/layout/hierarchical/stage/mxMedianHybridCrossingReduction.js');
-	mxClient.include(mxClient.basePath + '/layout/hierarchical/stage/mxMinimumCycleRemover.js');
-	mxClient.include(mxClient.basePath + '/layout/hierarchical/stage/mxCoordinateAssignment.js');
-	mxClient.include(mxClient.basePath + '/layout/hierarchical/stage/mxSwimlaneOrdering.js');
-	mxClient.include(mxClient.basePath + '/layout/hierarchical/mxHierarchicalLayout.js');
-	mxClient.include(mxClient.basePath + '/layout/hierarchical/mxSwimlaneLayout.js');
 	mxClient.include(mxClient.basePath + '/model/mxGraphModel.js');
 	mxClient.include(mxClient.basePath + '/model/mxCell.js');
 	mxClient.include(mxClient.basePath + '/model/mxGeometry.js');

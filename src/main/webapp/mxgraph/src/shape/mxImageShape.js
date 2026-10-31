@@ -126,6 +126,16 @@ mxImageShape.prototype.createHtml = function()
  */
 mxImageShape.prototype.isRoundable = function()
 {
+	return true;
+};
+
+/**
+ * Function: isGlassable
+ *
+ * Disables inherited glass support.
+ */
+mxImageShape.prototype.isGlassable = function()
+{
 	return false;
 };
 
@@ -134,9 +144,20 @@ mxImageShape.prototype.isRoundable = function()
  * 
  * Returns the image to be rendered.
  */
-mxImageShape.prototype.getImageDataUri = function()
+mxImageShape.prototype.getImageDataUri = function(c)
 {
 	return this.image;
+};
+
+/**
+ * Function: getImageCssVars
+ *
+ * Returns the optional CSS declarations to be applied to the image
+ * content in the given canvas.
+ */
+mxImageShape.prototype.getImageCssVars = function(c)
+{
+	return null;
 };
 
 /**
@@ -158,23 +179,61 @@ mxImageShape.prototype.paintVertexShape = function(c, x, y, w, h)
 {
 	if (this.image != null)
 	{
+		var r = (this.isRounded) ? this.getArcSize(w, h) : 0;
+
 		if (this.imageBackground != null)
 		{
 			// Stroke rendering required for shadow
 			c.setFillColor(this.imageBackground);
 			c.setStrokeColor(this.imageBorder);
-			c.rect(x, y, w, h);
+
+			if (r > 0)
+			{
+				c.roundrect(x, y, w, h, r, r);
+			}
+			else
+			{
+				c.rect(x, y, w, h);
+			}
+
 			c.fillAndStroke();
 		}
-		
+
 		// FlipH/V are implicit via mxShape.updateTransform
-		c.image(x, y, w, h, this.getImageDataUri(), this.preserveImageAspect, false, false, this.clipPath);
-		
+		var clip = this.clipPath;
+
+		if (r > 0)
+		{
+			var roundVal = ' round ' + (r * 100 / Math.min(w, h)) + '%';
+
+			if (clip != null && clip.substring(0, 5) == 'inset' &&
+				clip.indexOf('round') < 0)
+			{
+				clip = clip.replace(')', roundVal + ')');
+			}
+			else if (clip == null)
+			{
+				clip = 'inset(0% 0% 0% 0%' + roundVal + ')';
+			}
+		}
+
+		c.image(x, y, w, h, this.getImageDataUri(c), this.preserveImageAspect, false, false, clip,
+			this.getImageCssVars(c));
+
 		if (this.imageBorder != null)
 		{
 			c.setShadow(false);
 			c.setStrokeColor(this.imageBorder);
-			c.rect(x, y, w, h);
+
+			if (r > 0)
+			{
+				c.roundrect(x, y, w, h, r, r);
+			}
+			else
+			{
+				c.rect(x, y, w, h);
+			}
+
 			c.stroke();
 		}
 	}

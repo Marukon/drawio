@@ -335,7 +335,7 @@
 					w * 70, h * 45, '', 'Meaning', null, null, this.getTagsForStencil(gn, '', dt + 'meaning').join(' ')),
 			this.createVertexTemplateEntry(am + 'application;appType=amValue;archiType=oct;', 
 					w * 150, h * 75, 'Value', 'Value', null, null, this.getTagsForStencil(gn, '', dt + 'value').join(' ')),
-			this.createVertexTemplateEntry('shape=ellipse;html=1;whiteSpace=wrap;fillColor=#CCCCFF;', 
+			this.createVertexTemplateEntry('shape=ellipse;perimeter=ellipsePerimeter;html=1;whiteSpace=wrap;fillColor=#CCCCFF;', 
 					w * 70, h * 35, '', 'Value', null, null, this.getTagsForStencil(gn, '', dt + 'value').join(' '))
 		];
 			
@@ -498,7 +498,7 @@
 					w * 150, h * 75, 'Communication Network', 'Communication Network', null, null, this.getTagsForStencil(gn, '', dt + 'communication network').join(' ')),
 			this.createVertexTemplateEntry(am + 'network;', 
 					w * 65, h * 50, '', 'Communication Network', null, null, this.getTagsForStencil(gn, '', dt + 'communication network').join(' ')),
-			this.createVertexTemplateEntry(am + 'application;appType=func;archiType=square;', 
+			this.createVertexTemplateEntry(am + 'application;appType=func;archiType=rounded;', 
 					w * 150, h * 75, 'Technology Function', 'Technology Function', null, null, this.getTagsForStencil(gn, '', dt + 'function').join(' ')),
 			this.createVertexTemplateEntry(am + 'function;', 
 					w * 60, h * 40, '', 'Function', null, null, this.getTagsForStencil(gn, '', dt + 'function').join(' ')),

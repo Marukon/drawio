@@ -11,7 +11,6 @@
  *
  * - dev=1: For developers only
  * - test=1: For developers only
- * - export=URL for export: For developers only
  * - ignoremime=1: For developers only (see DriveClient.js). Use Cmd-S to override mime.
  * - createindex=1: For developers only (see etc/build/README)
  * - filesupport=0: For developers only (see Editor.js in core)
@@ -51,7 +50,7 @@ if (window.location.hash != null && window.location.hash.substring(0, 2) == '#P'
         if (urlParams.hash != null)
         {
             window.location.hash = urlParams.hash;
-            delete urlparams.hash;
+            delete urlParams.hash;
         }
 
         for (var key in params)
@@ -99,6 +98,32 @@ if (urlParams['dev'] != '1')
                 window.location.href = href;
             }
         }
+    })();
+}
+
+// Opens Microsoft 365 files from viewer links in the app. Links from before
+// 31.5.3 use the viewer, whose Azure app has no /ms365 redirect URI, so the
+// sign-in fails with AADSTS50011 [jgraph/drawio#5663]. The target host is
+// fixed and frames are not redirected because the app only allows framing
+// by itself and Microsoft hosts.
+var mxM365Redirect = urlParams['dev'] != '1' &&
+    window.location.hostname == 'viewer.diagrams.net' &&
+    window.location.hash.substring(0, 2) == '#M' &&
+    window.top === window;
+
+if (mxM365Redirect)
+{
+    (function()
+    {
+        var search = window.location.search;
+
+        // The viewer host forces lightbox mode
+        if (!/[?&]lightbox=1(&|$)/.test(search))
+        {
+            search = ((search.length > 1) ? search + '&' : '?') + 'lightbox=1';
+        }
+
+        window.location.replace('https://app.diagrams.net/' + search + window.location.hash);
     })();
 }
 
@@ -219,7 +244,7 @@ function mxinclude(src)
         mxmeta(null, 'default-src \'self\'; script-src \'self\' \'sha256-6g514VrT/cZFZltSaKxIVNFF46+MFaTSDTPB8WfYK+c=\' ' +
             (urlParams['dev'] != '1' ? '' : ' \'unsafe-eval\'') + '; ' +
             'connect-src \'self\' https://*.draw.io https://*.diagrams.net https://fonts.googleapis.com https://fonts.gstatic.com; ' +
-            'img-src * data:; media-src *; font-src * data:; frame-src \'none\'; style-src \'self\' \'unsafe-inline\' ' +
+            'img-src * data:; media-src *; font-src * data:; frame-src \'self\'; style-src \'self\' \'unsafe-inline\' ' +
             'https://fonts.googleapis.com; base-uri \'none\';child-src \'self\';object-src \'none\';', 'Content-Security-Policy');
     }
 })();
@@ -234,6 +259,32 @@ try
 catch (e)
 {
     // ignored
+}
+
+// Release channel: ?channel=stable pins this browser to the stable channel
+// before any login (enterprise onboarding link), ?channel=beta clears the
+// pin (the next daily login check of a listed domain switches it back).
+// Stored here so the service worker registration in App.main sees it on
+// this same load.
+if (isLocalStorage && urlParams['channel'] != null)
+{
+    try
+    {
+        if (urlParams['channel'] == 'stable')
+        {
+            localStorage.setItem('.drawio-channel', 'stable');
+        }
+        else if (urlParams['channel'] == 'beta')
+        {
+            localStorage.removeItem('.drawio-channel');
+        }
+
+        localStorage.removeItem('.drawio-channel-ts');
+    }
+    catch (e)
+    {
+        // ignored
+    }
 }
 
 var mxScriptsLoaded = false, mxWinLoaded = false;
@@ -282,11 +333,18 @@ if (urlParams['dev'] == '1')
     {
         mxscript('js/desktop/DesktopLibrary.js');
         mxscript('js/desktop/ElectronApp.js');
+
+        // ELK, Mermaid and PlantUML are loaded by Devel.js above. Do not
+        // load js/elk/drawio-elk.min.js again here: re-running its footer
+        // (var ElkLayout = ELK.ElkLayout) replaces the class after the
+        // ElkLayout.js editor statics have attached, breaking Arrange >
+        // Layout with "ElkLayout.runWithDialog is not a function".
     }
-    
+
     mxscript(drawDevUrl + 'js/PostConfig.js');
 }
-else
+// Skips the app while the page is redirected
+else if (!mxM365Redirect)
 {
     (function()
     {
@@ -316,7 +374,22 @@ else
                                 {
                                     mxscript('js/shapes-14-6-5.min.js', function()
                                     {
-                                        mxscript('js/PostConfig.js');
+                                        // ELK and Mermaid ship inside extensions.min.js
+                                        // above (elk bundle, then the ElkLayout editor
+                                        // statics, then mermaid). Loading
+                                        // js/elk/drawio-elk.min.js again would re-run its
+                                        // footer (var ElkLayout = ELK.ElkLayout) and swap
+                                        // in a bare class without the statics, breaking
+                                        // Arrange > Layout with "ElkLayout.runWithDialog
+                                        // is not a function" [jgraph/drawio-desktop#2471].
+                                        // Only PlantUML is not in extensions.min.js; it
+                                        // is preloaded here and EditorUi.loadPlantUml
+                                        // skips its own load once mxPlantUmlToDrawio is
+                                        // defined.
+                                        mxscript('js/plantuml/drawio-plantuml.min.js', function()
+                                        {
+                                            mxscript('js/PostConfig.js');
+                                        });
                                     });
                                 });
                             });
