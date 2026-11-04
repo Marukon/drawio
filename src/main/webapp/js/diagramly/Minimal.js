@@ -49,13 +49,14 @@ EditorUi.initMinimalTheme = function()
 			{
 				var x = Math.max(10, ui.diagramContainer.clientWidth - 248);
 				var y = 60;
-				var h = Math.min(566, graph.container.clientHeight - 10);
+				var h = Math.min(600, graph.container.clientHeight - 10);
+				var format = null;
 
 				ui.formatWindow = new WrapperWindow(ui, '', x, y, 240, h,
 					function(container)
 				{
 					container.className = 'geSidebarContainer geFormatContainer';
-					var format = ui.createFormat(container);
+					format = ui.createFormat(container);
 					format.init();
 				});
 
@@ -67,6 +68,12 @@ EditorUi.initMinimalTheme = function()
 				ui.formatWindow.window.addListener(mxEvent.SHOW, mxUtils.bind(this, function()
 				{
 					ui.formatWindow.window.fit();
+
+					// Changes while the window was hidden were not shown (see Format.immediateRefresh)
+					if (format != null)
+					{
+						format.refresh();
+					}
 				}));
 				
 				ui.formatWindow.window.minimumSize = new mxRectangle(0, 0, 240, 80);
@@ -81,27 +88,25 @@ EditorUi.initMinimalTheme = function()
 		{
 			if (ui.formatElt == null)
 			{
+				// Like the format window, in the column of the format panel
+				// of the editor (see .geEditor)
 				ui.formatElt = ui.createSidebarContainer();
+				ui.formatElt.classList.add('geFormatContainer');
 				var format = ui.createFormat(ui.formatElt);
 				format.init();
 				ui.formatElt.style.border = 'none';
 				ui.formatElt.style.width = '240px';
 				ui.formatElt.style.borderLeftWidth = '1px';
 				ui.formatElt.style.borderLeftStyle = 'solid';
-				ui.formatElt.style.right = '0px';
 			}
-
-			var wrapper = ui.diagramContainer.parentNode;
 
 			if (ui.formatElt.parentNode != null)
 			{
 				ui.formatElt.parentNode.removeChild(ui.formatElt);
-				wrapper.style.right = '0px';
 			}
 			else
 			{
-				wrapper.parentNode.appendChild(ui.formatElt);
-				wrapper.style.right = ui.formatElt.style.width;
+				ui.diagramContainer.parentNode.appendChild(ui.formatElt);
 			}
 		}
 	};
@@ -158,23 +163,27 @@ EditorUi.initMinimalTheme = function()
 			if (ui.sidebarElt == null)
 			{
 				ui.sidebarElt = ui.createSidebarContainer();
-				ui.createShapesPanel(ui.sidebarElt);
+
+				// The shapes panel adds its buttons to the parent of its content
+				// like in the shapes window (see WrapperWindow)
+				var content = document.createElement('div');
+				content.style.width = '100%';
+				content.style.height = '100%';
+				ui.sidebarElt.appendChild(content);
+				ui.createShapesPanel(content);
 				ui.sidebarElt.style.border = 'none';
 				ui.sidebarElt.style.width = '210px';
 				ui.sidebarElt.style.borderRight = '1px solid gray';
 			}
 
-			var wrapper = ui.diagramContainer.parentNode;
-
+			// In the column of the shapes of the editor (see .geEditor)
 			if (ui.sidebarElt.parentNode != null)
 			{
 				ui.sidebarElt.parentNode.removeChild(ui.sidebarElt);
-				wrapper.style.left = '0px';
 			}
 			else
 			{
-				wrapper.parentNode.appendChild(ui.sidebarElt);
-				wrapper.style.left = ui.sidebarElt.style.width;
+				ui.diagramContainer.parentNode.appendChild(ui.sidebarElt);
 			}
 		}
 	};
@@ -267,7 +276,8 @@ EditorUi.initMinimalTheme = function()
     EditorUi.prototype.isFormatPanelVisible = function()
     {
 		return (this.formatWindow != null && this.formatWindow.window.isVisible()) ||
-			(this.formatWindow == null && this.formatWidth > 0);
+			(this.formatWindow == null && this.formatElt != null &&
+			this.formatElt.parentNode != null);
     };
 	
 	// Initializes the user interface
@@ -301,7 +311,7 @@ EditorUi.initMinimalTheme = function()
 		{
 			var iw = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 
-			if (iw >= 1000 && this.sidebarWindow != null)
+			if (iw >= 1000 && this.sidebarWindow != null && this.sidebarEnabled)
             {
                 this.sidebarWindow.window.setVisible(true);
             }
@@ -338,6 +348,26 @@ EditorUi.initMinimalTheme = function()
 				div.parentNode.removeChild(div);
 			}
 		}));
+	};
+
+	/**
+	 * Tab order: the toolbar at the top, the shapes, the diagram, the format
+	 * window and the page tabs with the zoom (see EditorUi.getTabStops). The
+	 * shapes and the format are panels without windows (see toggleShapes).
+	 */
+	EditorUi.prototype.getTabRegions = function()
+	{
+		return [this.minimalMenubarElt, (this.sidebarWindow != null) ?
+			this.sidebarWindow.window.div : this.sidebarElt, this.editor.graph.container,
+			this.getFormatRegion(), this.tabContainer];
+	};
+
+	/**
+	 * The format panel is the format window, or the panel without windows.
+	 */
+	EditorUi.prototype.getFormatRegion = function()
+	{
+		return (this.formatWindow != null) ? this.formatWindow.window.div : this.formatElt;
 	};
 
 	var formatWindowInitialized = false;
@@ -401,8 +431,8 @@ EditorUi.initMinimalTheme = function()
 		
 		this.sidebar = this.createSidebar(this.sidebarContainer);
 		
-		if (iw >= 1000 || urlParams['clibs'] != null || urlParams['libs'] != null ||
-			urlParams['search-shapes'] != null)
+		if (urlParams['sidebar'] != '0' && (iw >= 1000 || urlParams['clibs'] != null || urlParams['libs'] != null ||
+			urlParams['search-shapes'] != null))
 		{
 			toggleShapes(this, true);
 			
@@ -413,7 +443,7 @@ EditorUi.initMinimalTheme = function()
 			}
 		}
 		
-		if (EditorUi.windowed && iw >= 1000)
+		if (this.formatEnabled && EditorUi.windowed && iw >= 1000)
 		{
 			toggleFormat(this, true);
 			this.formatWindow.window.setVisible(true);
@@ -425,15 +455,17 @@ EditorUi.initMinimalTheme = function()
 		ui.toolbar = this.createToolbar(ui.createDiv('geToolbar'));
 		var menubar = document.createElement('div');
 		menubar.className = 'geMenubarContainer';
+		ui.minimalMenubarElt = menubar;
 		var menuObj = new Menubar(ui, menubar);
 
 		function addMenu(id, small, img)
 		{
 			var menu = ui.menus.get(id);
 
-			var elt = menuObj.addMenu(mxResources.get(id), mxUtils.bind(this, function()
+			var elt = menuObj.addMenu(mxResources.get(id), mxUtils.bind(this, function(popupMenu, parent)
 			{
 				menu.funct.apply(this, arguments);
+				ui.menus.appendPluginMenuItems(id, popupMenu, parent);
 			}));
             
 			elt.className = 'geButton';
@@ -474,8 +506,8 @@ EditorUi.initMinimalTheme = function()
                 mxEvent.consume(evt);
             });
 
-			mxEvent.preventDefault(btn);
-            
+			ui.initKeyboardButton(btn);
+
             if (tooltip != null)
             {
                 btn.setAttribute('title', tooltip);
@@ -557,11 +589,15 @@ EditorUi.initMinimalTheme = function()
 		
 		// Hides popup menus
 		var uiHideCurrentMenu = ui.hideCurrentMenu;
-		
+
 		ui.hideCurrentMenu = function()
 		{
 			uiHideCurrentMenu.apply(this, arguments);
-			this.editor.graph.popupMenuHandler.hideMenu();
+
+			if (this.editor != null)
+			{
+				this.editor.graph.popupMenuHandler.hideMenu();
+			}
 		};
 
 		// Connects the status bar to the editor status
@@ -663,7 +699,7 @@ EditorUi.initMinimalTheme = function()
 		ui.container.appendChild(menubar);
 		ui.updateTabContainer();
 
-		if (!EditorUi.windowed && iw >= 1000)
+		if (this.formatEnabled && !EditorUi.windowed && iw >= 1000)
 		{
 			toggleFormat(this, true);
 		}
@@ -671,8 +707,17 @@ EditorUi.initMinimalTheme = function()
         function refreshMenu()
         {
 			iw = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+			
+			// Measure embed button width before clearing menubar
+			var embedOffset = 0;
+
+			if (urlParams['embed'] == '1' && ui.buttonContainer != null)
+			{
+				embedOffset = ui.buttonContainer.offsetWidth || 300;
+			}
+
 			menubar.innerHTML = '';
-			var small = iw < 1000;
+			var small = iw < 1000 + embedOffset;
 			var appElt = addMenu('diagram', null, (small) ? Editor.menuImage : null);
 
 			createGroup([appElt, addMenuItem(mxResources.get('shapes'), ui.actions.get('toggleShapes').funct, null,
@@ -680,7 +725,7 @@ EditorUi.initMinimalTheme = function()
 				addMenuItem(mxResources.get('format'), ui.actions.get('format').funct, null,
 				mxResources.get('format') + ' (' + ui.actions.get('format').shortcut + ')', ui.actions.get('image'),
 				(small) ? Editor.formatImage : null)]);
-		
+
 			var insertElt = addMenu('insert', true, (small) ? insertImage : null);
 			createGroup([insertElt, addMenuItem(mxResources.get('delete'), ui.actions.get('delete').funct,
 				null, mxResources.get('delete'), ui.actions.get('delete'),
@@ -690,7 +735,7 @@ EditorUi.initMinimalTheme = function()
 			{
 				insertElt.setAttribute('disabled', 'disabled');
 			}
-			
+
 			undoElt.setAttribute('title', mxResources.get('undo') +
 				' (' + undoAction.shortcut + ')');
 			redoElt.setAttribute('title', mxResources.get('redo') +
@@ -698,17 +743,17 @@ EditorUi.initMinimalTheme = function()
 			fitElt.setAttribute('title', mxResources.get('fit') +
 				' (' + Editor.ctrlKey + '+H)');
 
-			if (iw >= 411)
+			if (iw >= 411 + embedOffset)
 			{
 				createGroup([undoElt, redoElt]);
-	
-				if (iw >= 520)
+
+				if (iw >= 520 + embedOffset)
 				{
 					createGroup([fitElt,
-						(iw >= 640) ? addMenuItem('', zoomInAction.funct, true,
+						(iw >= 640 + embedOffset) ? addMenuItem('', zoomInAction.funct, true,
 							mxResources.get('zoomIn') + ' (' + Editor.ctrlKey + ' +)',
 							zoomInAction, Editor.zoomInImage) : null,
-						(iw >= 640) ? addMenuItem('', zoomOutAction.funct, true,
+						(iw >= 640 + embedOffset) ? addMenuItem('', zoomOutAction.funct, true,
 							mxResources.get('zoomOut') + ' (' + Editor.ctrlKey + ' -)',
 							zoomOutAction, Editor.zoomOutImage) : null]);
 				}
@@ -757,14 +802,14 @@ EditorUi.initMinimalTheme = function()
             	ui.menus.tagsWindow.window.fit();
             }
 
-            if (ui.menus.findWindow != null)
+            if (ui.findWindow != null)
             {
-            	ui.menus.findWindow.window.fit();
+            	ui.findWindow.window.fit();
             }
 
-            if (ui.menus.findReplaceWindow != null)
+            if (ui.findReplaceWindow != null)
             {
-            	ui.menus.findReplaceWindow.window.fit();
+            	ui.findReplaceWindow.window.fit();
             }
 		});
 	};

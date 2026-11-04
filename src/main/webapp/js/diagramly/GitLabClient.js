@@ -17,6 +17,13 @@ window.GitLabClient = function(editorUi)
 mxUtils.extend(GitLabClient, GitHubClient);
 
 /**
+ * Default GitLab server URL. Retained as an immutable class constant so the
+ * "has the URL been overridden?" check is not affected by Init.js mutating
+ * window.DRAWIO_GITLAB_URL in response to the ?gitlab= URL parameter.
+ */
+GitLabClient.DEFAULT_URL = 'https://gitlab.com';
+
+/**
  * Gitlab Client ID, see https://gitlab.com/oauth/applications/135239
  */
 GitLabClient.prototype.clientId = DRAWIO_GITLAB_ID;
@@ -44,10 +51,46 @@ GitLabClient.prototype.authToken = 'Bearer';
 GitLabClient.prototype.redirectUri = window.DRAWIO_SERVER_URL + 'gitlab';
 
 /**
+ * Sets the token of this client. Overrides GitHubClient.setToken so that the
+ * GitLab token is not stored as the token of the GitHub client.
+ */
+GitLabClient.prototype.setToken = function(token)
+{
+	_token = token;
+};
+
+/**
+ * Adds the authorization header with the GitLab token to the given request
+ * (used in the inherited GitHubClient.updateUser).
+ */
+GitLabClient.prototype.authorizeRequest = function(req)
+{
+	var temp = this.authToken + ' ' + _token;
+
+	req.setRequestHeaders = function(request, params)
+	{
+		request.setRequestHeader('Authorization', temp);
+	};
+};
+
+/**
  * Authorizes the client, gets the userId and calls <open>.
  */
 GitLabClient.prototype.authenticate = function(success, error)
 {
+	if (DRAWIO_GITLAB_URL !== GitLabClient.DEFAULT_URL && !Editor.enableCustomGitLabUrl)
+	{
+		this.ui.showDialog(new CustomGitLabUrlWarningDialog(
+			this.ui, DRAWIO_GITLAB_URL).container, 420, null, true, true);
+
+		if (error != null)
+		{
+			error({message: mxResources.get('accessDenied')});
+		}
+
+		return;
+	}
+
 	var req = new mxXmlRequest(this.redirectUri + '?getState=1', null, 'GET');
 	
 	req.send(mxUtils.bind(this, function(req)
@@ -75,7 +118,7 @@ GitLabClient.prototype.authenticateStep2 = function(state, success, error)
 			
 			if (authRemembered != null)
 			{
-				var req = new mxXmlRequest(this.redirectUri + '?state=' + encodeURIComponent('cId=' + this.clientId + '&domain=' + window.location.host + '&token=' + state), null, 'GET'); //To identify which app/domain is used
+				var req = new mxXmlRequest(this.redirectUri + '?state=' + encodeURIComponent('cId=' + this.clientId + '&domain=' + window.location.host + '&token=' + state + this.getRedirectPathState()), null, 'GET'); //To identify which app/domain is used
 				
 				req.send(mxUtils.bind(this, function(req)
 				{
@@ -84,7 +127,6 @@ GitLabClient.prototype.authenticateStep2 = function(state, success, error)
 						try
 						{
 							_token = JSON.parse(req.getText()).access_token;
-							this.setToken(_token);
 							this.setUser(null);
 							success();
 						}
@@ -98,7 +140,6 @@ GitLabClient.prototype.authenticateStep2 = function(state, success, error)
 						this.clearPersistentToken();
 						this.setUser(null);
 						_token = null;
-						this.setToken(null);
 
 						if (req.getStatus() == 401) // (Unauthorized) [e.g, invalid refresh token]
 						{
@@ -119,11 +160,11 @@ GitLabClient.prototype.authenticateStep2 = function(state, success, error)
 						this.clientId + '&scope=' + this.scope + 
 						'&redirect_uri=' + encodeURIComponent(this.redirectUri) +
 						'&response_type=code&state=' + encodeURIComponent('cId=' + this.clientId + //To identify which app/domain is used
-							'&domain=' + window.location.host + '&token=' + state) , 'gitlabauth'); 
+							'&domain=' + window.location.host + '&token=' + state + '&relay=1' + this.getRedirectPathState()) , 'gitlabauth');
 					
 					if (win != null)
 					{
-						window.onGitLabCallback = mxUtils.bind(this, function(newAuthInfo, authWindow)
+						window.onGitLabCallback = this.createAuthCallback(state, mxUtils.bind(this, function(newAuthInfo, authWindow)
 						{
 							if (acceptAuthResponse)
 							{
@@ -142,7 +183,6 @@ GitLabClient.prototype.authenticateStep2 = function(state, success, error)
 									}
 									
 									_token = newAuthInfo.access_token;
-									this.setToken(_token);
 									this.setUser(null);
 									
 									if (remember)
@@ -162,7 +202,7 @@ GitLabClient.prototype.authenticateStep2 = function(state, success, error)
 							{
 								authWindow.close();
 							}
-						});
+						}));
 					}
 					else
 					{
@@ -376,7 +416,8 @@ GitLabClient.prototype.getRefIndex = function(tokens, isFolder, success, error, 
 };
 
 /**
- * Checks if the client is authorized and calls the next step.
+ * Loads the file with the given path and passes a GitLabFile, or a
+ * GitLabLibrary if asLibrary is true, to success.
  */
 GitLabClient.prototype.getFile = function(path, success, error, asLibrary, checkExists, knownRefPos)
 {
@@ -451,10 +492,9 @@ GitLabClient.prototype.getFile = function(path, success, error, asLibrary, check
 };
 
 /**
- * Translates this point by the given vector.
- * 
- * @param {number} dx X-coordinate of the translation.
- * @param {number} dy Y-coordinate of the translation.
+ * Returns the content of the given file object. Base64 content is decoded
+ * and images and PDFs are converted to data URIs unless a PNG contains a
+ * diagram.
  */
 GitLabClient.prototype.getFileContent = function(data)
 {
@@ -501,10 +541,8 @@ GitLabClient.prototype.getFileContent = function(data)
 };
 
 /**
- * Translates this point by the given vector.
- * 
- * @param {number} dx X-coordinate of the translation.
- * @param {number} dy Y-coordinate of the translation.
+ * Returns a new GitLabFile, or a GitLabLibrary if asLibrary is true, for the
+ * given repository, ref and file object.
  */
 GitLabClient.prototype.createGitLabFile = function(org, repo, ref, data, asLibrary, refPos)
 {
@@ -522,10 +560,10 @@ GitLabClient.prototype.createGitLabFile = function(org, repo, ref, data, asLibra
 };
 
 /**
- * Translates this point by the given vector.
- * 
- * @param {number} dx X-coordinate of the translation.
- * @param {number} dy Y-coordinate of the translation.
+ * Passes a new file with the given filename and data in the folder with the
+ * given ID to success. Asks the user before replacing an existing file.
+ * Libraries are committed immediately while other files are written when
+ * they are saved.
  */
 GitLabClient.prototype.insertFile = function(filename, data, success, error, asLibrary, folderId, base64Encoded)
 {
@@ -538,7 +576,7 @@ GitLabClient.prototype.insertFile = function(filename, data, success, error, asL
 		var org = tokens.slice(0, repoPos).join('/');
 		var repo = tokens[repoPos];
 		var ref = tokens[refPos];
-		path = tokens.slice(refPos + 1, tokens.length).join('/');
+		var path = tokens.slice(refPos + 1, tokens.length).join('/');
 	
 		if (path.length > 0)
 		{
@@ -599,10 +637,10 @@ GitLabClient.prototype.insertFile = function(filename, data, success, error, asL
 };
 
 /**
- * Translates this point by the given vector.
- * 
- * @param {number} dx X-coordinate of the translation.
- * @param {number} dy Y-coordinate of the translation.
+ * Passes true and the last commit ID to fn if the user confirms replacing the
+ * existing file with the given path, or true if the file does not exist. If
+ * askReplace is false, an error is shown for existing files and false is
+ * passed to fn.
  */
 GitLabClient.prototype.checkExists = function(path, askReplace, fn)
 {
@@ -677,10 +715,8 @@ GitLabClient.prototype.writeFile = function(org, repo, ref, path, message, data,
 };
 
 /**
- * Translates this point by the given vector.
- * 
- * @param {number} dx X-coordinate of the translation.
- * @param {number} dy Y-coordinate of the translation.
+ * Commits the data of the given file, as PNG for .png files, with the given
+ * message. If overwrite is true, the latest commit ID is fetched first.
  */
 GitLabClient.prototype.saveFile = function(file, success, error, overwrite, message)
 {
@@ -746,7 +782,7 @@ GitLabClient.prototype.saveFile = function(file, success, error, overwrite, mess
 };
 
 /**
- * Checks if the client is authorized and calls the next step.
+ * Shows the GitLab dialog for picking a folder.
  */
 GitLabClient.prototype.pickFolder = function(fn)
 {
@@ -783,7 +819,6 @@ GitLabClient.prototype.showGitLabDialog = function(showFiles, fn, hideNoFilesErr
 
 	var hd = document.createElement('h3');
 	mxUtils.write(hd, mxResources.get((showFiles) ? 'selectFile' : 'selectFolder'));
-	hd.style.cssText = 'width:100%;text-align:center;margin-top:0px;margin-bottom:12px';
 	content.appendChild(hd);
 
 	var div = document.createElement('div');
@@ -795,6 +830,7 @@ GitLabClient.prototype.showGitLabDialog = function(showFiles, fn, hideNoFilesErr
 	div.style.lineHeight = '1.2em';
 	div.style.height = '274px';
 	content.appendChild(div);
+	Editor.keepFocusInList(div);
 
 	var listItem = document.createElement('div');
 	listItem.style.textOverflow = 'ellipsis';
@@ -821,6 +857,7 @@ GitLabClient.prototype.showGitLabDialog = function(showFiles, fn, hideNoFilesErr
 		link.style.cursor = 'pointer';
 		mxUtils.write(link,  label);
 		mxEvent.addListener(link, 'click', fn);
+		Editor.initKeyboardButton(link);
 
 		if (underline)
 		{
@@ -936,6 +973,7 @@ GitLabClient.prototype.showGitLabDialog = function(showFiles, fn, hideNoFilesErr
 		nextPageDiv.style.display = 'block';
 		nextPageDiv.style.cursor = 'pointer';
 		mxUtils.write(nextPageDiv, mxResources.get('more') + '...');
+		Editor.initKeyboardButton(nextPageDiv);
 		
 		var nextPage = mxUtils.bind(this, function()
 		{
@@ -1081,6 +1119,7 @@ GitLabClient.prototype.showGitLabDialog = function(showFiles, fn, hideNoFilesErr
 		nextPageDiv.style.display = 'block';
 		nextPageDiv.style.cursor = 'pointer';
 		mxUtils.write(nextPageDiv, mxResources.get('more') + '...');
+		Editor.initKeyboardButton(nextPageDiv);
 		
 		var nextPage = mxUtils.bind(this, function()
 		{
@@ -1205,6 +1244,7 @@ GitLabClient.prototype.showGitLabDialog = function(showFiles, fn, hideNoFilesErr
 		nextPageDiv.style.display = 'block';
 		nextPageDiv.style.cursor = 'pointer';
 		mxUtils.write(nextPageDiv, mxResources.get('more') + '...');
+		Editor.initKeyboardButton(nextPageDiv);
 		
 		var nextPage = mxUtils.bind(this, function()
 		{
@@ -1432,7 +1472,6 @@ GitLabClient.prototype.logout = function()
 	this.clearPersistentToken();
 	this.setUser(null);
 	_token = null;
-	this.setToken(null);
 };
 
 })();

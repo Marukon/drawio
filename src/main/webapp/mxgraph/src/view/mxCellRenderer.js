@@ -36,12 +36,14 @@ function mxCellRenderer() { };
 
 /**
  * Variable: defaultShapes
- * 
+ *
  * Static array that contains the globally registered shapes which are
  * known to all instances of this class. For adding new shapes you should
- * use the static <mxCellRenderer.registerShape> function.
+ * use the static <mxCellRenderer.registerShape> function. The map has no
+ * prototype so that shape names from untrusted cell styles cannot resolve
+ * inherited members of Object.prototype (eg. __proto__ or constructor).
  */
-mxCellRenderer.defaultShapes = new Object();
+mxCellRenderer.defaultShapes = Object.create(null);
 
 /**
  * Variable: defaultEdgeShape
@@ -101,6 +103,15 @@ mxCellRenderer.prototype.minSvgStrokeWidth = 1;
  * click handler (to allow folding in disabled graphs). Default is false.
  */
 mxCellRenderer.prototype.forceControlClickHandler = false;
+
+/**
+ * Variable: minControlHitSize
+ *
+ * Minimum width and height in screen pixels of the area that handles events
+ * for the control (folding icon). The control is painted unchanged. Use 0 to
+ * disable. Default is 12.
+ */
+mxCellRenderer.prototype.minControlHitSize = 12;
 
 /**
  * Function: registerShape
@@ -282,33 +293,152 @@ mxCellRenderer.prototype.postConfigureShape = function(state)
  * Function: checkPlaceholderStyles
  * 
  * Checks if the style of the given <mxCellState> contains 'inherit',
- * 'indicated' or 'swimlane' for colors that support those keywords.
+ * 'indicated', 'swimlane', 'parentFillColor' or 'parentStrokeColor' for
+ * colors that support those keywords and if the resolved values differ
+ * from the values of the current shape or label.
  */
 mxCellRenderer.prototype.checkPlaceholderStyles = function(state)
 {
-	// LATER: Check if the color has actually changed
 	if (state.style != null)
 	{
-		if (state.style[mxConstants.STYLE_FONTSIZE] == 'inherit' ||
-			state.style[mxConstants.STYLE_FONTFAMILY] == 'inherit')
-		{
-			return true;
-		}
-		
+		var label = state.style[mxConstants.STYLE_FONTSIZE] == 'inherit' ||
+			state.style[mxConstants.STYLE_FONTFAMILY] == 'inherit';
+		var shape = false;
+
+		var values = this.placeholderValues;
 		var styles = [mxConstants.STYLE_FILLCOLOR, mxConstants.STYLE_STROKECOLOR,
 			mxConstants.STYLE_GRADIENTCOLOR, mxConstants.STYLE_FONTCOLOR];
-		var graph = state.view.graph;
-		
+
 		for (var i = 0; i < styles.length; i++)
 		{
-			if (graph.isSpecialColor(state.style[styles[i]]) >= 0)
+			if (mxUtils.indexOf(values, state.style[styles[i]]) >= 0)
 			{
-				return true;
+				if (styles[i] == mxConstants.STYLE_FONTCOLOR)
+				{
+					label = true;
+				}
+				else
+				{
+					shape = true;
+				}
 			}
 		}
+
+		return (shape && this.isPlaceholderShapeChanged(state)) ||
+			(label && this.isPlaceholderLabelChanged(state));
 	}
 	
 	return false;
+};
+
+/**
+ * Variable: placeholderValues
+ * 
+ * Color values that are resolved in <resolveColor>.
+ */
+mxCellRenderer.prototype.placeholderValues = ['inherit', 'swimlane',
+	'indicated', 'parentFillColor', 'parentStrokeColor'];
+
+/**
+ * Variable: placeholderShapeFields
+ * 
+ * Fields of the shape that are compared in <isPlaceholderShapeChanged>.
+ */
+mxCellRenderer.prototype.placeholderShapeFields = ['fill', 'gradient',
+	'stroke', 'laneFill', 'indicatorColor', 'indicatorGradientColor',
+	'indicatorStrokeColor'];
+
+/**
+ * Function: isPlaceholderShapeChanged
+ * 
+ * Returns true if configuring the shape of the given state for its current
+ * style changes any of the <placeholderShapeFields>. The configuration is
+ * applied to a temporary object so that the shape is not modified.
+ */
+mxCellRenderer.prototype.isPlaceholderShapeChanged = function(state)
+{
+	var shape = state.shape;
+
+	if (shape == null)
+	{
+		return true;
+	}
+
+	try
+	{
+		// Defaults of the fields as after resetStyles
+		var proto = Object.getPrototypeOf(shape);
+		var probe = Object.create(shape);
+
+		for (var i = 0; i < this.placeholderShapeFields.length; i++)
+		{
+			var field = this.placeholderShapeFields[i];
+			probe[field] = proto[field];
+		}
+
+		var tmp = Object.create(state);
+		tmp.shape = probe;
+		this.configureShape(tmp);
+
+		return this.isShapeConfigurationChanged(shape, probe);
+	}
+	catch (e)
+	{
+		return true;
+	}
+};
+
+/**
+ * Function: isShapeConfigurationChanged
+ * 
+ * Returns true if any of the <placeholderShapeFields> differ in the given
+ * shape and the given reconfigured temporary shape.
+ */
+mxCellRenderer.prototype.isShapeConfigurationChanged = function(shape, probe)
+{
+	for (var i = 0; i < this.placeholderShapeFields.length; i++)
+	{
+		var field = this.placeholderShapeFields[i];
+
+		if (shape[field] != probe[field])
+		{
+			return true;
+		}
+	}
+
+	return false;
+};
+
+/**
+ * Function: isPlaceholderLabelChanged
+ * 
+ * Returns true if the resolved font color, size or family of the given
+ * state differ from the values of its current label.
+ */
+mxCellRenderer.prototype.isPlaceholderLabelChanged = function(state)
+{
+	var text = state.text;
+
+	if (text == null)
+	{
+		return false;
+	}
+
+	var probe = {color: state.style[mxConstants.STYLE_FONTCOLOR],
+		size: state.style[mxConstants.STYLE_FONTSIZE],
+		family: state.style[mxConstants.STYLE_FONTFAMILY]};
+	var tmp = Object.create(state);
+	tmp.text = probe;
+
+	this.resolveColor(tmp, 'color', mxConstants.STYLE_FONTCOLOR);
+	this.inheritFontStyle(tmp, 'size', mxConstants.STYLE_FONTSIZE);
+	this.inheritFontStyle(tmp, 'family', mxConstants.STYLE_FONTFAMILY);
+
+	return (mxUtils.indexOf(this.placeholderValues, state.style[
+		mxConstants.STYLE_FONTCOLOR]) >= 0 && probe.color != text.color) ||
+		(state.style[mxConstants.STYLE_FONTSIZE] == 'inherit' &&
+		probe.size != text.size) || (state.style[mxConstants.STYLE_FONTFAMILY] ==
+		'inherit' && probe.family != text.family);
 };
 
 /**
@@ -335,7 +465,9 @@ mxCellRenderer.prototype.inheritFontStyle = function(state, field, key)
  * Function: resolveColor
  * 
  * Resolves special keywords 'inherit', 'indicated' and 'swimlane' and sets
- * the respective color on the shape.
+ * the respective color on the shape. 'parentFillColor' and
+ * 'parentStrokeColor' use the fill or stroke color of the parent, and
+ * 'fillColor' and 'strokeColor' the respective color of the cell itself.
  */
 mxCellRenderer.prototype.resolveColor = function(state, field, key)
 {
@@ -347,17 +479,18 @@ mxCellRenderer.prototype.resolveColor = function(state, field, key)
 		var graph = state.view.graph;
 		var value = shape[field];
 		var referenced = null;
+		var rfield = field;
 		
-		if (value == 'inherit' ||
-			value == mxConstants.STYLE_FILLCOLOR ||
-			value == mxConstants.STYLE_STROKECOLOR)
+		if (value == 'inherit')
 		{
 			referenced = graph.model.getParent(state.cell);
-
-			if (value != 'inherit')
-			{
-				key = value;
-			}
+		}
+		else if (value == 'parentFillColor' || value == 'parentStrokeColor')
+		{
+			referenced = graph.model.getParent(state.cell);
+			key = (value == 'parentFillColor') ? mxConstants.STYLE_FILLCOLOR :
+				mxConstants.STYLE_STROKECOLOR;
+			rfield = (value == 'parentFillColor') ? 'fill' : 'stroke';
 		}
 		else if (value == 'swimlane')
 		{
@@ -403,11 +536,9 @@ mxCellRenderer.prototype.resolveColor = function(state, field, key)
 			{
 				var rshape = (key == mxConstants.STYLE_FONTCOLOR) ? rstate.text : rstate.shape;
 				
-				if (rshape != null && field != 'indicatorColor' &&
-					value != mxConstants.STYLE_STROKECOLOR &&
-					value != mxConstants.STYLE_FILLCOLOR)
+				if (rshape != null && field != 'indicatorColor')
 				{
-					shape[field] = rshape[field];
+					shape[field] = rshape[rfield];
 				}
 				else
 				{
@@ -724,15 +855,57 @@ mxCellRenderer.prototype.createControl = function(state)
 			var b = new mxRectangle(0, 0, image.width, image.height);
 			state.control = new mxImageShape(b, image.src);
 			state.control.preserveImageAspect = false;
+			state.control.state = state;
 			state.control.dialect = graph.dialect;
 
 			this.initControl(state, state.control, true, this.createControlClickHandler(state));
+			this.addControlHitArea(state.control);
 		}
 	}
 	else if (state.control != null)
 	{
 		state.control.destroy();
 		state.control = null;
+	}
+};
+
+/**
+ * Function: addControlHitArea
+ *
+ * Adds a transparent rectangle of at least <minControlHitSize> screen pixels
+ * around the given control after each repaint so that small controls, eg.
+ * folding icons at low zoom levels, are easier to hit. The painted control
+ * is not changed.
+ *
+ * Parameters:
+ *
+ * control - <mxShape> that represents the control.
+ */
+mxCellRenderer.prototype.addControlHitArea = function(control)
+{
+	var min = this.minControlHitSize;
+
+	if (min > 0)
+	{
+		control.afterPaint = function(c)
+		{
+			this.constructor.prototype.afterPaint.apply(this, arguments);
+			var b = this.bounds;
+
+			// Minimum size is in screen pixels
+			var size = (this.inModelUnits) ? min / this.state.view.scale : min;
+
+			// SVG only as HTML controls have no canvas nodes
+			if (this.node != null && this.node.ownerSVGElement != null &&
+				b != null && (b.width < size || b.height < size))
+			{
+				var w = Math.max(b.width, size);
+				var h = Math.max(b.height, size);
+
+				this.node.appendChild(this.createTransparentSvgRectangle(
+					b.getCenterX() - w / 2, b.getCenterY() - h / 2, w, h));
+			}
+		};
 	}
 };
 
@@ -790,7 +963,11 @@ mxCellRenderer.prototype.initControl = function(state, control, handleEvents, cl
 	}
 	else
 	{
-		control.init(state.view.getOverlayPane());
+		// In model coordinates the control is painted in model units in the
+		// draw pane, where insertStateAfter moves it after its cell, so that
+		// it is not painted in screen units before it is moved there
+		control.init((state.view.modelCoordinates) ? state.view.getDrawPane() :
+			state.view.getOverlayPane());
 	}
 
 	var node = control.innerNode || control.node;
@@ -1012,8 +1189,10 @@ mxCellRenderer.prototype.redrawLabel = function(state, forced)
 			state.text.apply(state);
 			this.configureShape(state);
 			
-			// Special case where value is obtained via hook in graph
+			// Special case where value is obtained via hook in graph, with the
+			// margin of the bounding box for the new value (see apply)
 			state.text.valign = graph.getVerticalAlign(state);
+			state.text.updateMargin();
 		}
 		
 		var bounds = this.getLabelBounds(state);
@@ -1089,6 +1268,7 @@ mxCellRenderer.prototype.isTextShapeInvalid = function(state, shape)
 		check('horizontal', mxConstants.STYLE_HORIZONTAL, true) ||
 		check('background', mxConstants.STYLE_LABEL_BACKGROUNDCOLOR) ||
 		check('border', mxConstants.STYLE_LABEL_BORDERCOLOR) ||
+		check('borderWidth', mxConstants.STYLE_LABEL_BORDER_WIDTH, 1) ||
 		check('opacity', mxConstants.STYLE_TEXT_OPACITY, 100) ||
 		check('textDirection', mxConstants.STYLE_TEXT_DIRECTION, mxConstants.DEFAULT_TEXT_DIRECTION);
 };
@@ -1163,10 +1343,13 @@ mxCellRenderer.prototype.getLabelBounds = function(state, text, margin, disableR
 		
 		bounds.x += state.x;
 		bounds.y += state.y;
-		
-		// Minimum of 1 fixes alignment bug in HTML labels
-		bounds.width = Math.max(1, state.width);
-		bounds.height = Math.max(1, state.height);
+
+		// Minimum of 1 fixes alignment bug in HTML labels, which is one
+		// model unit in model coordinates where labels are laid out in
+		// model units, so that the label bounds are linear in the scale
+		var min = (state.view.modelCoordinates) ? scale : 1;
+		bounds.width = Math.max(min, state.width);
+		bounds.height = Math.max(min, state.height);
 	}
 
 	if (text.isPaintBoundsInverted() && !disableRotation)
@@ -1188,7 +1371,7 @@ mxCellRenderer.prototype.getLabelBounds = function(state, text, margin, disableR
 		
 		if (hpos == mxConstants.ALIGN_CENTER && vpos == mxConstants.ALIGN_MIDDLE)
 		{
-			bounds = state.shape.getLabelBounds(bounds);
+			bounds = this.getShapeLabelBounds(state, bounds);
 		}
 	}
 	
@@ -1209,8 +1392,58 @@ mxCellRenderer.prototype.getLabelBounds = function(state, text, margin, disableR
 };
 
 /**
+ * Function: getShapeLabelBounds
+ *
+ * Returns the label bounds of the shape of the given state for the given
+ * bounds. If the shape is painted in model units, the shape computes the
+ * label bounds in model units, where the label is laid out, so that the
+ * result is linear in the scale (eg. if the shape rounds the label margins)
+ * and the label does not have to be laid out again for a new scale (see
+ * <updateScreenBounds>).
+ *
+ * Parameters:
+ *
+ * state - <mxCellState> whose label bounds should be returned.
+ * bounds - <mxRectangle> that contains the label bounds of the cell.
+ */
+mxCellRenderer.prototype.getShapeLabelBounds = function(state, bounds)
+{
+	var shape = state.shape;
+	var screen = shape.beginModelUnits();
+
+	if (screen != null)
+	{
+		var s = screen.scale;
+		var tr = (screen.viewTranslate != null) ?
+			screen.viewTranslate : state.view.translate;
+
+		try
+		{
+			bounds = shape.getLabelBounds(new mxRectangle(
+				mxUtils.unscale(bounds.x, s, tr.x),
+				mxUtils.unscale(bounds.y, s, tr.y),
+				mxUtils.unscale(bounds.width, s),
+				mxUtils.unscale(bounds.height, s)));
+		}
+		finally
+		{
+			shape.endModelUnits(screen);
+		}
+
+		bounds = new mxRectangle((bounds.x + tr.x) * s, (bounds.y + tr.y) * s,
+			bounds.width * s, bounds.height * s);
+	}
+	else
+	{
+		bounds = shape.getLabelBounds(bounds);
+	}
+
+	return bounds;
+};
+
+/**
  * Function: rotateLabelBounds
- * 
+ *
  * Adds the shape rotation to the given label bounds and
  * applies the alignment and offsets.
  * 
@@ -1311,6 +1544,7 @@ mxCellRenderer.prototype.redrawCellOverlays = function(state, forced)
 			{
 				shape.bounds = bounds;
 				shape.scale = state.view.scale;
+				shape.viewTranslate = state.view.translate;
 				shape.redraw();
 			}
 		});
@@ -1366,8 +1600,8 @@ mxCellRenderer.prototype.getControlBounds = function(state, w, h)
 	
 		if (!state.view.graph.getModel().isEdge(state.cell))
 		{
-			cx = state.x + w * s;
-			cy = state.y + h * s;
+			cx = state.x + Math.max(w / 2, 9) * s;
+			cy = state.y + Math.max(h / 2, 9) * s;
 			
 			if (state.shape != null)
 			{
@@ -1434,7 +1668,7 @@ mxCellRenderer.prototype.insertStateAfter = function(state, node, htmlNode)
 				shapes[i].node.parentNode != state.view.getOverlayPane();
 			var temp = (html) ? htmlNode : node;
 			
-			if (temp != null && temp.nextSibling != shapes[i].node)
+			if (temp != null && temp.parentNode != null && temp.nextSibling != shapes[i].node)
 			{
 				if (temp.nextSibling == null)
 				{
@@ -1629,7 +1863,8 @@ mxCellRenderer.prototype.redrawShape = function(state, force, rendering)
 			}
 
 			state.shape.scale = state.view.scale;
-			
+			state.shape.viewTranslate = state.view.translate;
+
 			if (rendering == null || rendering)
 			{
 				this.doRedrawShape(state);
@@ -1640,6 +1875,73 @@ mxCellRenderer.prototype.redrawShape = function(state, force, rendering)
 	}
 
 	return shapeChanged;
+};
+
+/**
+ * Function: updateScreenBounds
+ *
+ * Updates the screen fields of the shapes of the given state after the
+ * screen fields of the state have been updated for a new scale and
+ * translate of the view. The given scale and translate are the previous
+ * values. The shapes are not repainted as they are painted in model units,
+ * see <mxGraphView.modelCoordinates>.
+ */
+mxCellRenderer.prototype.updateScreenBounds = function(state, scale, translate)
+{
+	var shape = state.shape;
+	var text = state.text;
+
+	if (shape != null)
+	{
+		shape.scale = state.view.scale;
+		shape.viewTranslate = state.view.translate;
+
+		if (state.absolutePoints != null)
+		{
+			shape.points = state.absolutePoints.slice();
+			shape.updateBoundsFromPoints();
+		}
+		else
+		{
+			shape.bounds = new mxRectangle(state.x, state.y, state.width, state.height);
+		}
+
+		shape.boundingBox = this.getScreenBounds(state, shape.boundingBox, scale, translate);
+		shape.updateSvgScreenOffset();
+	}
+
+	if (text != null && text.bounds != null)
+	{
+		text.bounds = this.getLabelBounds(state);
+		text.scale = this.getTextScale(state);
+		text.boundingBox = this.getScreenBounds(state, text.boundingBox, scale, translate);
+		text.unrotatedBoundingBox = this.getScreenBounds(state,
+			text.unrotatedBoundingBox, scale, translate);
+		text.updateTextBackground();
+	}
+
+	this.redrawControl(state);
+	this.redrawCellOverlays(state);
+};
+
+/**
+ * Function: getScreenBounds
+ *
+ * Returns the given rectangle for the given previous scale and translate
+ * for the current scale and translate of the view of the given state.
+ */
+mxCellRenderer.prototype.getScreenBounds = function(state, rect, scale, translate)
+{
+	if (rect != null)
+	{
+		var s = state.view.scale;
+		var tr = state.view.translate;
+		rect = new mxRectangle((rect.x / scale - translate.x + tr.x) * s,
+			(rect.y / scale - translate.y + tr.y) * s,
+			rect.width / scale * s, rect.height / scale * s);
+	}
+
+	return rect;
 };
 
 /**

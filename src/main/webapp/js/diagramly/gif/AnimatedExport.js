@@ -22,8 +22,8 @@ function AnimatedGifExport(editorUi)
  *   border: padding in pixels (default 0)
  *   transparent: transparent background (default false)
  *   repeat: loop count, 0 = forever (default 0)
- *   background: background color (default '#ffffff')
- *   theme: 'light' or 'dark' (default null for auto)
+ *   background: background color (default white or dark page background)
+ *   theme: 'light' or 'dark' (default null for light)
  *
  * Callback receives the GIF Blob or null on error.
  */
@@ -40,7 +40,7 @@ AnimatedGifExport.prototype.doExport = function(options, callback, errorCallback
 	var repeat = (options.repeat != null) ? options.repeat : 0;
 	var bg = transparent ? null :
 		((options.background != null && options.background != mxConstants.NONE) ?
-			options.background : '#ffffff');
+			options.background : Editor.getDefaultPageBackgroundColor());
 	var theme = options.theme || null;
 
 	try
@@ -56,15 +56,14 @@ AnimatedGifExport.prototype.doExport = function(options, callback, errorCallback
 		{
 			if (errorCallback != null)
 			{
-				errorCallback(new Error(mxResources.get('noFlowAnimations',
-					null, 'No flow animations found in diagram')));
+				errorCallback(new Error(mxResources.get('noAnimationsInDiagram')));
 			}
 
 			return;
 		}
 
 		// Auto-detect duration from animation CSS or use provided value
-		var duration = options.duration || AnimatedGifExport.detectDuration(animInfos) || 1000;
+		var duration = options.duration || AnimatedGifExport.getLoopDuration(animInfos) || 1000;
 		var totalFrames = Math.max(2, Math.round(fps * duration / 1000));
 
 		// Remove CSS animation from paths (we'll set offsets manually)
@@ -75,8 +74,8 @@ AnimatedGifExport.prototype.doExport = function(options, callback, errorCallback
 		{
 			try
 			{
-				this.renderFrames(convertedSvg, animInfos, totalFrames,
-					fps, scale, transparent, repeat, bg, theme, callback, errorCallback);
+				this.renderFrames(convertedSvg, animInfos, totalFrames, fps, scale,
+					transparent, repeat, bg, theme, callback, errorCallback, duration);
 			}
 			catch (e)
 			{
@@ -97,11 +96,15 @@ AnimatedGifExport.prototype.doExport = function(options, callback, errorCallback
 };
 
 /**
- * Renders all frames and assembles the GIF.
+ * Renders all frames and assembles the GIF. The frames cover the given
+ * duration in ms (default is the number of frames at the given fps).
  */
 AnimatedGifExport.prototype.renderFrames = function(svgRoot, animInfos,
-	totalFrames, fps, scale, transparent, repeat, bg, theme, callback, errorCallback)
+	totalFrames, fps, scale, transparent, repeat, bg, theme, callback,
+	errorCallback, duration)
 {
+	duration = (duration != null) ? duration : totalFrames * 1000 / fps;
+
 	var w = parseInt(svgRoot.getAttribute('width'));
 	var h = parseInt(svgRoot.getAttribute('height'));
 
@@ -129,6 +132,18 @@ AnimatedGifExport.prototype.renderFrames = function(svgRoot, animInfos,
 	encoder.setRepeat(repeat);
 	encoder.setTransparent(transparent);
 
+	// Resolves light-dark() backgrounds to the exported theme as
+	// canvas fillStyle is not resolved against the SVG color-scheme
+	var fillStyle = null;
+
+	if (bg != null)
+	{
+		var cssBg = mxUtils.getLightDarkColor(bg);
+		fillStyle = (theme == 'dark' &&
+			this.editorUi.editor.graph.getAdaptiveColors() != 'none') ?
+			cssBg.dark : cssBg.light;
+	}
+
 	var frameIndex = 0;
 
 	var renderNextFrame = mxUtils.bind(this, function()
@@ -153,37 +168,12 @@ AnimatedGifExport.prototype.renderFrames = function(svgRoot, animInfos,
 		}
 
 		// Set stroke-dashoffset for this frame
-		var t = (totalFrames > 1) ? frameIndex / totalFrames : 0;
+		var time = (totalFrames > 1) ? frameIndex * duration / totalFrames : 0;
 
 		for (var i = 0; i < animInfos.length; i++)
 		{
-			var info = animInfos[i];
-			var offset;
-
-			if (info.direction === 'alternate' || info.direction === 'alternate-reverse')
-			{
-				// Triangular wave: t maps 0→1→0 over one GIF loop
-				var halfT = (t < 0.5) ? t * 2 : (1 - t) * 2;
-
-				if (info.direction === 'alternate')
-				{
-					offset = info.dashSum * (1 - halfT);
-				}
-				else
-				{
-					offset = info.dashSum * halfT;
-				}
-			}
-			else if (info.direction === 'reverse')
-			{
-				offset = info.dashSum * t;
-			}
-			else
-			{
-				offset = info.dashSum * (1 - t);
-			}
-
-			info.node.style.strokeDashoffset = offset;
+			animInfos[i].node.style.strokeDashoffset =
+				AnimatedGifExport.getDashOffset(animInfos[i], time);
 		}
 
 		// Rasterize SVG to canvas
@@ -199,9 +189,9 @@ AnimatedGifExport.prototype.renderFrames = function(svgRoot, animInfos,
 				canvas.height = h;
 				var ctx = canvas.getContext('2d');
 
-				if (bg != null)
+				if (fillStyle != null)
 				{
-					ctx.fillStyle = bg;
+					ctx.fillStyle = fillStyle;
 					ctx.fillRect(0, 0, w, h);
 				}
 
@@ -244,8 +234,22 @@ AnimatedGifExport.prototype.renderFrames = function(svgRoot, animInfos,
 // --- Static methods ---
 
 /**
+ * Longest duration in ms of a GIF that loops all flow animations (see
+ * getLoopDuration).
+ */
+AnimatedGifExport.maxLoopDuration = 10000;
+
+/**
+ * Longest duration in ms of a GIF of the flow animations.
+ */
+AnimatedGifExport.maxDuration = 30000;
+
+/**
  * Finds all SVG path elements that have flow animation applied.
- * Returns array of {node, dashSum, duration, direction} objects.
+ * Returns array of {node, dashSum, dashShift, restOffset, duration, delay,
+ * direction, once} objects. The dash offset goes from dashShift + dashSum
+ * to dashShift in each iteration and is restOffset without the animation,
+ * e.g. after a single pass (once).
  */
 AnimatedGifExport.findAnimatedPaths = function(svgRoot)
 {
@@ -266,48 +270,157 @@ AnimatedGifExport.findAnimatedPaths = function(svgRoot)
 				dashOffset = parseFloat(path.getAttribute('stroke-dashoffset'));
 			}
 
+			var restOffset = dashOffset;
+			var once = path.style.animationIterationCount == '1' ||
+				String(animation).indexOf('-ring-once') >= 0;
+			var dashShift = 0;
+
+			// The dashes of rings and dots move by flowRingPeriod in a loop
+			// and by two times flowRingPeriod to a negative offset in a
+			// single pass (see Graph.addFlowRingsToNode)
+			if (path.getAttribute('pathLength') != null)
+			{
+				dashShift = (once) ? -2 * Graph.flowRingPeriod : 0;
+				dashOffset = ((once) ? 2 : 1) * Graph.flowRingPeriod;
+			}
+
 			if (!isNaN(dashOffset) && dashOffset > 0)
 			{
 				// Parse direction from animation shorthand
-				var direction = 'normal';
+				var direction = path.style.animationDirection;
 
-				if (typeof animation === 'string')
+				if (mxUtils.indexOf(['normal', 'reverse', 'alternate',
+					'alternate-reverse'], direction) < 0)
 				{
-					if (animation.indexOf('alternate-reverse') >= 0)
+					direction = 'normal';
+
+					if (typeof animation === 'string')
 					{
-						direction = 'alternate-reverse';
-					}
-					else if (animation.indexOf('alternate') >= 0)
-					{
-						direction = 'alternate';
-					}
-					else if (animation.indexOf('reverse') >= 0)
-					{
-						direction = 'reverse';
+						if (animation.indexOf('alternate-reverse') >= 0)
+						{
+							direction = 'alternate-reverse';
+						}
+						else if (animation.indexOf('alternate') >= 0)
+						{
+							direction = 'alternate';
+						}
+						else if (animation.indexOf('reverse') >= 0)
+						{
+							direction = 'reverse';
+						}
 					}
 				}
 
 				// Parse duration from animation shorthand (e.g. "ge-flow-animation-xxx 500ms linear infinite normal")
-				var durationMs = 500;
-				var match = (typeof animation === 'string') ?
-					animation.match(/(\d+)ms/) : null;
+				var durationMs = AnimatedGifExport.parseTime(path.style.animationDuration);
 
-				if (match != null)
+				if (durationMs == null)
 				{
-					durationMs = parseInt(match[1]);
+					var match = (typeof animation === 'string') ?
+						animation.match(/(\d+)ms/) : null;
+					durationMs = (match != null) ? parseInt(match[1]) : 500;
 				}
 
 				results.push({
 					node: path,
 					dashSum: dashOffset,
-					duration: durationMs,
-					direction: direction
+					dashShift: dashShift,
+					restOffset: (isNaN(restOffset)) ? dashShift + dashOffset : restOffset,
+					duration: Math.max(1, durationMs),
+					delay: AnimatedGifExport.parseTime(path.style.animationDelay) || 0,
+					direction: direction,
+					once: once
 				});
 			}
 		}
 	}
 
 	return results;
+};
+
+/**
+ * Returns the given CSS time in ms or null if it is not a time.
+ */
+AnimatedGifExport.parseTime = function(value)
+{
+	var match = /^\s*(-?(\d+\.?\d*|\.\d+))(ms|s)\s*$/.exec(String(value));
+
+	return (match != null) ? parseFloat(match[1]) *
+		((match[3] == 's') ? 1000 : 1) : null;
+};
+
+/**
+ * Returns the dash offset of the given animation info (see findAnimatedPaths)
+ * at the given time in ms after the start of the animation, with the delay,
+ * direction and iterations of the CSS animation and linear timing. A single
+ * pass has the offset without the animation (restOffset) after its end.
+ */
+AnimatedGifExport.getDashOffset = function(info, time)
+{
+	var local = time - (info.delay || 0);
+	var offset = info.restOffset;
+
+	if (local >= 0 && (!info.once || local < info.duration))
+	{
+		var iteration = Math.floor(local / info.duration);
+		var t = mxUtils.mod(local, info.duration) / info.duration;
+		var reverse = info.direction == 'reverse' ||
+			(info.direction == 'alternate' && iteration % 2 == 1) ||
+			(info.direction == 'alternate-reverse' && iteration % 2 == 0);
+		offset = (info.dashShift || 0) + info.dashSum * ((reverse) ? t : 1 - t);
+	}
+
+	return Math.round(offset * 100) / 100;
+};
+
+/**
+ * Returns the duration in ms of a GIF that loops all given animations at
+ * their speed: the least common multiple of their periods (two times the
+ * duration for alternating directions) or the longest period if that is
+ * longer than maxLoopDuration, repeated until all single passes have ended
+ * and at most maxDuration.
+ */
+AnimatedGifExport.getLoopDuration = function(animInfos)
+{
+	var gcd = function(a, b)
+	{
+		while (b > 0)
+		{
+			var temp = a % b;
+			a = b;
+			b = temp;
+		}
+
+		return a;
+	};
+
+	var lcm = 0;
+	var longest = 0;
+	var end = 0;
+
+	for (var i = 0; i < animInfos.length; i++)
+	{
+		var info = animInfos[i];
+
+		if (info.once)
+		{
+			end = Math.max(end, info.delay + info.duration);
+		}
+		else
+		{
+			var period = Math.max(1, Math.round(info.duration *
+				((info.direction == 'alternate' ||
+				info.direction == 'alternate-reverse') ? 2 : 1)));
+			longest = Math.max(longest, period);
+			lcm = (lcm == 0) ? period : ((lcm <= AnimatedGifExport.maxLoopDuration) ?
+				lcm / gcd(lcm, period) * period : lcm);
+		}
+	}
+
+	var duration = (lcm <= AnimatedGifExport.maxLoopDuration) ? lcm : longest;
+	duration = (duration > 0) ? duration * Math.max(1, Math.ceil(end / duration)) : end;
+
+	return Math.min(AnimatedGifExport.maxDuration, duration);
 };
 
 /**

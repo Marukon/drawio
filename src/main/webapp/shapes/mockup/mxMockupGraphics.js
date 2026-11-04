@@ -366,6 +366,9 @@ mxShapeMockupPieChart.prototype.foreground = function(c, x, y, w, h)
 		total = total + parseInt(parts[i], 10);
 	}
 	
+	// Sum of the parts before the current part
+	var sumPerc = 0;
+
 	for (var i = 0; i < partNum; i++)
 	{
 		if (partColors.length > i)
@@ -377,18 +380,14 @@ mxShapeMockupPieChart.prototype.foreground = function(c, x, y, w, h)
 			c.setFillColor('#ff0000');
 		}
 
-		var beginPerc = 0;
+		var beginPerc = sumPerc;
 		var endPerc = 0;
 		var currPerc = parseInt(parts[i], 10) / total;
+		sumPerc = sumPerc + currPerc;
 
 		if (currPerc === 0.5)
 		{
 			currPerc = 0.501;
-		}
-
-		for (var j = 0; j < i; j++)
-		{
-			beginPerc = beginPerc + parseInt(parts[j], 10) / total;
 		}
 
 		endPerc = currPerc + beginPerc;
@@ -444,6 +443,13 @@ mxShapeMockupIconGrid.prototype.cst = {
 };
 
 /**
+ * Variable: maxIcons
+ *
+ * Maximum number of icons. Default is 1000.
+ */
+mxShapeMockupIconGrid.prototype.maxIcons = 1000;
+
+/**
  * Function: paintVertexShape
  * 
  * Paints the vertex shape.
@@ -463,9 +469,10 @@ mxShapeMockupIconGrid.prototype.background = function(c, w, h, gridSize)
 	var boxSizeX = w / (parseInt(gridSize[0],10) + (gridSize[0]-1) * 0.5);
 	var boxSizeY = h / (parseInt(gridSize[1],10) + (gridSize[1]-1) * 0.5);
 
-	for (var i = 0; i < gridSize[0]; i++)
+	// Limits the number of rows and icons for huge grid sizes
+	for (var i = 0, n = 0; i < gridSize[0] && i < this.maxIcons; i++)
 	{
-		for (var j = 0; j < gridSize[1]; j++)
+		for (var j = 0; j < gridSize[1] && n < this.maxIcons; j++, n++)
 		{
 			c.rect(boxSizeX * 1.5 * i, boxSizeY * 1.5 * j, boxSizeX, boxSizeY);
 			c.fillAndStroke();
@@ -478,9 +485,10 @@ mxShapeMockupIconGrid.prototype.foreground = function(c, w, h, gridSize)
 	var boxSizeX = w / (parseInt(gridSize[0],10) + (gridSize[0]-1) * 0.5);
 	var boxSizeY = h / (parseInt(gridSize[1],10) + (gridSize[1]-1) * 0.5);
 
-	for (var i = 0; i < gridSize[0]; i++)
+	// Limits the number of rows and icons for huge grid sizes
+	for (var i = 0, n = 0; i < gridSize[0] && i < this.maxIcons; i++)
 	{
-		for (var j = 0; j < gridSize[1]; j++)
+		for (var j = 0; j < gridSize[1] && n < this.maxIcons; j++, n++)
 		{
 			c.begin();
 			c.moveTo(boxSizeX * 1.5 * i, boxSizeY * 1.5 * j);
@@ -677,7 +685,7 @@ mxShapeMockupGauge.prototype.background = function(c, w, h)
 mxShapeMockupGauge.prototype.foreground = function(c, w, h)
 {
 	var gaugePos = mxUtils.getValue(this.style, mxShapeMockupGauge.prototype.cst.GAUGE_POS, '0');
-	var scaleColors = decodeURIComponent(mxUtils.getValue(this.style, mxShapeMockupGauge.prototype.cst.SCALE_COLORS, '#888888,#aaaaaa,#444444').toString()).split(',');
+	var scaleColors = mxUtils.safeDecodeURIComponent(mxUtils.getValue(this.style, mxShapeMockupGauge.prototype.cst.SCALE_COLORS, '#888888,#aaaaaa,#444444').toString()).split(',');
 	var gaugeLabels = mxUtils.getValue(this.style, mxShapeMockupGauge.prototype.cst.GAUGE_LABELS, 'CPU[%],0,100').toString().split(',');
 	var needleColor = mxUtils.getValue(this.style, mxShapeMockupGauge.prototype.cst.NEEDLE_COLOR, '#008cff');
 	var fillColor = mxUtils.getValue(this.style, mxConstants.STYLE_FILLCOLOR, '#ffffff');
@@ -848,7 +856,7 @@ mxShapeMockupPlotChart.prototype.foreground = function(c, x, y, w, h)
 {
 	var shapeStroke = mxUtils.getValue(this.style, mxShapeMockupPlotChart.prototype.cst.STROKE_COLOR2, '#dddddd');
 	var coordStroke = mxUtils.getValue(this.style, mxShapeMockupPlotChart.prototype.cst.STROKE_COLOR3, '#666666');
-	var shapesColors = decodeURIComponent(mxUtils.getValue(this.style, mxShapeMockupPlotChart.prototype.cst.SHAPES_COLORS, '#00aaff,#0044ff,#008cff').toString()).split(',');
+	var shapesColors = mxUtils.safeDecodeURIComponent(mxUtils.getValue(this.style, mxShapeMockupPlotChart.prototype.cst.SHAPES_COLORS, '#00aaff,#0044ff,#008cff').toString()).split(',');
 
 	var strokeWidth = mxUtils.getValue(this.style, mxConstants.STYLE_STROKEWIDTH, '1');
 	var shapeSize = Math.min(w, h) * 0.03;
@@ -1028,7 +1036,7 @@ mxShapeMockupGanttChart.prototype.background = function(c, x, y, w, h, bgColor, 
 
 mxShapeMockupGanttChart.prototype.foreground = function(c, x, y, w, h)
 {
-	var shapesColors = decodeURIComponent(mxUtils.getValue(this.style, mxShapeMockupGanttChart.prototype.cst.SHAPES_COLORS, '#888888,#bbbbbb').toString()).split(',');
+	var shapesColors = mxUtils.safeDecodeURIComponent(mxUtils.getValue(this.style, mxShapeMockupGanttChart.prototype.cst.SHAPES_COLORS, '#888888,#bbbbbb').toString()).split(',');
 	var textColor = mxUtils.getValue(this.style, mxShapeMockupGanttChart.prototype.cst.TEXT_COLOR, '#666666');
 	var textSize = mxUtils.getValue(this.style, mxShapeMockupGanttChart.prototype.cst.TEXT_SIZE, '#12');
 

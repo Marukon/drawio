@@ -135,25 +135,80 @@ mxImageExport.prototype.drawCellState = function(state, canvas)
 
 	// Experimental feature
 	var title = this.getTitleForCellState(state, canvas);
-	
-	if (title != null)
-	{
-		canvas.setTitle(title);
-	}
-	
+	var root = (title != null) ? canvas.root : null;
+	var last = (root != null) ? root.lastChild : null;
+
 	// Paints the shape and text
 	this.drawShape(state, canvas);
 	this.drawText(state, canvas);
 
-	if (title != null)
+	if (root != null)
 	{
-		canvas.setTitle(null);
+		this.addTitle(state, canvas, title, root, (last != null) ?
+			last.nextSibling : root.firstChild, link != null);
 	}
 
 	if (link != null)
 	{
 		canvas.setLink(null);
 	}
+};
+
+/**
+ * Function: addTitle
+ * 
+ * Adds the given title to the elements that were drawn for the given state,
+ * which are the children of root from first. The title is added once as the
+ * first child of root if root is the link of the cell, or else of a new group
+ * that contains the elements, and not to each element (see
+ * <mxSvgCanvas2D.setTitle>), so that the size of the output does not grow
+ * with the number of elements times the length of the title. No title is
+ * added if no element was painted.
+ */
+mxImageExport.prototype.addTitle = function(state, canvas, title, root, first, link)
+{
+	if (this.isPainted(first))
+	{
+		var node = root;
+
+		if (!link)
+		{
+			node = canvas.createElement('g');
+			root.insertBefore(node, first);
+
+			while (node.nextSibling != null)
+			{
+				node.appendChild(node.nextSibling);
+			}
+		}
+
+		var temp = canvas.createElement('title');
+		mxUtils.write(temp, title);
+		node.insertBefore(temp, node.firstChild);
+	}
+};
+
+/**
+ * Function: isPainted
+ * 
+ * Returns true if the given node or one of its next siblings is an element
+ * other than a group or a group with such an element, ie. if an element was
+ * painted and not only the empty group of a shape.
+ */
+mxImageExport.prototype.isPainted = function(node)
+{
+	while (node != null)
+	{
+		if (node.nodeType == mxConstants.NODETYPE_ELEMENT &&
+			(node.nodeName != 'g' || this.isPainted(node.firstChild)))
+		{
+			return true;
+		}
+
+		node = node.nextSibling;
+	}
+
+	return false;
 };
 
 /**
@@ -196,7 +251,7 @@ mxImageExport.prototype.drawText = function(state, canvas)
 		shape.node = canvas.root;
 		canvas.save();
 
-		var off = shape.getSvgScreenOffset();
+		var off = this.getSvgShapeOffset(shape, canvas);
 
 		if (off != 0)
 		{
@@ -216,7 +271,37 @@ mxImageExport.prototype.drawText = function(state, canvas)
 		canvas.root = root;
 	 }
  };
- 
+
+/**
+ * Function: getSvgShapeOffset
+ *
+ * Returns the crisp rendering offset for the given shape in the export.
+ * The exported graph is cropped to bounds that grow by the raw strokewidth
+ * (see mxShape.augmentBoundingBox), so the offset is only applied where a
+ * stroke grew those bounds, with the parity taken from the stroke width at
+ * the scale of the output rather than the screen. Otherwise the content
+ * shifts against the crop, adding padding on one side of the exported
+ * image and clipping content on the other. Strokes thinner than a pixel
+ * at the output scale take the offset of a one pixel stroke, as on screen
+ * (see mxShape.getSvgScreenOffset), so that they stay aligned with the
+ * shapes around them. Shape-specific overrides of the screen offset (eg.
+ * mxText, mxImageShape) are used unchanged.
+ */
+mxImageExport.prototype.getSvgShapeOffset = function(shape, canvas)
+{
+	if (shape.getSvgScreenOffset != mxShape.prototype.getSvgScreenOffset)
+	{
+		return shape.getSvgScreenOffset();
+	}
+
+	var sw = (shape.stencil != null && shape.stencil.strokewidth != 'inherit') ?
+		Number(shape.stencil.strokewidth) : shape.strokewidth;
+	var scale = shape.scale * ((canvas.state != null) ? canvas.state.scale : 1);
+
+	return (shape.stroke != null && sw > 0 && mxUtils.mod(Math.max(1,
+		Math.round(sw * scale)), 2) == 1) ? 0.5 : 0;
+};
+
 /**
  * Function: drawOverlays
  * 

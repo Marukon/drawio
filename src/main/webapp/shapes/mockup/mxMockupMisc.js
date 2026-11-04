@@ -366,6 +366,13 @@ mxShapeMockupRating.prototype.customProperties = [
 ];
 
 /**
+ * Variable: maxIcons
+ *
+ * Maximum number of filled and of empty icons. Default is 1000.
+ */
+mxShapeMockupRating.prototype.maxIcons = 1000;
+
+/**
  * Function: paintVertexShape
  * 
  * Paints the vertex shape.
@@ -380,7 +387,7 @@ mxShapeMockupRating.prototype.paintVertexShape = function(c, x, y, w, h)
 
 	if (ratingStyle === mxShapeMockupRating.prototype.cst.RATING_STAR)
 	{
-		for (var i = 0; i < grade; i++)
+		for (var i = 0; i < grade && i < this.maxIcons; i++)
 		{
 			c.begin();
 			c.moveTo(i * h * 1.5, 0.33 * h);
@@ -399,7 +406,7 @@ mxShapeMockupRating.prototype.paintVertexShape = function(c, x, y, w, h)
 	}
 	else if (ratingStyle === mxShapeMockupRating.prototype.cst.RATING_HEART)
 	{
-		for (var i = 0; i < grade; i++)
+		for (var i = 0; i < grade && i < this.maxIcons; i++)
 		{
 			c.begin();
 			c.moveTo(i * h * 1.5 + h * 0.519, h * 0.947);
@@ -418,7 +425,7 @@ mxShapeMockupRating.prototype.paintVertexShape = function(c, x, y, w, h)
 
 	if (ratingStyle === mxShapeMockupRating.prototype.cst.RATING_STAR)
 	{
-		for (var i = grade; i < ratingScale; i++)
+		for (var i = grade, n = 0; i < ratingScale && n < this.maxIcons; i++, n++)
 		{
 			c.begin();
 			c.moveTo(i * h * 1.5, 0.33 * h);
@@ -437,7 +444,7 @@ mxShapeMockupRating.prototype.paintVertexShape = function(c, x, y, w, h)
 	}
 	else if (ratingStyle === mxShapeMockupRating.prototype.cst.RATING_HEART)
 	{
-		for (var i = grade; i < ratingScale; i++)
+		for (var i = grade, n = 0; i < ratingScale && n < this.maxIcons; i++, n++)
 		{
 			c.begin();
 			c.moveTo(i * h * 1.5 + h * 0.519, h * 0.947);
@@ -1080,6 +1087,13 @@ mxShapeMockupRuler.prototype.cst = {
 };
 
 /**
+ * Variable: maxTicks
+ *
+ * Maximum number of ticks. Default is 10000.
+ */
+mxShapeMockupRuler.prototype.maxTicks = 10000;
+
+/**
 * Function: paintVertexShape
 * 
 * Paints the vertex shape.
@@ -1113,7 +1127,7 @@ mxShapeMockupRuler.prototype.foreground = function(c, w, h)
 	{
 		c.begin();
 		
-		while (currX < w)
+		while (currX < w && i <= this.maxTicks)
 		{
 			var remainder = i % 10;
 
@@ -1143,7 +1157,7 @@ mxShapeMockupRuler.prototype.foreground = function(c, w, h)
 	{
 		c.begin();
 		
-		while (currX < w)
+		while (currX < w && i <= this.maxTicks)
 		{
 			var remainder = i % 10;
 
@@ -1209,6 +1223,13 @@ mxShapeMockupRuler2.prototype.customProperties = [
 ];
 
 /**
+ * Variable: maxTicks
+ *
+ * Maximum number of ticks. Default is 10000.
+ */
+mxShapeMockupRuler2.prototype.maxTicks = 10000;
+
+/**
 * Function: paintVertexShape
 * 
 * Paints the vertex shape.
@@ -1232,6 +1253,9 @@ mxShapeMockupRuler2.prototype.foreground = function(c, x, y, w, h)
 {
 	var facing = mxUtils.getValue(this.style, mxShapeMockupRuler2.prototype.cst.ORIENTATION, mxShapeMockupRuler2.prototype.cst.FACE_DOWN);
 	var fontColor = mxUtils.getValue(this.style, mxConstants.STYLE_FONTCOLOR, '#000000');
+	var fontSize = mxUtils.getValue(this.style, mxConstants.STYLE_FONTSIZE, mxConstants.DEFAULT_FONTSIZE);
+	var fontFamily = mxUtils.getValue(this.style, mxConstants.STYLE_FONTFAMILY, mxConstants.DEFAULT_FONTFAMILY);
+	var fontStyle = mxUtils.getValue(this.style, mxConstants.STYLE_FONTSTYLE, 0);
 	var dx = mxUtils.getValue(this.style, 'dx', '100');
 	var unitSize = dx / 10;
 	this.state.style['spacingLeft'] = Math.round(1000 * Math.max(0, Math.min(w, dx))) / 1000 - 4;
@@ -1239,6 +1263,9 @@ mxShapeMockupRuler2.prototype.foreground = function(c, x, y, w, h)
 	unitSize = Math.max(unitSize, 1);
 	
 	c.setFontColor(fontColor);
+	c.setFontSize(fontSize);
+	c.setFontFamily(fontFamily);
+	c.setFontStyle(fontStyle);
 	
 	var currX = unitSize;
 	var i = 1;
@@ -1247,7 +1274,7 @@ mxShapeMockupRuler2.prototype.foreground = function(c, x, y, w, h)
 	{
 		c.begin();
 		
-		while (currX < w)
+		while (currX < w && i <= this.maxTicks)
 		{
 			var remainder = i % 10;
 
@@ -1292,7 +1319,7 @@ mxShapeMockupRuler2.prototype.foreground = function(c, x, y, w, h)
 	{
 		c.begin();
 		
-		while (currX < w)
+		while (currX < w && i <= this.maxTicks)
 		{
 			var remainder = i % 10;
 
@@ -1563,12 +1590,16 @@ mxUtils.extend(mxShapeMockupPin, mxShape);
 mxShapeMockupPin.prototype.cst = {
 		SHAPE_PIN : 'mxgraph.mockup.misc.pin',
 		FILL_COLOR2 : 'fillColor2',
-		FILL_COLOR3 : 'fillColor3'
+		FILL_COLOR3 : 'fillColor3',
+		FILL_COLOR4 : 'fillColor4',
+		STROKE_COLOR2 : 'strokeColor2',
 };
 
 mxShapeMockupPin.prototype.customProperties = [
-	{name: 'fillColor2', dispName: 'Fill2 Color', type: 'color'},
-	{name: 'fillColor3', dispName: 'Fill3 Color', type: 'color'}
+	{name: 'fillColor2', dispName: 'Fill2 Color', type: 'color', primary: true},
+	{name: 'fillColor3', dispName: 'Fill3 Color', type: 'color', primary: true},
+	{name: 'fillColor4', dispName: 'Fill4 Color', type: 'color', primary: true, defVal: '#ffffff'},
+	{name: 'strokeColor2', dispName: 'Stroke2 Color', type: 'color', primary: true, defVal: '#666666'}
 ];
 
 /**
@@ -1580,12 +1611,14 @@ mxShapeMockupPin.prototype.paintVertexShape = function(c, x, y, w, h)
 {
 	var fillColor2 = mxUtils.getValue(this.style, mxShapeMockupPin.prototype.cst.FILL_COLOR2, '#000000');
 	var fillColor3 = mxUtils.getValue(this.style, mxShapeMockupPin.prototype.cst.FILL_COLOR3, '#000000');
+	var fillColor4 = mxUtils.getValue(this.style, mxShapeMockupPin.prototype.cst.FILL_COLOR4, '#ffffff');
 	var strokeColor = mxUtils.getValue(this.style, mxConstants.STYLE_STROKECOLOR, '#000000');
+	var strokeColor2 = mxUtils.getValue(this.style, mxShapeMockupPin.prototype.cst.STROKE_COLOR2, '#666666');
 	c.setShadow(false);
 	c.translate(x, y);
 
 	c.setStrokeWidth(3);
-	c.setStrokeColor('#666666');
+	c.setStrokeColor(strokeColor2);
 	c.begin();
 	c.moveTo(w * 0.5, h * 0.4);
 	c.lineTo(w * 0.5, h);
@@ -1598,7 +1631,7 @@ mxShapeMockupPin.prototype.paintVertexShape = function(c, x, y, w, h)
 	c.ellipse(0, 0, w, h * 0.4);
 	c.fillAndStroke();
 
-	c.setFillColor('#ffffff');
+	c.setFillColor(fillColor4);
 	c.setAlpha(0.5);
 	c.ellipse(w * 0.2, h * 0.08, w * 0.3, h * 0.12);
 	c.fill();

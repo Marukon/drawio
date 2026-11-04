@@ -65,13 +65,54 @@ var mxSettings =
 			localStorage.setItem('.drawio-config', JSON.stringify(value));
 		}
 	},
-	getShowStartScreen: function()
+	getCurrentEdgeStyle: function()
 	{
-		return mxSettings.settings.showStartScreen;
+		return (mxSettings.settings != null) ? mxSettings.settings.currentEdgeStyle : null;
 	},
-	setShowStartScreen: function(showStartScreen)
+	setCurrentEdgeStyle: function(value)
 	{
-		mxSettings.settings.showStartScreen = showStartScreen;
+		mxSettings.settings.currentEdgeStyle = value;
+		mxSettings.save();
+	},
+	/**
+	 * Returns the stored array of export presets for the given format or an
+	 * empty array. The entries are unvalidated and must be sanitized by the
+	 * caller (see EditorUi.sanitizeExportPreset).
+	 */
+	getExportPresets: function(format)
+	{
+		var presets = (mxSettings.settings != null) ?
+			mxSettings.settings.exportPresets : null;
+
+		if (presets != null && typeof presets === 'object' &&
+			!Array.isArray(presets) && typeof format === 'string' &&
+			Object.prototype.hasOwnProperty.call(presets, format) &&
+			Array.isArray(presets[format]))
+		{
+			return presets[format];
+		}
+
+		return [];
+	},
+	/**
+	 * Stores the given array of export presets for the given format.
+	 */
+	setExportPresets: function(format, value)
+	{
+		if (typeof format === 'string' && /^[a-z]+$/.test(format) &&
+			Array.isArray(value))
+		{
+			var presets = mxSettings.settings.exportPresets;
+
+			if (presets == null || typeof presets !== 'object' || Array.isArray(presets))
+			{
+				presets = {};
+			}
+
+			presets[format] = value;
+			mxSettings.settings.exportPresets = presets;
+			mxSettings.save();
+		}
 	},
 	getGridColor: function(darkMode)
 	{
@@ -201,6 +242,14 @@ var mxSettings =
 	{
 		mxSettings.settings.recentColors = recentColors;
 	},
+	getRecentShapes: function()
+	{
+		return mxSettings.settings.recentShapes;
+	},
+	setRecentShapes: function(recentShapes)
+	{
+		mxSettings.settings.recentShapes = recentShapes;
+	},
 	getFormatWidth: function()
 	{
 		return parseInt(mxSettings.settings.formatWidth);
@@ -209,13 +258,52 @@ var mxSettings =
 	{
 		mxSettings.settings.formatWidth = formatWidth;
 	},
-	isCreateTarget: function()
+	getSidebarWidth: function()
 	{
-		return mxSettings.settings.createTarget;
+		return mxSettings.settings.sidebarWidth;
 	},
-	setCreateTarget: function(value)
+	setSidebarWidth: function(sidebarWidth)
 	{
-		mxSettings.settings.createTarget = value;
+		mxSettings.settings.sidebarWidth = sidebarWidth;
+	},
+	getCollapsedSections: function()
+	{
+		return mxSettings.settings.collapsedSections || {};
+	},
+	setCollapsedSections: function(collapsedSections)
+	{
+		mxSettings.settings.collapsedSections = collapsedSections;
+	},
+	getCollapsedLibraries: function()
+	{
+		return mxSettings.settings.collapsedLibraries || {};
+	},
+	setCollapsedLibraries: function(collapsedLibraries)
+	{
+		mxSettings.settings.collapsedLibraries = collapsedLibraries;
+	},
+	getLibraryOrder: function()
+	{
+		return mxSettings.settings.libraryOrder || null;
+	},
+	setLibraryOrder: function(order)
+	{
+		mxSettings.settings.libraryOrder = order;
+	},
+	getWindowState: function(name)
+	{
+		var states = mxSettings.settings.windowStates;
+
+		return (states != null) ? states[name] : null;
+	},
+	setWindowState: function(name, state)
+	{
+		if (mxSettings.settings.windowStates == null)
+		{
+			mxSettings.settings.windowStates = {};
+		}
+
+		mxSettings.settings.windowStates[name] = state;
 	},
 	getPageFormat: function()
 	{
@@ -259,11 +347,13 @@ var mxSettings =
 			customLibraries: Editor.defaultCustomLibraries,
 			plugins: [],
 			recentColors: [],
+			recentShapes: [],
 			formatWidth: mxSettings.defaultFormatWidth,
-			createTarget: urlParams['sketch'] == '1',
+			sidebarWidth: null,
+			collapsedSections: {},
+			collapsedLibraries: {},
 			pageFormat: mxGraph.prototype.pageFormat,
 			search: true,
-			showStartScreen: false,
 			gridColor: mxGraphView.prototype.defaultGridColor,
 			darkGridColor: mxGraphView.prototype.defaultDarkGridColor,
 			darkMode: 'auto',
@@ -274,7 +364,11 @@ var mxSettings =
 			// Only defined and true for new settings which haven't been saved
 			isNew: true,
 			unit: mxConstants.POINTS,
-			isRulerOn: false
+			isRulerOn: false,
+			windowStates: {},
+			// Persisted global current edge style (the toolbar dropdown's choice for
+			// new edges when nothing is selected). null => use the theme default.
+			currentEdgeStyle: null
 		};
 	},
 	init: function()
@@ -323,7 +417,10 @@ var mxSettings =
 	{
 		var config = (value != null) ? JSON.parse(value) : null;
 
-		if (config == null || (config.configVersion != Editor.configVersion) ||
+		// A stored value that is not an object, eg. 1, would silently drop all
+		// defaults below, including the page format
+		if (config == null || typeof config !== 'object' ||
+			(config.configVersion != Editor.configVersion) ||
 			(Editor.config != null && Editor.config.override))
 		{
 			mxSettings.settings = null;
@@ -341,6 +438,12 @@ var mxSettings =
 			if (mxSettings.settings.recentColors == null)
 			{
 				mxSettings.settings.recentColors = [];
+			}
+
+			// Recent shapes of the sidebar (see Sidebar.addRecentShapes)
+			if (!Array.isArray(mxSettings.settings.recentShapes))
+			{
+				mxSettings.settings.recentShapes = [];
 			}
 
 			if (mxSettings.settings.customFonts == null)
@@ -373,11 +476,6 @@ var mxSettings =
 				delete mxSettings.settings.lastAlert;
 			}
 			
-			if (mxSettings.settings.createTarget == null)
-			{
-				mxSettings.settings.createTarget = false;
-			}
-			
 			if (mxSettings.settings.pageFormat == null)
 			{
 				mxSettings.settings.pageFormat = mxGraph.prototype.pageFormat;
@@ -386,11 +484,6 @@ var mxSettings =
 			if (mxSettings.settings.search == null)
 			{
 				mxSettings.settings.search = true;
-			}
-			
-			if (mxSettings.settings.showStartScreen == null)
-			{
-				mxSettings.settings.showStartScreen = false;
 			}
 			
 			if (mxSettings.settings.gridColor == null)

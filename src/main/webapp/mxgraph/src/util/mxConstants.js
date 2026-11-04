@@ -470,7 +470,7 @@
 	 * Defines the strokewidth to be used for the outline rectangle
 	 * stroke width. Default is 3.
 	 */
-	OUTLINE_STROKEWIDTH: (mxClient.IS_IE) ? 2 : 3,
+	OUTLINE_STROKEWIDTH: 3,
 
 	/**
 	 * Variable: HANDLE_SIZE
@@ -785,6 +785,16 @@
 	STYLE_OPACITY: 'opacity',
 
 	/**
+	 * Variable: STYLE_OPACITY_GROUP
+	 *
+	 * Defines the key for applying the opacity to the shape as a whole in
+	 * SVG, so that overlapping parts of the shape (eg. the stroke over the
+	 * fill or a marker over its line) do not get darker. Possible values
+	 * are 0 and 1. Default is 0. Value is "opacityGroup".
+	 */
+	STYLE_OPACITY_GROUP: 'opacityGroup',
+
+	/**
 	 * Variable: STYLE_FILL_OPACITY
 	 * 
 	 * Defines the key for the fill opacity style. The type of the value is 
@@ -795,10 +805,37 @@
 
 	/**
 	 * Variable: STYLE_FILL_STYLE
-	 * 
+	 *
 	 * Defines the key for the fill style style.
 	 */
 	STYLE_FILL_STYLE: 'fillStyle',
+
+	/**
+	 * Variable: STYLE_HACHURE_GAP
+	 *
+	 * Defines the key for the hachure gap style. The type of the value is
+	 * numeric and defines the distance between the strokes of fill
+	 * patterns. -1 means automatic. Value is "hachureGap".
+	 */
+	STYLE_HACHURE_GAP: 'hachureGap',
+
+	/**
+	 * Variable: STYLE_HACHURE_ANGLE
+	 *
+	 * Defines the key for the hachure angle style. The type of the value
+	 * is numeric and defines the angle of the strokes of fill patterns in
+	 * degrees. Value is "hachureAngle".
+	 */
+	STYLE_HACHURE_ANGLE: 'hachureAngle',
+
+	/**
+	 * Variable: STYLE_FILL_WEIGHT
+	 *
+	 * Defines the key for the fill weight style. The type of the value is
+	 * numeric and defines the stroke width of fill patterns. -1 means
+	 * automatic. Value is "fillWeight".
+	 */
+	STYLE_FILL_WEIGHT: 'fillWeight',
 
 	/**
 	 * Variable: STYLE_STROKE_OPACITY
@@ -978,7 +1015,9 @@
 	 * Defines the key for the fill color. Possible values are all HTML color
 	 * names or HEX codes, as well as special keywords such as 'swimlane,
 	 * 'inherit' or 'indicated' to use the color code of a related cell or the
-	 * indicator shape. Value is "fillColor".
+	 * indicator shape, 'parentFillColor' or 'parentStrokeColor' to use the
+	 * respective color of the parent and 'strokeColor' to use the stroke color
+	 * of the cell. Value is "fillColor".
 	 */
 	STYLE_FILLCOLOR: 'fillColor',
 
@@ -1016,8 +1055,10 @@
 	 * Defines the key for the gradient color. Possible values are all HTML color
 	 * names or HEX codes, as well as special keywords such as 'swimlane,
 	 * 'inherit' or 'indicated' to use the color code of a related cell or the
-	 * indicator shape. This is ignored if no fill color is defined. Value is
-	 * "gradientColor".
+	 * indicator shape, 'parentFillColor' or 'parentStrokeColor' to use the
+	 * respective color of the parent and 'fillColor' or 'strokeColor' to use
+	 * the respective color of the cell. This is ignored if no fill color is
+	 * defined. Value is "gradientColor".
 	 */
 	STYLE_GRADIENTCOLOR: 'gradientColor',
 
@@ -1041,7 +1082,9 @@
 	 * Defines the key for the strokeColor style. Possible values are all HTML
 	 * color names or HEX codes, as well as special keywords such as 'swimlane,
 	 * 'inherit', 'indicated' to use the color code of a related cell or the
-	 * indicator shape or 'none' for no color. Value is "strokeColor".
+	 * indicator shape, 'parentFillColor' or 'parentStrokeColor' to use the
+	 * respective color of the parent, 'fillColor' to use the fill color of the
+	 * cell or 'none' for no color. Value is "strokeColor".
 	 */
 	STYLE_STROKECOLOR: 'strokeColor',
 
@@ -1274,10 +1317,23 @@
 	STYLE_LABEL_BORDERCOLOR: 'labelBorderColor',
 
 	/**
+	 * Variable: STYLE_LABEL_BORDER_WIDTH
+	 *
+	 * Defines the key for the width of the label border in pixels (see
+	 * <STYLE_LABEL_BORDERCOLOR>). The border is scaled with the zoom and a
+	 * width of 0 hides it. Default is 1. Value is "labelBorderWidth".
+	 */
+	STYLE_LABEL_BORDER_WIDTH: 'labelBorderWidth',
+
+	/**
 	 * Variable: STYLE_LABEL_PADDING
-	 * 
+	 *
 	 * Defines the key for the label padding, ie. the space between the label
-	 * border and the label. Value is "labelPadding".
+	 * text and its background box as defined by <STYLE_LABEL_BACKGROUNDCOLOR>
+	 * and <STYLE_LABEL_BORDERCOLOR>. The value is a CSS-style spacing
+	 * shorthand of 1-4 space-separated numbers (top, right, bottom, left).
+	 * For labels with a fixed-size box (fill, width and block <STYLE_OVERFLOW>
+	 * values) the padding insets the text instead. Value is "labelPadding".
 	 */
 	STYLE_LABEL_PADDING: 'labelPadding',
 
@@ -1470,6 +1526,17 @@
 	STYLE_STARTSIZE: 'startSize',
 
 	/**
+	 * Variable: STYLE_FIXED_HEADER
+	 *
+	 * Defines the key for the fixedHeader style. If true, the swimlane header
+	 * is always rendered even when startSize is 0. If false, a startSize of 0
+	 * causes the shape to fall back to non-swimlane rendering (eg label bounds
+	 * from mxShape). Default is true for swimlanes, subclasses may override
+	 * via fixedHeaderDefault. Value is "fixedHeader".
+	 */
+	STYLE_FIXED_HEADER: 'fixedHeader',
+
+	/**
 	 * Variable: STYLE_SWIMLANE_LINE
 	 * 
 	 * Defines the key for the swimlaneLine style. This style specifies whether
@@ -1497,6 +1564,45 @@
 	STYLE_SWIMLANE_BODY: 'swimlaneBody',
 
 	/**
+	 * Variable: STYLE_FOOTER_SIZE
+	 *
+	 * Defines the key for the footerSize style. This style specifies the size of
+	 * an additional filled, bordered region painted at the end of a swimlane
+	 * opposite the title (the "footer"), or at the bottom of a rectangle. Use 0
+	 * (default) for no footer. Value is "footerSize".
+	 */
+	STYLE_FOOTER_SIZE: 'footerSize',
+
+	/**
+	 * Variable: STYLE_FOOTER_COLOR
+	 *
+	 * Defines the key for the footerColor style. This style specifies the fill
+	 * color of the footer region of a rectangle (see <STYLE_FOOTER_SIZE>). If
+	 * not specified then the stroke color is used. Value is "footerColor".
+	 */
+	STYLE_FOOTER_COLOR: 'footerColor',
+
+	/**
+	 * Variable: STYLE_CENTER_RADIUS
+	 *
+	 * Defines the key for the centerRadius style. This style specifies the
+	 * radius of an additional filled circle painted at the center of an
+	 * ellipse, e.g. for UML final states. Use 0 (default) for no center
+	 * circle. Value is "centerRadius".
+	 */
+	STYLE_CENTER_RADIUS: 'centerRadius',
+
+	/**
+	 * Variable: STYLE_CENTER_COLOR
+	 *
+	 * Defines the key for the centerColor style. This style specifies the
+	 * fill color of the center circle of an ellipse (see
+	 * <STYLE_CENTER_RADIUS>). If not specified then the stroke color is
+	 * used. Value is "centerColor".
+	 */
+	STYLE_CENTER_COLOR: 'centerColor',
+
+	/**
 	 * Variable: STYLE_ENDFILL
 	 * 
 	 * Defines the key for the endFill style. Use 0 for no fill or 1 (default)
@@ -1514,6 +1620,14 @@
 	STYLE_ENDFILLCOLOR: 'endFillColor',
 
 	/**
+	 * Variable: STYLE_ENDSTROKECOLOR
+	 * 
+	 * Defines the key for the endStrokeColor style. If not specified then the
+	 * stroke color is used to stroke the markers. Value is "endStrokeColor".
+	 */
+	STYLE_ENDSTROKECOLOR: 'endStrokeColor',
+
+	/**
 	 * Variable: STYLE_STARTFILL
 	 * 
 	 * Defines the key for the startFill style. Use 0 for no fill or 1 (default)
@@ -1529,6 +1643,14 @@
 	 * stroke color is used to fill the markers. Value is "startFillColor".
 	 */
 	STYLE_STARTFILLCOLOR: 'startFillColor',
+
+	/**
+	 * Variable: STYLE_STARTSTROKECOLOR
+	 * 
+	 * Defines the key for the startStrokeColor style. If not specified then the
+	 * stroke color is used to stroke the markers. Value is "startStrokeColor".
+	 */
+	STYLE_STARTSTROKECOLOR: 'startStrokeColor',
 
 	/**
 	 * Variable: STYLE_DASHED
@@ -1635,6 +1757,19 @@
 	STYLE_TARGET_PERIMETER_SPACING: 'targetPerimeterSpacing',
 
 	/**
+	 * Variable: STYLE_FIXED_POINT_SPACING
+	 *
+	 * Defines the key for the fixed point spacing style. If this is 1 then
+	 * <STYLE_SOURCE_PERIMETER_SPACING> and <STYLE_TARGET_PERIMETER_SPACING>
+	 * of the edge also apply to ends that are attached to a fixed connection
+	 * point: after routing, such an end is moved by the spacing towards its
+	 * neighbouring point of the route (away from it for negative values) but
+	 * never past it. Possible values are 1 and 0 (default). This style only
+	 * applies to edges. Value is "fixedPointSpacing".
+	 */
+	STYLE_FIXED_POINT_SPACING: 'fixedPointSpacing',
+
+	/**
 	 * Variable: STYLE_PERIMETER_SPACING
 	 * 
 	 * Defines the key for the perimeter spacing. This is the distance between
@@ -1646,6 +1781,22 @@
 	 * "perimeterSpacing".
 	 */
 	STYLE_PERIMETER_SPACING: 'perimeterSpacing',
+
+	/**
+	 * Variable: STYLE_LABEL_PERIMETER
+	 * 
+	 * Defines the key for the label perimeter style of a vertex. If this is 1
+	 * and the label of the vertex is placed outside the shape on one side (a
+	 * verticalLabelPosition of top or bottom with a labelPosition of center,
+	 * or a labelPosition of left or right with a verticalLabelPosition of
+	 * middle), then edges that meet the vertex on that side end at the far
+	 * edge of the label instead of crossing the label to the shape, as in
+	 * cloud architecture diagrams. Edges on the other sides are unchanged.
+	 * Rotated and flipped vertices are not affected. Possible values are 1
+	 * and 0 (default). See <mxGraphView.getLabelPerimeterSide>. Value is
+	 * "labelPerimeter".
+	 */
+	STYLE_LABEL_PERIMETER: 'labelPerimeter',
 
 	/**
 	 * Variable: STYLE_SPACING
@@ -1820,6 +1971,17 @@
 	STYLE_FOLDABLE: 'foldable',
 
 	/**
+	 * Variable: STYLE_GROUP_PADDING
+	 *
+	 * Defines the key for the groupPadding style. This specifies the padding
+	 * in pixels between the children of a group and the group bounds when
+	 * using extendParent or contractParent. Accepts 1-4 space-separated
+	 * values in CSS TRBL order (see mxUtils.parsePadding). Default is 0.
+	 * Value is "groupPadding".
+	 */
+	STYLE_GROUP_PADDING: 'groupPadding',
+
+	/**
 	 * Variable: STYLE_EDITABLE
 	 * 
 	 * Defines the key for the editable style. This specifies if the value of
@@ -1845,6 +2007,19 @@
 	 * 1. See <mxGraph.isCellBendable>. Value is "bendable".
 	 */
 	STYLE_BENDABLE: 'bendable',
+
+	/**
+	 * Variable: STYLE_COLLAPSED_POINTS
+	 *
+	 * Defines the key for the collapsedPoints style. This specifies if the
+	 * control points of an edge are used while one of its terminals is
+	 * replaced by a collapsed ancestor in the view. If this is 0 then the
+	 * edge is routed as if it had no control points in that case. The stored
+	 * points are not changed and are used again once the terminals are
+	 * visible. Possible values are 0 or 1. Default is 1. See
+	 * <mxGraphView.isCollapsedPointsIgnored>. Value is "collapsedPoints".
+	 */
+	STYLE_COLLAPSED_POINTS: 'collapsedPoints',
 
 	/**
 	 * Variable: STYLE_MOVABLE
@@ -2027,11 +2202,20 @@
 
 	/**
 	 * Variable: FONT_STRIKETHROUGH
-	 * 
+	 *
 	 * Constant for strikthrough fonts. Default is 8.
 	 */
 	FONT_STRIKETHROUGH: 8,
-	
+
+	/**
+	 * Variable: FONT_UNDERLINE_DOTTED
+	 *
+	 * Constant for dotted text decorations. Only takes effect together
+	 * with <FONT_UNDERLINE> or <FONT_STRIKETHROUGH> and renders all text
+	 * decorations of the label dotted. Default is 16.
+	 */
+	FONT_UNDERLINE_DOTTED: 16,
+
 	/**
 	 * Variable: SHAPE_RECTANGLE
 	 * 

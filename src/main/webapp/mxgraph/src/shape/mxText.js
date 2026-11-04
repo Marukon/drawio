@@ -78,6 +78,7 @@ function mxText(value, bounds, align, valign, color,
 	this.horizontal = (horizontal != null) ? horizontal : true;
 	this.background = background;
 	this.border = border;
+	this.borderWidth = 1;
 	this.wrap = (wrap != null) ? wrap : false;
 	this.clipped = (clipped != null) ? clipped : false;
 	this.overflow = (overflow != null) ? overflow : 'visible';
@@ -160,10 +161,9 @@ mxText.prototype.ignoreStringSize = false;
  * Variable: textWidthPadding
  * 
  * Specifies the padding to be added to the text width for the bounding box.
- * This is needed to make sure no clipping is applied to borders. Default is 4
- * for IE 8 standards mode and 3 for all others.
+ * This is needed to make sure no clipping is applied to borders. Default is 3.
  */
-mxText.prototype.textWidthPadding = (document.documentMode == 8 && !mxClient.IS_EM) ? 4 : 3;
+mxText.prototype.textWidthPadding = 3;
 
 /**
  * Variable: lastValue
@@ -187,7 +187,7 @@ mxText.prototype.cacheEnabled = true;
  */
 mxText.prototype.isHtmlAllowed = function()
 {
-	return document.documentMode != 8 || mxClient.IS_EM;
+	return true;
 };
 
 /**
@@ -307,6 +307,82 @@ mxText.prototype.paint = function(c, update)
  */
 mxText.prototype.redraw = function()
 {
+	this.invalidateBoundingBox();
+
+	var screen = this.beginModelUnits();
+
+	try
+	{
+		this.redrawText();
+	}
+	finally
+	{
+		this.endModelUnits(screen);
+	}
+
+	this.backgroundNodes = null;
+
+	if (screen != null && this.node != null)
+	{
+		var rects = this.node.getElementsByTagName('rect');
+
+		for (var i = 0; i < rects.length; i++)
+		{
+			if (rects[i].textBackground != null)
+			{
+				this.backgroundNodes = this.backgroundNodes || [];
+				this.backgroundNodes.push(rects[i]);
+			}
+		}
+
+		this.updateTextBackground();
+	}
+};
+
+/**
+ * Function: updateTextBackground
+ *
+ * Applies the pixels of the view to the backgrounds of plain text labels
+ * if the text is painted in model units, so that their padding and border
+ * stay in screen pixels for any scale or translate (see
+ * <mxSvgCanvas2D.updateTextBackground>).
+ */
+mxText.prototype.updateTextBackground = function()
+{
+	if (this.backgroundNodes != null && this.state != null)
+	{
+		var s = this.state.view.scale;
+		var tr = this.state.view.translate;
+
+		for (var i = 0; i < this.backgroundNodes.length; i++)
+		{
+			mxSvgCanvas2D.updateTextBackground(this.backgroundNodes[i],
+				1 / s, tr.x, tr.y);
+		}
+	}
+};
+
+/**
+ * Function: redrawText
+ *
+ * Updates the DOM nodes of the text for the current bounds and scale.
+ */
+mxText.prototype.redrawText = function()
+{
+	// Forces full repaint when SVG word wrapping is active and width changes
+	if (this.wrap && this.convertToSvg && this.style != null &&
+		this.style['svgWhiteSpace'] == 'wrap' && this.bounds != null)
+	{
+		var currentWidth = this.bounds.width;
+
+		if (this.lastWrapWidth != null && this.lastWrapWidth != currentWidth)
+		{
+			this.lastValue = null;
+		}
+
+		this.lastWrapWidth = currentWidth;
+	}
+
 	if (this.visible && this.checkBounds() && this.cacheEnabled && this.lastValue == this.value &&
 		(mxUtils.isNode(this.value) || this.dialect == mxConstants.DIALECT_STRICTHTML))
 	{
@@ -318,16 +394,8 @@ mxText.prototype.redraw = function()
 			}
 			else
 			{
-				this.updateSize(this.node, (this.state == null || this.state.view.textDiv == null));
-	
-				if (mxClient.IS_IE && (document.documentMode == null || document.documentMode <= 8))
-				{
-					this.updateHtmlFilter();
-				}
-				else
-				{
-					this.updateHtmlTransform();
-				}
+				this.updateSize(this.node);
+				this.updateHtmlTransform();
 			}
 		}
 		else
@@ -387,6 +455,8 @@ mxText.prototype.resetStyles = function()
 	this.horizontal = true;
 	delete this.background;
 	delete this.border;
+	this.borderWidth = 1;
+	this.labelPadding = 0;
 	this.textDirection = mxConstants.DEFAULT_TEXT_DIRECTION;
 	delete this.margin;
 };
@@ -421,6 +491,8 @@ mxText.prototype.apply = function(state)
 		this.horizontal = mxUtils.getValue(this.style, mxConstants.STYLE_HORIZONTAL, this.horizontal);
 		this.background = mxUtils.getValue(this.style, mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, this.background);
 		this.border = mxUtils.getValue(this.style, mxConstants.STYLE_LABEL_BORDERCOLOR, this.border);
+		this.borderWidth = mxUtils.getValue(this.style, mxConstants.STYLE_LABEL_BORDER_WIDTH, this.borderWidth);
+		this.labelPadding = mxUtils.getValue(this.style, mxConstants.STYLE_LABEL_PADDING, this.labelPadding);
 		this.textDirection = mxUtils.getValue(this.style, mxConstants.STYLE_TEXT_DIRECTION, mxConstants.DEFAULT_TEXT_DIRECTION);
 		this.opacity = mxUtils.getValue(this.style, mxConstants.STYLE_TEXT_OPACITY, 100);
 		this.updateMargin();
@@ -484,25 +556,28 @@ mxText.prototype.updateBoundingBox = function()
 	var node = this.node;
 	this.boundingBox = this.bounds.clone();
 	var rot = this.getTextRotation();
-	
-	var h = (this.style != null) ? mxUtils.getValue(this.style, mxConstants.STYLE_LABEL_POSITION, mxConstants.ALIGN_CENTER) : null;
-	var v = (this.style != null) ? mxUtils.getValue(this.style, mxConstants.STYLE_VERTICAL_LABEL_POSITION, mxConstants.ALIGN_MIDDLE) : null;
 
-	if (!this.ignoreStringSize && node != null && this.overflow != 'fill' && (!this.clipped ||
-		!this.ignoreClippedStringSize || h != mxConstants.ALIGN_CENTER || v != mxConstants.ALIGN_MIDDLE))
+	if (this.isStringSizeMeasured())
 	{
 		var ow = null;
 		var oh = null;
 		
 		if (node.ownerSVGElement != null)
 		{
-			if (node.firstChild != null && node.firstChild.firstChild != null &&
-				node.firstChild.firstChild.nodeName == 'foreignObject' &&
-				node.firstChild.firstChild.firstChild != null &&
-				node.firstChild.firstChild.firstChild.firstChild != null)
+			var fo = (node.firstChild != null) ? node.firstChild.firstChild : null;
+
+			// Skips the alternate content of labels in other documents (see
+			// mxSvgCanvas2D.text)
+			if (fo != null && fo.nodeName == 'switch')
+			{
+				fo = fo.firstChild;
+			}
+
+			if (fo != null && fo.nodeName == 'foreignObject' &&
+				fo.firstChild != null && fo.firstChild.firstChild != null)
 			{
 				// Uses second inner DIV for font metrics
-				node = node.firstChild.firstChild.firstChild.firstChild;
+				node = fo.firstChild.firstChild;
 				oh = node.offsetHeight * this.scale;
 				
 				if (this.overflow == 'width')
@@ -516,6 +591,14 @@ mxText.prototype.updateBoundingBox = function()
 			}
 			else
 			{
+				// Measures the texts of the pending backgrounds of plain text
+				// labels at once if the background of this label is pending, as
+				// it is part of the measured node
+				if (mxSvgCanvas2D.isTextBackgroundPending(node))
+				{
+					mxSvgCanvas2D.measureTextBackgrounds();
+				}
+
 				try
 				{
 					var b = node.getBBox();
@@ -531,7 +614,8 @@ mxText.prototype.updateBoundingBox = function()
 					}
 					else
 					{
-						this.boundingBox = new mxRectangle(b.x, b.y, b.width, b.height);
+						this.boundingBox = this.getScreenRectangle(
+							new mxRectangle(b.x, b.y, b.width, b.height));
 					}
 					
 					return;
@@ -544,8 +628,6 @@ mxText.prototype.updateBoundingBox = function()
 		}
 		else
 		{
-			var td = (this.state != null) ? this.state.view.textDiv : null;
-
 			// Use cached offset size
 			if (this.offsetWidth != null && this.offsetHeight != null)
 			{
@@ -554,59 +636,9 @@ mxText.prototype.updateBoundingBox = function()
 			}
 			else
 			{
-				// Cannot get node size while container hidden so a
-				// shared temporary DIV is used for text measuring
-				if (td != null)
-				{
-					this.updateFont(td);
-					this.updateSize(td, false);
-					this.updateInnerHtml(td);
-
-					node = td;
-				}
-				
 				var sizeDiv = node;
 
-				if (document.documentMode == 8 && !mxClient.IS_EM)
-				{
-					var w = Math.round(this.bounds.width / this.scale);
-	
-					if (this.wrap && w > 0)
-					{
-						node.style.wordWrap = mxConstants.WORD_WRAP;
-						node.style.whiteSpace = 'normal';
-
-						if (node.style.wordWrap != 'break-word')
-						{
-							// Innermost DIV is used for measuring text
-							var divs = sizeDiv.getElementsByTagName('div');
-							
-							if (divs.length > 0)
-							{
-								sizeDiv = divs[divs.length - 1];
-							}
-							
-							ow = sizeDiv.offsetWidth + 2;
-							divs = this.node.getElementsByTagName('div');
-							
-							if (this.clipped)
-							{
-								ow = Math.min(w, ow);
-							}
-							
-							// Second last DIV width must be updated in DOM tree
-							if (divs.length > 1)
-							{
-								divs[divs.length - 2].style.width = ow + 'px';
-							}
-						}
-					}
-					else
-					{
-						node.style.whiteSpace = 'nowrap';
-					}
-				}
-				else if (sizeDiv.firstChild != null && sizeDiv.firstChild.nodeName == 'DIV')
+				if (sizeDiv.firstChild != null && sizeDiv.firstChild.nodeName == 'DIV')
 				{
 					sizeDiv = sizeDiv.firstChild;
 				}
@@ -656,6 +688,22 @@ mxText.prototype.updateBoundingBox = function()
 };
 
 /**
+ * Function: isStringSizeMeasured
+ *
+ * Returns true if <updateBoundingBox> measures the text in the DOM. Labels
+ * with <ignoreStringSize>, overflow=fill and clipped labels in the middle of
+ * their shape with <ignoreClippedStringSize> have the box of their bounds.
+ */
+mxText.prototype.isStringSizeMeasured = function()
+{
+	var h = (this.style != null) ? mxUtils.getValue(this.style, mxConstants.STYLE_LABEL_POSITION, mxConstants.ALIGN_CENTER) : null;
+	var v = (this.style != null) ? mxUtils.getValue(this.style, mxConstants.STYLE_VERTICAL_LABEL_POSITION, mxConstants.ALIGN_MIDDLE) : null;
+
+	return !this.ignoreStringSize && this.node != null && this.overflow != 'fill' && (!this.clipped ||
+		!this.ignoreClippedStringSize || h != mxConstants.ALIGN_CENTER || v != mxConstants.ALIGN_MIDDLE);
+};
+
+/**
  * Function: getShapeRotation
  * 
  * Returns 0 to avoid using rotation in the canvas via updateTransform.
@@ -687,6 +735,20 @@ mxText.prototype.isPaintBoundsInverted = function()
 };
 
 /**
+ * Function: getBorderWidth
+ *
+ * Returns the width of the label border in pixels (see
+ * <mxConstants.STYLE_LABEL_BORDER_WIDTH>). Values that are not finite
+ * numbers of at least 0 are replaced with 1.
+ */
+mxText.prototype.getBorderWidth = function()
+{
+	var value = parseFloat(this.borderWidth);
+
+	return (isFinite(value) && value >= 0) ? value : 1;
+};
+
+/**
  * Function: configureCanvas
  * 
  * Sets the state of the canvas for drawing the shape.
@@ -697,7 +759,9 @@ mxText.prototype.configureCanvas = function(c, x, y, w, h)
 	
 	c.setFontColor(this.color);
 	c.setFontBackgroundColor(this.background);
-	c.setFontBorderColor(this.border);
+	c.setFontBorderColor((this.getBorderWidth() > 0) ? this.border : null);
+	c.setFontBorderWidth(this.getBorderWidth());
+	c.setLabelPadding(this.labelPadding);
 	c.setFontFamily(this.family);
 	c.setFontSize(this.size);
 	c.setFontStyle(this.fontStyle);
@@ -747,7 +811,7 @@ mxText.prototype.getTextCss = function()
 		mxConstants.LINE_HEIGHT;
 
 	var css = 'display: inline-block; font-size: ' + this.size + 'px; ' +
-		'font-family: ' + this.family + '; color: ' + this.color + '; line-height: ' + lh +
+		'font-family: ' + mxUtils.parseCssFontFamily(this.family) + '; color: ' + this.color + '; line-height: ' + lh +
 		'; pointer-events: ' + ((this.pointerEvents) ? 'all' : 'none') + '; ';
 
 	if ((this.fontStyle & mxConstants.FONT_BOLD) == mxConstants.FONT_BOLD)
@@ -771,9 +835,14 @@ mxText.prototype.getTextCss = function()
 	{
 		deco.push('line-through');
 	}
-	
+
 	if (deco.length > 0)
 	{
+		if ((this.fontStyle & mxConstants.FONT_UNDERLINE_DOTTED) == mxConstants.FONT_UNDERLINE_DOTTED)
+		{
+			deco.push('dotted');
+		}
+
 		css += 'text-decoration: ' + deco.join(' ') + '; ';
 	}
 
@@ -803,19 +872,11 @@ mxText.prototype.redrawHtmlShape = function()
 		
 		this.updateValue();
 		this.updateFont(this.node);
-		this.updateSize(this.node, (this.state == null || this.state.view.textDiv == null));
+		this.updateSize(this.node);
 		
 		this.offsetWidth = null;
 		this.offsetHeight = null;
-	
-		if (mxClient.IS_IE && (document.documentMode == null || document.documentMode <= 8))
-		{
-			this.updateHtmlFilter();
-		}
-		else
-		{
-			this.updateHtmlTransform();
-		}
+		this.updateHtmlTransform();
 	}
 };
 
@@ -835,7 +896,8 @@ mxText.prototype.redrawHtmlShapeWithCss3 = function()
 	
 	mxSvgCanvas2D.createCss(w + 2, h, this.align, this.valign, this.wrap, this.overflow, this.clipped, dir,
 		(this.background != null) ? mxUtils.htmlEntities(this.background) : null,
-		(this.border != null) ? mxUtils.htmlEntities(this.border) : null,
+		(this.border != null && this.getBorderWidth() > 0) ? mxUtils.htmlEntities(this.border) : null,
+		mxUtils.parseCssSpacing(this.labelPadding),
 		flex, block, this.scale, mxUtils.bind(this, function(dx, dy, flex, item, block, ofl)
 	{
 		var r = this.getTextRotation();
@@ -887,46 +949,11 @@ mxText.prototype.redrawHtmlShapeWithCss3 = function()
 		if (this.node.firstChild == null)
 		{
 			this.node.innerHTML = '<div><div>' + html +'</div></div>';
-			
-			if (mxClient.IS_IE11)
-			{
-				this.fixFlexboxForIe11(this.node);
-			}
 		}
 
 		this.node.firstChild.firstChild.setAttribute('style', block);
 		this.node.firstChild.setAttribute('style', item);
-	}));
-};
-
-/**
- * Function: fixFlexboxForIe11
- * 
- * Rewrites flexbox CSS for IE11 to work around overflow issues.
- */
-mxText.prototype.fixFlexboxForIe11 = function(node)
-{
-	var elts = node.querySelectorAll('div[style*="display: flex; justify-content: flex-end;"]');
-	
-	for (var i = 0; i < elts.length; i++)
-	{
-		// Fixes right aligned elements to allow for overflow
-		elts[i].style.justifyContent = 'flex-start';
-		elts[i].style.flexDirection = 'row-reverse';
-	}
-	
-	// LATER: Overflow center with flexbox in IE11 that keeps word wrapping
-	if (!this.wrap)
-	{
-		var elts = node.querySelectorAll('div[style*="display: flex; justify-content: center;"]');
-		var w = -window.innerWidth;
-		
-		for (var i = 0; i < elts.length; i++)
-		{
-			elts[i].style.marginLeft = w + 'px';
-			elts[i].style.marginRight = w + 'px';
-		}
-	}
+	}), this.getBorderWidth());
 };
 
 /**
@@ -999,185 +1026,6 @@ mxText.prototype.updateInnerHtml = function(elt)
 };
 
 /**
- * Function: updateHtmlFilter
- *
- * Rotated text rendering quality is bad for IE9 quirks/IE8 standards
- */
-mxText.prototype.updateHtmlFilter = function()
-{
-	var style = this.node.style;
-	var dx = this.margin.x;
-	var dy = this.margin.y;
-	var s = this.scale;
-	
-	// Resets filter before getting offsetWidth
-	mxUtils.setOpacity(this.node, this.opacity);
-	
-	// Adds 1 to match table height in 1.x
-	var ow = 0;
-	var oh = 0;
-	var td = (this.state != null) ? this.state.view.textDiv : null;
-	var sizeDiv = this.node;
-	
-	// Fallback for hidden text rendering in IE quirks mode
-	if (td != null)
-	{
-		td.style.overflow = '';
-		td.style.height = '';
-		td.style.width = '';
-		
-		this.updateFont(td);
-		this.updateSize(td, false);
-		this.updateInnerHtml(td);
-		
-		var w = Math.round(this.bounds.width / this.scale);
-
-		if (this.wrap && w > 0)
-		{
-			td.style.whiteSpace = 'normal';
-			td.style.wordWrap = mxConstants.WORD_WRAP;
-			ow = w;
-			
-			if (this.clipped)
-			{
-				ow = Math.min(ow, this.bounds.width);
-			}
-
-			td.style.width = ow + 'px';
-		}
-		else
-		{
-			td.style.whiteSpace = 'nowrap';
-		}
-		
-		sizeDiv = td;
-		
-		if (sizeDiv.firstChild != null && sizeDiv.firstChild.nodeName == 'DIV')
-		{
-			sizeDiv = sizeDiv.firstChild;
-			
-			if (this.wrap && td.style.wordWrap == 'break-word')
-			{
-				sizeDiv.style.width = '100%';
-			}
-		}
-
-		// Required to update the height of the text box after wrapping width is known 
-		if (!this.clipped && this.wrap && w > 0)
-		{
-			ow = sizeDiv.offsetWidth + this.textWidthPadding;
-			td.style.width = ow + 'px';
-		}
-		
-		oh = sizeDiv.offsetHeight + 2;
-	}
-	else if (sizeDiv.firstChild != null && sizeDiv.firstChild.nodeName == 'DIV')
-	{
-		sizeDiv = sizeDiv.firstChild;
-		oh = sizeDiv.offsetHeight;
-	}
-
-	ow = sizeDiv.offsetWidth + this.textWidthPadding;
-	
-	if (this.clipped)
-	{
-		oh = Math.min(oh, this.bounds.height);
-	}
-
-	var w = this.bounds.width / s;
-	var h = this.bounds.height / s;
-
-	// Handles special case for live preview with no wrapper DIV and no textDiv
-	if (this.overflow == 'fill')
-	{
-		oh = h;
-		ow = w;
-	}
-	else if (this.overflow == 'width')
-	{
-		oh = sizeDiv.scrollHeight;
-		ow = w;
-	}
-	
-	// Stores for later use
-	this.offsetWidth = ow;
-	this.offsetHeight = oh;
-	
-	h = oh;
-
-	if (this.overflow != 'fill' && this.overflow != 'width')
-	{
-		if (this.clipped)
-		{
-			ow = Math.min(w, ow);
-		}
-		
-		w = ow;
-
-		// Simulates max-width CSS in quirks mode
-		if (this.wrap)
-		{
-			style.width = Math.round(w) + 'px';
-		}
-	}
-
-	h *= s;
-	w *= s;
-	
-	// Rotation case is handled via VML canvas
-	var rad = this.getTextRotation() * (Math.PI / 180);
-	
-	// Precalculate cos and sin for the rotation
-	var real_cos = parseFloat(parseFloat(Math.cos(rad)).toFixed(8));
-	var real_sin = parseFloat(parseFloat(Math.sin(-rad)).toFixed(8));
-
-	rad %= 2 * Math.PI;
-	
-	if (rad < 0)
-	{
-		rad += 2 * Math.PI;
-	}
-	
-	rad %= Math.PI;
-	
-	if (rad > Math.PI / 2)
-	{
-		rad = Math.PI - rad;
-	}
-	
-	var cos = Math.cos(rad);
-	var sin = Math.sin(-rad);
-
-	var tx = w * -(dx + 0.5);
-	var ty = h * -(dy + 0.5);
-
-	var top_fix = (h - h * cos + w * sin) / 2 + real_sin * tx - real_cos * ty;
-	var left_fix = (w - w * cos + h * sin) / 2 - real_cos * tx - real_sin * ty;
-	
-	if (rad != 0)
-	{
-		var f = 'progid:DXImageTransform.Microsoft.Matrix(M11=' + real_cos + ', M12='+
-			real_sin + ', M21=' + (-real_sin) + ', M22=' + real_cos + ', sizingMethod=\'auto expand\')';
-		
-		if (style.filter != null && style.filter.length > 0)
-		{
-			style.filter += ' ' + f;
-		}
-		else
-		{
-			style.filter = f;
-		}
-	}
-	
-	// Workaround for rendering offsets
-	var dy = 0;
-	
-	style.zoom = s;
-	style.left = Math.round(this.bounds.x + left_fix - w / 2) + 'px';
-	style.top = Math.round(this.bounds.y + top_fix - h / 2 + dy) + 'px';
-};
-
-/**
  * Function: updateValue
  *
  * Updates the HTML node(s) to reflect the latest bounds and scale.
@@ -1202,7 +1050,8 @@ mxText.prototype.updateValue = function()
 		val = mxUtils.replaceTrailingNewlines(val, '<div><br></div>');
 		val = (this.replaceLinefeeds) ? val.replace(/\n/g, '<br/>') : val;
 		var bg = (this.background != null && this.background != mxConstants.NONE) ? this.background : null;
-		var bd = (this.border != null && this.border != mxConstants.NONE) ? this.border : null;
+		var bd = (this.border != null && this.border != mxConstants.NONE &&
+			this.getBorderWidth() > 0) ? this.border : null;
 
 		if (this.overflow == 'fill' || this.overflow == 'width')
 		{
@@ -1213,7 +1062,7 @@ mxText.prototype.updateValue = function()
 			
 			if (bd != null)
 			{
-				this.node.style.border = '1px solid ' + bd;
+				this.node.style.border = this.getBorderWidth() + 'px solid ' + bd;
 			}
 		}
 		else
@@ -1227,7 +1076,7 @@ mxText.prototype.updateValue = function()
 			
 			if (bd != null)
 			{
-				css += 'border:1px solid ' + mxUtils.htmlEntities(bd) + ';';
+				css += 'border:' + this.getBorderWidth() + 'px solid ' + mxUtils.htmlEntities(bd) + ';';
 			}
 			
 			// Wrapper DIV for background, zoom needed for inline in quirks
@@ -1277,7 +1126,7 @@ mxText.prototype.updateFont = function(node)
 	
 	style.lineHeight = (mxConstants.ABSOLUTE_LINE_HEIGHT) ? (this.size * mxConstants.LINE_HEIGHT) + 'px' : mxConstants.LINE_HEIGHT;
 	style.fontSize = this.size + 'px';
-	style.fontFamily = this.family;
+	style.fontFamily = mxUtils.parseCssFontFamily(this.family);
 	style.verticalAlign = 'top';
 	style.color = this.color;
 	
@@ -1310,9 +1159,14 @@ mxText.prototype.updateFont = function(node)
 	{
 		txtDecor.push('line-through');
 	}
-	
+
+	if (txtDecor.length > 0 && (this.fontStyle & mxConstants.FONT_UNDERLINE_DOTTED) == mxConstants.FONT_UNDERLINE_DOTTED)
+	{
+		txtDecor.push('dotted');
+	}
+
 	style.textDecoration = txtDecor.join(' ');
-	
+
 	if (this.align == mxConstants.ALIGN_CENTER)
 	{
 		style.textAlign = 'center';
@@ -1332,12 +1186,12 @@ mxText.prototype.updateFont = function(node)
  *
  * Updates the HTML node(s) to reflect the latest bounds and scale.
  */
-mxText.prototype.updateSize = function(node, enableWrap)
+mxText.prototype.updateSize = function(node)
 {
 	var w = Math.max(0, Math.round(this.bounds.width / this.scale));
 	var h = Math.max(0, Math.round(this.bounds.height / this.scale));
 	var style = node.style;
-	
+
 	// NOTE: Do not use maxWidth here because wrapping will
 	// go wrong if the cell is outside of the viewable area
 	if (this.clipped)
@@ -1362,14 +1216,14 @@ mxText.prototype.updateSize = function(node, enableWrap)
 	{
 		style.width = (w + 1) + 'px';
 	}
-	
+
 	if (this.wrap && w > 0)
 	{
 		style.wordWrap = mxConstants.WORD_WRAP;
 		style.whiteSpace = 'normal';
 		style.width = w + 'px';
 
-		if (enableWrap && this.overflow != 'fill' && this.overflow != 'width')
+		if (this.overflow != 'fill' && this.overflow != 'width')
 		{
 			var sizeDiv = node;
 			
