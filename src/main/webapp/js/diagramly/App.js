@@ -33,6 +33,11 @@ App = function(editor, container, lightbox)
 		App.versionPingStarted = true;
 		App.pingVersion();
 		window.setInterval(App.pingVersion, 3600000);
+
+		if (!this.editor.isChromelessView())
+		{
+			EditorUi.startUiLog();
+		}
 	}
 
 	// Reloads this tab when a release channel switch (flagged by
@@ -284,7 +289,8 @@ App.storages[App.MODE_TRELLO] = {client: 'trello', title: 'trello', char: 'T',
 	logo: 'trello-logo.svg', iconLogo: 'trello-logo-white-orange.svg',
 	url: 'https://trello.com/'};
 App.storages[App.MODE_DEVICE] = {title: 'device', logo: 'osa_drive-harddisk.png',
-	url: 'https://get.draw.io/'};
+	// Configurable (see Init.js)
+	get url() { return window.DRAWIO_APP_ICON_URL || 'https://get.draw.io/'; }};
 App.storages[App.MODE_BROWSER] = {title: 'browser', logo: 'osa_database.png'};
 
 /**
@@ -936,9 +942,61 @@ App.isSimpleThemePreferred = function()
 	var iw = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 	var userAgent = navigator.userAgent || navigator.vendor || window.opera;
 	
-	return (iw <= 1024 ||  /android/i.test(userAgent) || (/iPad|iPhone|iPod/.test(userAgent) &&
+	return (iw <= 1024 ||  /android/i.test(userAgent) || (/iPad|iPhone|iPod/.test(userAgent) &&
 		!window.MSStream) || (navigator.userAgent.match(/Mac/) &&
 		navigator.maxTouchPoints && navigator.maxTouchPoints > 2));
+};
+
+/**
+ * Returns true if the session needs the stylesheet of the theme Fusion
+ * (styles/fusion.css, see SimpleUi.loadCss), which App.main loads before it
+ * creates the UI: a start in the theme or its alias simple=new, not in a
+ * chromeless view (the lightbox, chrome=0), which shows nothing of the theme
+ * (see FusionTheme.js).
+ */
+App.isFusionCssNeeded = function()
+{
+	return typeof SimpleUi !== 'undefined' && typeof SimpleUi.loadCss === 'function' &&
+		Editor.isModernSession() && urlParams['lightbox'] != '1' && urlParams['chrome'] != '0';
+};
+
+/**
+ * Returns true if a start in the theme Fusion has to load the scripts of the
+ * theme (js/fusion.min.js, see SimpleUi.loadScripts) before App.main goes on:
+ * they are not in app.min.js and hook into the start of the app (the bundle
+ * of the desktop app has them).
+ */
+App.isFusionScriptsNeeded = function()
+{
+	return App.isFusionCssNeeded() && typeof SimpleUi.loadScripts === 'function' &&
+		!SimpleUi.scriptsLoaded;
+};
+
+/**
+ * Leaves the theme Fusion at a start whose scripts or stylesheet failed: the
+ * session opens in the previous look of the Simple theme, as a session of
+ * another theme (a switch into the theme tries again), the stored theme
+ * stays, and the restart message is shown once the UI is created. Returns
+ * the given callback of App.main with the message.
+ */
+App.leaveFusion = function(callback)
+{
+	Editor.modernTheme = false;
+	Editor.modernAlias = false;
+	Editor.modernInstalled = false;
+
+	return function(ui)
+	{
+		if (callback != null)
+		{
+			callback(ui);
+		}
+
+		if (ui != null && typeof ui.alert === 'function')
+		{
+			ui.alert(mxResources.get('restartForChangeRequired'));
+		}
+	};
 };
 
 /**
@@ -946,7 +1004,7 @@ App.isSimpleThemePreferred = function()
  * 
  * Optional callback is called with the app instance.
  */
-App.main = function(callback, createUi)
+App.main = function main(callback, createUi)
 {
 	try
 	{
@@ -968,8 +1026,35 @@ App.main = function(callback, createUi)
 			return;
 		}
 
+		// A start in the theme Fusion loads its scripts before it goes on (see
+		// App.isFusionScriptsNeeded), and its stylesheet in the meantime; the
+		// previous look opens if they fail. Goes on with this function, not
+		// App.main, as others may wrap it (eg. SimpleStatesBoard.js).
+		if (App.isFusionScriptsNeeded())
+		{
+			// Ignores calls while the scripts load (see App.isMainCalled)
+			if (SimpleUi.scriptsState == null)
+			{
+				SimpleUi.loadCss();
+
+				SimpleUi.loadScripts(function(loaded)
+				{
+					main((loaded) ? callback : App.leaveFusion(callback), createUi);
+				});
+			}
+
+			return;
+		}
+
 		// Replaces light-dark color functions with light colors for older browsers
 		Editor.loadCompatibleCss();
+
+		// Starts loading the stylesheet of the theme Fusion, which only its
+		// sessions load (see SimpleUi.loadCss); its UI waits for it below
+		if (App.isFusionCssNeeded())
+		{
+			SimpleUi.loadCss();
+		}
 
 		App.isMainCalled = true;
 
@@ -992,8 +1077,10 @@ App.main = function(callback, createUi)
 		// Handles uncaught errors before the app is loaded
 		window.onerror = function(message, url, linenumber, colno, err)
 		{
-			// Ignores errors of foreign scripts which carry no information
-			if (EditorUi.isOpaqueScriptError(message, linenumber))
+			// Ignores errors of foreign scripts which carry no information and
+			// the notices of ResizeObserver loops (see isResizeObserverLoopError)
+			if (EditorUi.isOpaqueScriptError(message, linenumber) ||
+				EditorUi.isResizeObserverLoopError(message))
 			{
 				return;
 			}
@@ -1496,9 +1583,32 @@ App.main = function(callback, createUi)
 					}
 				};
 				
+				// Creates the UI once the stylesheet of the theme Fusion is
+				// loaded, in sessions of the theme; if it failed, the previous
+				// look opens (App.leaveFusion)
+				function startMain()
+				{
+					if (App.isFusionCssNeeded())
+					{
+						SimpleUi.loadCss(function(loaded)
+						{
+							if (!loaded)
+							{
+								callback = App.leaveFusion(callback);
+							}
+
+							realMain();
+						});
+					}
+					else
+					{
+						realMain();
+					}
+				};
+
 				if (urlParams['dev'] == '1' || EditorUi.isElectronApp) //TODO check if we can remove these scripts loading from index.html
 				{
-					realMain();
+					startMain();
 				}
 				else
 				{
@@ -1506,7 +1616,7 @@ App.main = function(callback, createUi)
 					// has no impact as stencils.min.js is pre-cached in PWA
 					mxStencilRegistry.allowEval = false;
 					App.loadScripts(['js/shapes-14-6-5.min.js', 'js/stencils.min.js',
-						'js/extensions.min.js'], realMain, function(e)
+						'js/extensions.min.js'], startMain, function(e)
 						{
 							document.body.innerHTML = '';
 							var pre = document.createElement('pre');
@@ -1633,6 +1743,7 @@ App.main = function(callback, createUi)
 						if (data != null && data.action == 'configure')
 						{
 							mxEvent.removeListener(window, 'message', configHandler);
+							Editor.configureOrigin = evt.origin;
 							Editor.configure(data.config);
 
 							// A popup shares the storage of the app, so the settings of each
@@ -2270,13 +2381,24 @@ App.prototype.init = function()
 
 	if (this.menubar != null)
 	{
-		if (Editor.currentTheme != 'sketch' &&
-			(Editor.currentTheme != 'simple' ||
-			urlParams['embed'] != '1'))
+		// Also in embeds that start in Simple or Fusion: a switch to Classic
+		// without a restart makes its menu bar again, which drops the buttons
+		// of embeds (Save, Exit) that createMenubarForTheme put into it, and
+		// only this puts them back into the toolbar
+		if (Editor.currentTheme != 'sketch')
 		{
 			var insertButtonContainer = mxUtils.bind(this, function()
 			{
-				if (urlParams['embed'] != '1')
+				// The shell of Fusion has the buttons of embeds in its top bar,
+				// as the toolbar is hidden there (see installSimpleShell), and
+				// the previous look of Simple in its top bar
+				// (createMenubarForTheme in SimpleClassic.js)
+				if (urlParams['embed'] == '1' && ((this.isSimpleShell != null &&
+					this.isSimpleShell()) || Editor.currentTheme == 'simple'))
+				{
+					return;
+				}
+				else if (urlParams['embed'] != '1')
 				{
 					this.menubar.container.appendChild(this.buttonContainer);
 				}
@@ -2295,6 +2417,25 @@ App.prototype.init = function()
 			(Editor.currentTheme == 'atlas' && urlParams['embed'] != '1'))
 		{
 			this.setCompactMode(true);
+		}
+		else if (urlParams['embed'] == '1' && Editor.currentTheme != 'sketch')
+		{
+			// An embed that starts in Simple or Fusion is compact in Classic
+			// as one that starts there, from the first switch to it (else the
+			// menu bar pushes the buttons of the host out of narrow windows),
+			// and keeps the compact mode of the user after that. Classic is
+			// also dark and default (isDefaultTheme), e.g. Back to of the
+			// notice of Fusion after a start with ui=dark
+			var classicShown = false;
+
+			this.addListener('currentThemeChanged', mxUtils.bind(this, function()
+			{
+				if (!classicShown && this.isDefaultTheme(Editor.currentTheme))
+				{
+					classicShown = true;
+					this.setCompactMode(true);
+				}
+			}));
 		}
 
 		if (Editor.currentTheme == 'atlas' || urlParams['atlas'] == '1')
@@ -2498,14 +2639,15 @@ App.prototype.isChromelessDiagramPadded = function()
 /**
  * Shows a footer to download the desktop version once per session.
  */
-App.prototype.searchHelp = function(prompt)
+App.prototype.searchHelp = function(prompt, noLog)
 {
 	var link = 'https://www.drawio.com/search?src=' +
 		(EditorUi.isElectronApp ? 'DESKTOP' : encodeURIComponent(location.host)) + 
 			'&search=' + encodeURIComponent(prompt);
 	this.openLink(link);
 	
-	if (prompt.length > 0)
+	// Words of the omnibox are not logged (Simple Modern, see SimpleHelp.js)
+	if (prompt.length > 0 && !noLog)
 	{
 		EditorUi.logEvent({category: 'SEARCH-HELP', action: 'search', label: prompt});
 	}
@@ -3528,14 +3670,23 @@ App.prototype.getThumbnail = function(width, fn, border)
 	{
 		var acceptResponse = true;
 		
+		// The thumbnail is stored with the file, so it shows the cells as
+		// stored in its XML, not as shown or styled only in this window (eg.
+		// by the steps of custom links in a locked file or in the Hand tool
+		// of Simple, see showGraphAsStored), from the call below until the
+		// graph is rendered (success)
+		var restoreView = function() {};
+
 		var timeoutThread = window.setTimeout(mxUtils.bind(this, function()
 		{
 			acceptResponse = false;
+			restoreView();
 			fn(null);
 		}), this.timeout);
 		
 		var success = mxUtils.bind(this, function(canvas)
 		{
+			restoreView();
 			window.clearTimeout(timeoutThread);
 			
 			if (acceptResponse)
@@ -3597,6 +3748,8 @@ App.prototype.getThumbnail = function(width, fn, border)
 		// Uses client-side canvas export
 		if (mxClient.IS_CHROMEAPP || Editor.useCanvasForExport)
 		{
+			restoreView = this.showGraphAsStored(graph);
+
 		   	this.editor.exportToCanvas(mxUtils.bind(this, function(canvas)
 		   	{
 		   		try
@@ -3619,11 +3772,20 @@ App.prototype.getThumbnail = function(width, fn, border)
 		   		success();
 		   	}, null, null, null, null, null, null, graph, border, null, null,
 			   null, 'diagram', null);
+
+			// The export renders the graph at once unless it waits for the
+			// outlines of images
+			if (!graph.hasPendingOutlines())
+			{
+				restoreView();
+			}
 		   	
 		   	result = true;
 		}
 		else if (Editor.canvasSupported && this.getCurrentFile() != null)
 		{
+			// Until the graph is drawn into the canvas once the images are loaded
+			restoreView = this.showGraphAsStored(graph);
 			var canvas = document.createElement('canvas');
 			var bounds = graph.getGraphBounds();
 			var t = graph.view.translate;
@@ -3737,6 +3899,11 @@ App.prototype.getThumbnail = function(width, fn, border)
 	catch (e)
 	{
 		result = false;
+
+		if (restoreView != null)
+		{
+			restoreView();
+		}
 		
 		// Removes temporary graph from DOM
   	    if (graph != null && graph != this.editor.graph && graph.container.parentNode != null)
@@ -3829,7 +3996,9 @@ App.prototype.getThumbnail = function(width, fn, border)
 
 /**
  * Opens the URL of the current file, or of its folder if Alt is pressed, or
- * the start page of the storage of the current file.
+ * the start page of the storage of the current file. For files on the device
+ * or in the browser and with no file open, opens DRAWIO_APP_ICON_URL if it
+ * is set (Init.js, eg. a self-hosted instance), else the draw.io website.
  */
 App.prototype.appIconClicked = function(evt)
 {
@@ -3842,7 +4011,8 @@ App.prototype.appIconClicked = function(evt)
 
 	if (url == null)
 	{
-		url = (storage != null && storage.url != null) ? storage.url : 'https://www.drawio.com/';
+		url = (storage != null && storage.url != null) ? storage.url :
+			(window.DRAWIO_APP_ICON_URL || 'https://www.drawio.com/');
 	}
 
 	this.openLink(url);
@@ -3898,10 +4068,40 @@ App.prototype.open = function()
 			}
 			else if (window.opener.openFile != null)
 			{
-				window.opener.openFile.setConsumer(mxUtils.bind(this, function(xml, filename, temp)
+				window.opener.openFile.setConsumer(mxUtils.bind(this, function(xml, filename, temp, fileHandle, desc, editable)
 				{
 					this.spinner.stop();
 					
+					// A file handle and descriptor of the opener stop working when
+					// the opener is closed (InvalidStateError), so this window uses
+					// copies of its own, or opens the file without the file handle
+					// as before if they cannot be copied (saves download the file)
+					var handle = null;
+					var descriptor = null;
+
+					if (fileHandle != null && desc != null &&
+						typeof window.structuredClone === 'function')
+					{
+						try
+						{
+							handle = window.structuredClone(fileHandle);
+							descriptor = window.structuredClone(desc);
+
+							// The structuredClone of Init.js for browsers without
+							// one returns the value, ie. the objects of the opener
+							if (handle === fileHandle || descriptor === desc)
+							{
+								handle = null;
+								descriptor = null;
+							}
+						}
+						catch (e)
+						{
+							handle = null;
+							descriptor = null;
+						}
+					}
+
 					if (filename == null)
 					{
 						var title = urlParams['title'];
@@ -3923,11 +4123,16 @@ App.prototype.open = function()
 					if (dot > 0)
 					{
 						filename = filename.substring(0, filename.length - 4) + '.drawio';
+
+						// The file handle of the PNG would save the XML over the PNG
+						handle = null;
+						descriptor = null;
 					}
 					
 					this.fileLoaded((mxClient.IS_IOS) ?
 						new StorageFile(this, xml, filename) :
-						new LocalFile(this, xml, filename, temp));
+						new LocalFile(this, xml, filename, temp, handle,
+							descriptor, (handle != null) ? editable : null));
 					
 					// Marks temp files as changed to trigger draft save
 					var file = this.getCurrentFile();
@@ -4173,9 +4378,11 @@ App.prototype.start = function()
 
 		window.onerror = function(message, url, linenumber, colno, err)
 		{
-			// Ignores Grammarly error [1344] and errors of foreign scripts, eg.
+			// Ignores the notices of ResizeObserver loops (Grammarly [1344], and
+			// any observer that loops in a frame of a resize of the window, see
+			// isResizeObserverLoopError) and errors of foreign scripts, eg.
 			// in-app browsers, which carry no information (the app keeps working)
-			if (message != 'ResizeObserver loop limit exceeded' &&
+			if (!EditorUi.isResizeObserverLoopError(message) &&
 				!EditorUi.isOpaqueScriptError(message, linenumber))
 			{
 				// "Invalid or unexpected token" is a JS engine parse error that can only
@@ -4458,12 +4665,17 @@ App.prototype.start = function()
 				value = decodeURIComponent(window.location.hash.substring(8));
 			}
 			
+			// The prompt of smart-template is passed as an object: it is decoded
+			// once here and must not get the second decoding of create links
+			// (App.parseCreateObject), which would turn %41 in it into A
+			var createObject = null;
+
 			if (urlParams['smart-template'] != null && (window.location.hash == null ||
 				window.location.hash.length <= 1))
 			{
-				value = JSON.stringify({
-					type: 'generate', data: decodeURIComponent(urlParams['smart-template'])
-				});
+				createObject = {type: 'generate',
+					data: decodeURIComponent(urlParams['smart-template'])};
+				value = JSON.stringify(createObject);
 			}
 			
 			if ((window.location.hash == null || window.location.hash.length <= 1) &&
@@ -4568,12 +4780,14 @@ App.prototype.start = function()
 					{
 						if (value.charAt(0) == '{')
 						{
-							this.executeCreateObject(JSON.parse(decodeURIComponent(value)),
-								mxUtils.bind(this, function()
+							this.executeCreateObject((createObject != null) ? createObject :
+								App.parseCreateObject(value), mxUtils.bind(this, function()
 								{
+									// The hash holds the result: a reload without
+									// it must not generate the diagram again
 									window.history.replaceState(null, null,
 										window.location.pathname +
-										this.getSearch(['create']));
+										this.getSearch(['create', 'smart-template']));
 								}));
 						}
 						else
@@ -4666,6 +4880,26 @@ App.prototype.start = function()
 	catch (e)
 	{
 		this.handleError(e);
+	}
+};
+
+/**
+ * Parses the object of a create link (?create=), whose value the caller
+ * has decoded once. These links were always decoded a second time, so a
+ * value that gives an object that way keeps it (eg. one whose strings are
+ * encoded once more), but one that does not survive it (a percent sign as
+ * in "30% rent" or %% in Mermaid throws, an encoded quote ends a string)
+ * is parsed as it was decoded. The create hash is decoded once (loadFile).
+ */
+App.parseCreateObject = function(value)
+{
+	try
+	{
+		return JSON.parse(decodeURIComponent(value));
+	}
+	catch (e)
+	{
+		return JSON.parse(value);
 	}
 };
 
@@ -4910,17 +5144,51 @@ App.prototype.executeCreateObject = function(value, done)
 				throw new Error(mxResources.get('serviceUnavailableOrBlocked'));
 			}
 		}
-		else if (value.type == 'generate' && this.spinner.spin(
-			document.body, mxResources.get('generate') +
-			' \''+ data + '\''))
+		else if (value.type == 'generate')
 		{
-			this.generateOpenAiMermaidDiagram(data, function(xml)
+			// A link generates without a click, so it has the gates of the
+			// Generate action (Menus.js) and of the hosted service in the
+			// Generate window (ChatWindow): AI is enabled (by default only
+			// on app.diagrams.net, see Editor.enableAi), the hosted service
+			// may be used (isPublicGenerateEnabled: createPublic in
+			// Editor.aiActions, no model with its own API key, external
+			// requests allowed, so no lockdown, no offline mode and not the
+			// desktop app, where isExternalDataComms is false) and the
+			// prompt fits the limit of the hosted service. The test mode
+			// of the window does not count here: a link could add test=1.
+			if (!Editor.enableAi || this.getServiceName() != 'draw.io' ||
+				!this.isPublicGenerateEnabled() || this.getAiModels().length > 0)
 			{
-				createDiagram(xml);
-			}, mxUtils.bind(this, function(e)
+				throw new Error(mxResources.get('serviceUnavailableOrBlocked'));
+			}
+
+			data = (data != null) ? String(data) : '';
+			var maxLen = Editor.maxPublicPromptLength;
+
+			if (maxLen > 0 && data.length > maxLen)
 			{
-				this.handleError(e, mxResources.get('errorLoadingFile'));
-			}), {complexity: 'high'});
+				throw new Error(mxResources.get('promptTooLarge', [maxLen]));
+			}
+
+			// Every caller (the create and smart-template links, the create
+			// hash and its message) opens the object under the loading
+			// spinner of that load, which this replaces with the prompt.
+			// It used to keep it, so the next spin failed and the type
+			// fell through to invalidCallFnNotFound.
+			this.spinner.stop();
+
+			if (this.spinner.spin(document.body, mxResources.get('generate') +
+				' \'' + ((data.length > 80) ? data.substring(0, 80) + '...' :
+				data) + '\''))
+			{
+				this.generateOpenAiMermaidDiagram(data, function(xml)
+				{
+					createDiagram(xml);
+				}, mxUtils.bind(this, function(e)
+				{
+					this.handleError(e, mxResources.get('errorLoadingFile'));
+				}), {complexity: 'high'});
+			}
 		}
 		else if (value.type == 'csv')
 		{
@@ -5039,7 +5307,10 @@ App.prototype.openTemplateDialog = function(generatePrompt, searchTerms)
 			false, mxResources.get('insert'), null, null, generatePrompt,
 			null, true);
 
-		this.showDialog(dlg.container, 620, 460, true, true, mxUtils.bind(this, function()
+		// The Browser template is larger (TemplateBrowser.js)
+		var size = this.getNewDialogSize(dlg, 620, 460);
+
+		this.showDialog(dlg.container, size.width, size.height, true, true, mxUtils.bind(this, function()
 		{
 			this.sidebar.hideTooltip();
 		}));
@@ -5191,7 +5462,10 @@ App.prototype.checkDrafts = function()
 							success();
 						}
 					}), null, null, null, (drafts.length > 1) ? drafts : null);
-					this.showDialog(dlg.container, 640, 480, true, false, mxUtils.bind(this, function(cancel)
+					// The size of the layout of DraftLayout.js where it is shown
+					var size = (typeof this.getDraftLayoutSize === 'function') ?
+						this.getDraftLayoutSize(dlg, 640, 480) : {width: 640, height: 480};
+					this.showDialog(dlg.container, size.width, size.height, true, false, mxUtils.bind(this, function(cancel)
 					{
 						if (cancel)
 						{
@@ -5394,6 +5668,14 @@ App.prototype.showDriveAccessDialog = function(id, changeUserFn, cancelFn)
 		}), cancelFn);
 	}), cancelFn, mxResources.get('allowAccess', null, 'Allow access'));
 
+	// The layout of the sign-in in the Classic skin where the feature
+	// authDialog is on (AuthLayout.js); Fusion lays the content out when it
+	// is shown (SimpleMessages.js)
+	if (typeof this.installAuthLayout === 'function')
+	{
+		this.installAuthLayout(dlg, 'driveAccess', div);
+	}
+
 	// Escape closes the dialog without the Cancel button
 	this.showDialog(dlg.container, 420, null, true, false, function(cancel, isEsc)
 	{
@@ -5431,9 +5713,10 @@ App.prototype.showSplash = function(force)
 		}
 
 		var dlg = new SplashDialog(this);
+		var size = this.getStartScreenSize(dlg, 340, (mxClient.IS_CHROMEAPP ||
+			EditorUi.isElectronApp) ? 200 : 230);
 		
-		this.showDialog(dlg.container, 340, (mxClient.IS_CHROMEAPP ||
-			EditorUi.isElectronApp) ? 200 : 230, true, true,
+		this.showDialog(dlg.container, size.width, size.height, true, true,
 			mxUtils.bind(this, function(cancel, isEsc)
 			{
 				// Creates a blank diagram if the dialog is closed
@@ -5467,8 +5750,9 @@ App.prototype.showSplash = function(force)
 		}), rowLimit);
 		
 		// With the Terms of Use notice, the height of the content
-		this.showDialog(dlg.container, (rowLimit < 3) ? 200 : 300, (dlg.notice != null) ? null :
-			((serviceCount > 3) ? 320 : 210), true, false);
+		var size = this.getStartScreenSize(dlg, (rowLimit < 3) ? 200 : 300, (dlg.notice != null) ? null :
+			((serviceCount > 3) ? 320 : 210));
+		this.showDialog(dlg.container, size.width, size.height, true, false);
 	}
 	else if (urlParams['create'] == null)
 	{
@@ -6595,16 +6879,152 @@ App.prototype.uncompressPages = function(data)
 };
 
 /**
+ * Checks the name of a new file before the user enters what it is made of
+ * (the dialogs of From Text in New, see NewDialog): if a file with the given
+ * name exists in the given storage and folder, the user is asked if it
+ * should be replaced. Passes the version of that file to success if it is
+ * replaced (its data in the browser storage, its SHA or last commit in
+ * GitHub and GitLab, its eTag in OneDrive): createFile gets this as
+ * overwrite and only asks again if the file has changed since. Passes null
+ * if no such file exists or the storage keeps files of the same name
+ * (Google Drive, Trello) or asks itself (the file picker of the device).
+ * Calls cancel if the user does not replace the file (Cancel or a dismissal
+ * of the question, to change the name) or the check fails (after the error
+ * is shown). If active is given and returns false when the answer comes
+ * (eg. the dialog that asked was closed meanwhile), nothing is asked and
+ * cancel is called.
+ */
+App.prototype.checkNewFile = function(mode, folderId, filename, success, cancel, active)
+{
+	var client = (mode == App.MODE_ONEDRIVE) ? this.oneDrive :
+		((mode == App.MODE_M365) ? this.m365 : ((mode == App.MODE_GITHUB) ?
+		this.gitHub : ((mode == App.MODE_GITLAB) ? this.gitLab : null)));
+
+	// Try again of the error checks again (see handleErrorThenCancel)
+	var error = mxUtils.bind(this, function(e)
+	{
+		this.spinner.stop();
+		this.handleErrorThenCancel(e, cancel);
+	});
+
+	if (mode == App.MODE_BROWSER)
+	{
+		var exists = mxUtils.bind(this, function(data)
+		{
+			if (active != null && !active())
+			{
+				cancel();
+			}
+			else if (data != null)
+			{
+				this.confirmOrCancel(mxResources.get('replaceIt', [filename]), function()
+				{
+					success(data);
+				}, cancel, mxResources.get('replace'), mxResources.get('cancel'));
+			}
+			else
+			{
+				success(null);
+			}
+		});
+
+		StorageFile.getFileContent(this, filename, function(data)
+		{
+			exists(data);
+		}, function()
+		{
+			exists(null);
+		});
+	}
+	else if (client != null && this.spinner.spin(document.body, mxResources.get('loading')))
+	{
+		try
+		{
+			if (mode == App.MODE_ONEDRIVE || mode == App.MODE_M365)
+			{
+				if (!client.isValidFilename(filename))
+				{
+					error({message: client.invalidFilenameRegExs[0].test(filename) ?
+						mxResources.get('oneDriveCharsNotAllowed') :
+						mxResources.get('oneDriveInvalidDeviceName')});
+				}
+				else
+				{
+					// Asks to replace an existing file, false for Cancel
+					client.checkExists(folderId, filename, true, mxUtils.bind(this, function(checked, etag)
+					{
+						this.spinner.stop();
+
+						if (checked)
+						{
+							success((etag != null) ? etag : null);
+						}
+						else
+						{
+							cancel();
+						}
+					}), null, error, active);
+				}
+			}
+			else
+			{
+				// The new file of GitHub and GitLab is only written when it is
+				// saved (fileCreated): this asks to replace an existing file
+				// and passes its last version, which only an existing file has
+				client.insertFile(filename, '', mxUtils.bind(this, function(file)
+				{
+					var etag = file.getCurrentEtag();
+					this.spinner.stop();
+					success((etag != null) ? etag : null);
+				}), error, false, folderId, null, null, active);
+			}
+		}
+		catch (e)
+		{
+			error(e);
+		}
+	}
+	else
+	{
+		success(null);
+	}
+};
+
+/**
  * Creates a new file with the given title and data, or an empty diagram, in
  * the given or current storage mode and passes it to fileCreated. Temporary
- * files are created as local files without a storage mode.
+ * files are created as local files without a storage mode. If cancel is
+ * given, it is called once if the file is not created: right away if the
+ * user cancels a question of the storage (replacing a file of the same name,
+ * the file picker of the device, the commit message of GitHub or GitLab),
+ * or after the error is shown, so the caller can go back to the input that
+ * the file was made from (NewDialog). overwrite is the version of an
+ * existing file of the same name that the user has confirmed to replace
+ * for this storage, folder and name (see checkNewFile): it is replaced
+ * without asking again if it has not changed since.
  */
-App.prototype.createFile = function(title, data, libs, mode, done, replace, folderId, tempFile, clibs, success)
+App.prototype.createFile = function(title, data, libs, mode, done, replace, folderId, tempFile, clibs, success, cancel, overwrite)
 {
 	EditorUi.debug('App.createFile', [this],
 		'title', [title], 'data', [data],
 		'libs', [libs], 'mode', [mode]);
 	mode = (tempFile) ? null : ((mode != null) ? mode : this.mode);
+
+	// Once, also if more than one error comes in
+	if (cancel != null)
+	{
+		var cancelFn = cancel;
+
+		cancel = function()
+		{
+			if (cancelFn != null)
+			{
+				var fn = cancelFn;
+				cancelFn = null;
+				fn();
+			}
+		};
+	}
 
 	if (title != null && this.spinner.spin(document.body, mxResources.get('inserting')))
 	{
@@ -6625,7 +7045,13 @@ App.prototype.createFile = function(title, data, libs, mode, done, replace, fold
 		{
 			complete();
 			
-			if (resp == null && this.getCurrentFile() == null && this.dialog == null)
+			if (cancel != null)
+			{
+				// Shows the error first, if any (calls cancel at once without),
+				// and Try again of the error only retries
+				this.handleErrorThenCancel(resp, cancel);
+			}
+			else if (resp == null && this.getCurrentFile() == null && this.dialog == null)
 			{
 				this.showSplash();
 			}
@@ -6640,7 +7066,7 @@ App.prototype.createFile = function(title, data, libs, mode, done, replace, fold
 			var fileCreated = mxUtils.bind(this, function(file)
 			{
 				complete();
-				this.fileCreated(file, libs, replace, done, clibs, success);
+				this.fileCreated(file, libs, replace, done, clibs, success, cancel);
 			});
 
 			if (mode == App.MODE_GOOGLE && this.drive != null)
@@ -6654,11 +7080,11 @@ App.prototype.createFile = function(title, data, libs, mode, done, replace, fold
 			}
 			else if (mode == App.MODE_GITHUB && this.gitHub != null)
 			{
-				this.gitHub.insertFile(title, data, fileCreated, error, false, folderId);
+				this.gitHub.insertFile(title, data, fileCreated, error, false, folderId, null, overwrite);
 			}
 			else if (mode == App.MODE_GITLAB && this.gitLab != null)
 			{
-				this.gitLab.insertFile(title, data, fileCreated, error, false, folderId);
+				this.gitLab.insertFile(title, data, fileCreated, error, false, folderId, null, overwrite);
 			}
 			else if (mode == App.MODE_TRELLO && this.trello != null)
 			{
@@ -6666,15 +7092,15 @@ App.prototype.createFile = function(title, data, libs, mode, done, replace, fold
 			}
 			else if (mode == App.MODE_ONEDRIVE && this.oneDrive != null)
 			{
-				this.oneDrive.insertFile(title, data, fileCreated, error, false, folderId);
+				this.oneDrive.insertFile(title, data, fileCreated, error, false, folderId, overwrite);
 			}
 			else if (mode == App.MODE_M365 && this.m365 != null)
 			{
-				this.m365.insertFile(title, data, fileCreated, error, false, folderId);
+				this.m365.insertFile(title, data, fileCreated, error, false, folderId, overwrite);
 			}
 			else if (mode == App.MODE_BROWSER)
 			{
-				StorageFile.insertFile(this, title, data, fileCreated, error);
+				StorageFile.insertFile(this, title, data, fileCreated, error, null, overwrite);
 			}
 			else if (!tempFile && mode == App.MODE_DEVICE && EditorUi.nativeFileSupport)
 			{
@@ -6684,12 +7110,17 @@ App.prototype.createFile = function(title, data, libs, mode, done, replace, fold
 				{
 					// File is written in fileCreated to use the format of the file name
 					this.fileCreated(new LocalFile(this, data, desc.name, null, fileHandle, desc),
-						libs, replace, done, clibs, success);
+						libs, replace, done, clibs, success, cancel);
 				}), mxUtils.bind(this, function(e)
 				{
 					if (e.name != 'AbortError')
 					{
 						error(e);
+					}
+					// The picker was cancelled, also where it asks to replace a file
+					else if (cancel != null)
+					{
+						cancel();
 					}
 				}), this.createFileSystemOptions(title));
 			}
@@ -6697,13 +7128,21 @@ App.prototype.createFile = function(title, data, libs, mode, done, replace, fold
 			{
 				complete();
 				this.fileCreated(new LocalFile(this, data, title, mode == null),
-					libs, replace, done, clibs, success);
+					libs, replace, done, clibs, success, cancel);
 			}
 		}
 		catch (e)
 		{
 			complete();
-			this.handleError(e);
+
+			if (cancel != null)
+			{
+				this.handleErrorThenCancel(e, cancel);
+			}
+			else
+			{
+				this.handleError(e);
+			}
 		}
 	}
 };
@@ -6711,9 +7150,10 @@ App.prototype.createFile = function(title, data, libs, mode, done, replace, fold
 /**
  * Saves the data of the given new file, which needs the ID of the file for
  * the redirect, and opens the file in a new window if replace is false or in
- * this window otherwise. The given libraries are loaded after opening.
+ * this window otherwise. The given libraries are loaded after opening. If
+ * the file is not saved, cancel is called (see createFile).
  */
-App.prototype.fileCreated = function(file, libs, replace, done, clibs, success)
+App.prototype.fileCreated = function(file, libs, replace, done, clibs, success, cancel)
 {
 	EditorUi.debug('App.fileCreated', [this], 'file', [file],
 		'libs', [libs], 'replace', [replace]);
@@ -6842,7 +7282,8 @@ App.prototype.fileCreated = function(file, libs, replace, done, clibs, success)
 						window.openFile = null;
 					});
 						
-					window.openFile.setData(file.getData(), file.getTitle(), file.getMode() == null);
+					window.openFile.setData(file.getData(), file.getTitle(), file.getMode() == null,
+						file.fileHandle, file.desc, file.editable);
 				}
 
 				window.geOpenWindow(url, null, fn2);
@@ -6866,7 +7307,20 @@ App.prototype.fileCreated = function(file, libs, replace, done, clibs, success)
 
 				if (resp == null || resp.name != 'AbortError')
 				{
-					this.handleError(resp);
+					// A cancelled commit message passes no error (calls cancel at once),
+					// and Try again of an error only retries
+					if (cancel != null)
+					{
+						this.handleErrorThenCancel(resp, cancel);
+					}
+					else
+					{
+						this.handleError(resp);
+					}
+				}
+				else if (cancel != null)
+				{
+					cancel();
 				}
 			});
 
@@ -6910,6 +7364,9 @@ App.prototype.loadFile = function(id, sameWindow, file, success, force)
 		}
 		else if (this.spinner.spin(document.body, mxResources.get('loading')))
 		{
+			// Every kind of load replaces the one before it, see isOutdated
+			var load = this.currentFileLoad = {};
+
 			// Handles files from localStorage
 			if (id.charAt(0) == 'L')
 			{
@@ -7243,8 +7700,32 @@ App.prototype.loadFile = function(id, sameWindow, file, success, force)
 						// Malformed hashes are passed on as-is so that the service reports the error
 						id = mxUtils.safeDecodeURIComponent(id.substring(1));
 
+						// Drive retries a rate limit for about a minute beside other requests,
+						// so the answer can come after another load or file. It must not
+						// replace what the user opened since, or show its error there.
+						var previousFile = this.getCurrentFile();
+
+						var isOutdated = mxUtils.bind(this, function()
+						{
+							var newerLoad = this.currentFileLoad != load;
+							var outdated = newerLoad || this.getCurrentFile() != previousFile;
+
+							// The spinner belongs to the newer load
+							if (outdated && !newerLoad)
+							{
+								this.spinner.stop();
+							}
+
+							return outdated;
+						});
+
 						peer.getFile(id, mxUtils.bind(this, function(file)
 						{
+							if (isOutdated())
+							{
+								return;
+							}
+
 							this.spinner.stop();
 							this.fileLoaded(file);
 							var currentFile = this.getCurrentFile();
@@ -7312,6 +7793,11 @@ App.prototype.loadFile = function(id, sameWindow, file, success, force)
 							}
 						}), mxUtils.bind(this, function(resp)
 						{
+							if (isOutdated())
+							{
+								return;
+							}
+
 							// Makes sure the file does not save the invalid UI model and overwrites anything important
 							if (window.console != null && resp != null)
 							{
@@ -7332,6 +7818,14 @@ App.prototype.loadFile = function(id, sameWindow, file, success, force)
 									window.location.hash = '#' + currentFile.getHash();
 								}
 							});
+
+							// Null is a cancelled load in the other storages. In Drive it is a
+							// request without a JSON answer (eg. offline or blocked), as closing
+							// its sign-in dialog does not get here
+							if (resp == null && mode == App.MODE_GOOGLE)
+							{
+								resp = {message: mxResources.get('serviceUnavailableOrBlocked')};
+							}
 
 							if (resp == null || resp.name != 'AbortError')
 							{
@@ -7837,9 +8331,30 @@ App.prototype.updateButtonContainer = function(skipNotifications)
 					this.shareButton.setAttribute('title', mxResources.get('share'));
 				}));
 				
-				mxEvent.addListener(this.shareButton, 'click', mxUtils.bind(this, function()
+				// Opens the menu of Share of Simple (Share, Publish and Export,
+				// then Presentation mode and Explore) where the switch shareMenu
+				// is on (the driver, 22 November 2026: "alles was im classic ist
+				// solle auch in min, sketch und atlas sein"), else Share... as
+				// before (Editor.featureDefaults, read at the click)
+				this.addMenuHandler(this.shareButton, mxUtils.bind(this, function(menu, parent)
 				{
-					this.actions.get('share').funct();
+					this.menus.get('share').funct(menu, parent);
+					this.menus.appendPluginMenuItems('share', menu, parent);
+				}), mxUtils.bind(this, function(evt)
+				{
+					if (!Editor.isFeatureEnabled('shareMenu'))
+					{
+						// Without the menu only a click, Enter and Space share as
+						// before (the arrow keys, which open a menu, and the
+						// hover of an open menu next to it do nothing)
+						if (evt.type == 'click' || (evt.type == 'keydown' &&
+							(evt.keyCode == 13 /* Enter */ || evt.keyCode == 32 /* Space */)))
+						{
+							this.actions.get('share').funct();
+						}
+
+						mxEvent.consume(evt);
+					}
 				}));
 				
 				this.buttonContainer.appendChild(this.shareButton);
@@ -7848,6 +8363,23 @@ App.prototype.updateButtonContainer = function(skipNotifications)
 			this.shareButton.style.display = (file != null &&
 				Editor.currentTheme == 'kennedy' &&
 				urlParams['embed'] != '1') ? '' : 'none';
+
+			// Screen readers hear a menu only where the button opens one
+			// (without it, no state of a menu that is collapsed either)
+			if (Editor.isFeatureEnabled('shareMenu'))
+			{
+				this.shareButton.setAttribute('aria-haspopup', 'menu');
+
+				if (!this.shareButton.hasAttribute('aria-expanded'))
+				{
+					this.shareButton.setAttribute('aria-expanded', 'false');
+				}
+			}
+			else
+			{
+				this.shareButton.removeAttribute('aria-haspopup');
+				this.shareButton.removeAttribute('aria-expanded');
+			}
 			
 			// User
 			if (Editor.currentTheme != 'simple')
@@ -8713,9 +9245,19 @@ App.prototype.showAuthDialog = function(peer, showRememberOption, fn, closeFn)
 	}));
 
 	// Room for three lines of the Terms of Use notice (the logo loads later,
-	// so the content can't be measured)
-	this.showDialog(dlg.container, 300, ((showRememberOption) ? 180 : 140) + ((dlg.notice != null) ? 70 : 0),
-		true, true, mxUtils.bind(this, function(cancel)
+	// so the content can't be measured); the layout of the Classic skin has
+	// its width and the height of its content, as its logo has a size
+	// (AuthLayout.js)
+	var w = 300;
+	var h = ((showRememberOption) ? 180 : 140) + ((dlg.notice != null) ? 70 : 0);
+
+	if (typeof AuthLayout !== 'undefined')
+	{
+		w = AuthLayout.getWidth(dlg, w);
+		h = AuthLayout.getHeight(dlg, h);
+	}
+
+	this.showDialog(dlg.container, w, h, true, true, mxUtils.bind(this, function(cancel)
 	{
 		if (closeFn != null)
 		{

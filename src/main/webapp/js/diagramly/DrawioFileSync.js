@@ -66,7 +66,16 @@ DrawioFileSync = function(file)
 
 	mxEvent.addListener(document, (mxClient.IS_POINTER) ? 'pointermove' : 'mousemove', this.activityListener);
 	mxEvent.addListener(document, 'keypress', this.activityListener);
-	mxEvent.addListener(window, 'focus', this.activityListener);
+
+	// A polled file is checked when the window gets the focus, as changes
+	// of other tabs or windows would only arrive with the next poll
+	this.focusListener = mxUtils.bind(this, function(evt)
+	{
+		this.activityListener(evt);
+		this.pollSoon();
+	});
+
+	mxEvent.addListener(window, 'focus', this.focusListener);
 	
 	if (!mxClient.IS_POINTER && mxClient.IS_TOUCH)
 	{
@@ -361,6 +370,19 @@ DrawioFileSync.prototype.lastActivity = null;
 DrawioFileSync.pageRootReported = false;
 
 /**
+ * Specifies if a save that leaves out cells was reported in this session
+ * (see checkOwnPage).
+ */
+DrawioFileSync.ownPageReported = false;
+
+/**
+ * Time in milliseconds that saves must leave out cells of the screen until
+ * this is reported (see checkOwnPage). Longer than the lazy cleanup. Default
+ * is 120000.
+ */
+DrawioFileSync.prototype.ownPageDelay = 120000;
+
+/**
  * Error created by the local edit that left the current page without
  * the root of the model, for the stack of the report in checkPageRoot.
  */
@@ -396,10 +418,26 @@ DrawioFileSync.prototype.start = function()
 			if (this.polling == null)
 			{
 				this.polling = new DrawioFilePolling(this.file, this);
+
+				// Checks at once after the hidden or idle stop, and the
+				// first time a file that was opened in a hidden tab is
+				// shown, as the file may have changed meanwhile (see
+				// pollSoon)
+				if (this.pollOnStart)
+				{
+					this.pollOnStart = false;
+					this.pollSoon();
+				}
 			}
 
 			this.polling.start(this.file.getPollingInterval());
 			updateStatus = true;
+		}
+		// Opened in a hidden tab: the polling starts when the tab is shown,
+		// which may be without the focus that would check the file too
+		else if (this.polling == null)
+		{
+			this.pollOnStart = true;
 		}
 	}
 	// Only once until stop: start runs for every mouse move and key press
@@ -547,6 +585,86 @@ DrawioFileSync.prototype.isConnected = function()
 };
 
 /**
+ * Delay in milliseconds of the check of a polled file when the window is
+ * shown or gets the focus (see pollSoon). Both events of a switch of the
+ * tab or window then check once. Default is 50.
+ */
+DrawioFileSync.prototype.activationPollDelay = 50;
+
+/**
+ * Specifies if the next start of the polling checks the file at once (see
+ * start), as it may have changed while the polling was stopped (hidden or
+ * idle) or before it ran for the first time (the file was opened in a hidden
+ * tab). Default is false.
+ */
+DrawioFileSync.prototype.pollOnStart = false;
+
+/**
+ * Specifies if a check of the file was asked for while the file was saving,
+ * so that it runs when the save ends (see pollNow). Default is false.
+ */
+DrawioFileSync.prototype.pollDeferred = false;
+
+/**
+ * Checks a polled file for changes at once (see DrawioFilePolling.pollNow)
+ * instead of waiting for the next poll, eg. when another tab wrote the
+ * file. While the file is saving, also with autosave off, the check runs
+ * when the save ends (see runDeferredPoll): a merge between the bytes of
+ * the save and its write is not in the bytes
+ * (browser-tab-manual-save-channel). While the file waits for its autosave
+ * the check also runs when that save ends: the save reads the stored copy
+ * and merges it before it writes (see StorageFile.saveFile), but a save
+ * that fails before it merges would drop the check
+ * (browser-tab-autosave-fails-before-merge). A modified file with no
+ * autosave scheduled, eg. after a failed save, is checked at once
+ * (browser-tab-failed-autosave).
+ */
+DrawioFileSync.prototype.pollNow = function()
+{
+	if (this.polling != null && this.polling.isConnected())
+	{
+		if (this.file.isSaving() || (this.file.isModified() &&
+			this.file.isAutosave() && this.file.autosaveThread != null))
+		{
+			this.pollDeferred = true;
+		}
+		else
+		{
+			this.polling.pollNow();
+		}
+	}
+};
+
+/**
+ * Runs the check of the file that was asked for during the save that ended
+ * (see pollNow).
+ */
+DrawioFileSync.prototype.runDeferredPoll = function()
+{
+	if (this.pollDeferred)
+	{
+		this.pollDeferred = false;
+		this.pollNow();
+	}
+};
+
+/**
+ * Checks a polled file for changes after activationPollDelay, once for the
+ * events of an activation of the window (visibilitychange and focus).
+ */
+DrawioFileSync.prototype.pollSoon = function()
+{
+	if (this.file.isPolling() && this.pollSoonThread == null)
+	{
+		this.pollSoonThread = window.setTimeout(mxUtils.bind(this, function()
+		{
+			this.pollSoonThread = null;
+			this.pollNow();
+		}), this.activationPollDelay);
+	}
+};
+
+/**
  * Returns true if the session on the relay socket is established, also a
  * notify-only one (see updateRealtime).
  */
@@ -628,8 +746,7 @@ DrawioFileSync.prototype.updateStatus = function()
 					(!this.file.isEditable() ? '<div class="geStatusBox" title="' +
 						mxUtils.htmlEntities(mxResources.get('readOnly')) + '">' +
 						mxUtils.htmlEntities(mxResources.get('readOnly')) + '</div>' :
-					(this.file.isLocked() ? ' <img class="geToolbarButton geAdaptiveAsset" data-action="properties" ' +
-						'style="margin-left:4px;flex-shrink:0;" src="' + Editor.lockedImage + '"/>' : '')) +
+					this.ui.createLockedStatus()) +
 					(status != null ? '<div class="geStatusBox" title="' + mxUtils.htmlEntities(status) + '">' +
 						mxUtils.htmlEntities(status) + '</div>' : '') +
 					((msg != null) ? ' <div class="geStatusBox" data-effect="fade" title="' + mxUtils.htmlEntities(msg) + '">' +
@@ -1106,23 +1223,16 @@ DrawioFileSync.prototype.sendSharedViewMessage = function(pageId, bounds, presen
 };
 
 /**
- * Sends the current view, the state of presentation mode and the explorer
- * (see EditorUi.getSharedViewMode) and the laser pointer (see
- * EditorUi.getSharedLaser) to the clients that follow this one. Uses the
- * cursor channel as these updates are frequent and may be dropped.
+ * Sends the current view and the state of presentation mode and the explorer
+ * (see EditorUi.getSharedViewMode) to the clients that follow this one. Uses
+ * the cursor channel as these updates are frequent and may be dropped.
  */
-DrawioFileSync.prototype.sendViewUpdate = function(pageId, bounds, mode, laser)
+DrawioFileSync.prototype.sendViewUpdate = function(pageId, bounds, mode)
 {
 	if (this.p2pCollab != null)
 	{
 		var data = this.createViewData(pageId, bounds);
 		data.mode = (mode != null) ? mode : null;
-
-		if (laser !== undefined)
-		{
-			data.laser = laser;
-		}
-
 		this.p2pCollab.sendMessage('view', data);
 	}
 };
@@ -1147,7 +1257,6 @@ DrawioFileSync.prototype.handleViewUpdate = function(data, clientId)
 		}
 
 		this.ui.applySharedViewMode(data.mode);
-		this.ui.applySharedLaser(data.laser);
 	}
 };
 
@@ -2700,6 +2809,95 @@ DrawioFileSync.prototype.checkPageRoot = function()
 			// ignore
 		}
 	}
+};
+
+/**
+ * Reports saves that leave out cells of the visible page for a time, once per
+ * session. Saves write the own pages and the thumbnail shows the screen, so
+ * the file can stop following the screen while saves succeed and nothing else
+ * reports it. Content of collaborators that is not confirmed yet is expected
+ * to be missing, and a cell they removed leaves the own pages first and the
+ * screen with the next cleanup, so a difference must last for ownPageDelay.
+ * Detection only, the numbers show if a route exists that is not the page
+ * root (see checkPageRoot).
+ */
+DrawioFileSync.prototype.checkOwnPage = function()
+{
+	if (!DrawioFileSync.ownPageReported && this.file.isRealtime() &&
+		this.ui.getCurrentFile() == this.file && this.ui.currentPage != null)
+	{
+		// Never stops the save it runs in
+		try
+		{
+			var ownPage = this.ui.getPageById(this.ui.currentPage.getId(),
+				this.file.ownPages);
+			var shown = 0;
+			var saved = 0;
+
+			if (ownPage != null && ownPage.root != null &&
+				this.unconfirmedRemoteSince == null)
+			{
+				shown = this.getCellCount(this.ui.editor.graph.model.root);
+				saved = this.getCellCount(ownPage.root);
+			}
+
+			if (shown <= saved)
+			{
+				this.ownPageBehindSince = null;
+			}
+			else if (this.ownPageBehindSince == null)
+			{
+				this.ownPageBehindSince = Date.now();
+			}
+			else if (Date.now() - this.ownPageBehindSince >= this.ownPageDelay)
+			{
+				DrawioFileSync.ownPageReported = true;
+				var user = this.file.getCurrentUser();
+				// Hashed like sendErrorReport: no raw user or file ids in logs
+				var uid = (user != null) ? this.ui.hashValue(user.id) : 'unknown';
+
+				EditorUi.debug('DrawioFileSync.checkOwnPage', [this],
+					'shown', shown, 'saved', saved);
+				EditorUi.logError('Save leaves out cells: ' + shown + ' shown, ' +
+					saved + ' saved', null, this.file.getMode() + '.' +
+					this.ui.hashValue(this.file.getId()), uid, null, 'WARNING', true);
+			}
+		}
+		catch (e)
+		{
+			// ignore
+		}
+	}
+};
+
+/**
+ * Returns the number of cells under the given root, including the root. Does
+ * not recurse as cells can be nested deeply, and a patch can leave a cycle.
+ */
+DrawioFileSync.prototype.getCellCount = function(root)
+{
+	var seen = new Set();
+	var stack = (root != null) ? [root] : [];
+
+	while (stack.length > 0)
+	{
+		var cell = stack.pop();
+
+		if (!seen.has(cell))
+		{
+			seen.add(cell);
+
+			if (cell.children != null)
+			{
+				for (var i = 0; i < cell.children.length; i++)
+				{
+					stack.push(cell.children[i]);
+				}
+			}
+		}
+	}
+
+	return seen.size;
 };
 
 /**
@@ -4510,6 +4708,14 @@ DrawioFileSync.prototype.stop = function()
 	{
 		this.polling.stop();
 		this.polling = null;
+		this.pollOnStart = true;
+		this.pollDeferred = false;
+	}
+
+	if (this.pollSoonThread != null)
+	{
+		window.clearTimeout(this.pollSoonThread);
+		this.pollSoonThread = null;
 	}
 
 	// The hidden and the idle stop end the session too, and start
@@ -4597,7 +4803,6 @@ DrawioFileSync.prototype.destroy = function()
 	{
 		mxEvent.removeListener(document, (mxClient.IS_POINTER) ? 'pointermove' : 'mousemove', this.activityListener);
 		mxEvent.removeListener(document, 'keypress', this.activityListener);
-		mxEvent.removeListener(window, 'focus', this.activityListener);
 		
 		if (!mxClient.IS_POINTER && mxClient.IS_TOUCH)
 		{
@@ -4606,6 +4811,12 @@ DrawioFileSync.prototype.destroy = function()
 		}
 		
 		this.activityListener = null;
+	}
+
+	if (this.focusListener != null)
+	{
+		mxEvent.removeListener(window, 'focus', this.focusListener);
+		this.focusListener = null;
 	}
 	
 	// This is not needed now as stop already destroyed it

@@ -43,6 +43,9 @@ window.DRAWIO_GITHUB_ID = window.DRAWIO_GITHUB_ID || 'Iv1.98d62f0431e40543';
 window.SAVE_URL = window.SAVE_URL || window.DRAWIO_SERVER_URL + 'save';
 window.PROXY_URL = window.PROXY_URL || window.DRAWIO_SERVER_URL + 'proxy';
 window.DRAWIO_VIEWER_URL = window.DRAWIO_VIEWER_URL || null;
+// The page that the app icon opens for files on the device or in the browser and
+// with no file open, instead of the draw.io website (see App.appIconClicked)
+window.DRAWIO_APP_ICON_URL = window.DRAWIO_APP_ICON_URL || null;
 window.NOTIFICATIONS_URL = window.NOTIFICATIONS_URL || ((/.*\.draw\.io$/.test(window.location.hostname)) ||
 	(/.*\.diagrams\.net$/.test(window.location.hostname)) ?
 	window.DRAWIO_SERVER_URL + 'notifications' : null);
@@ -336,6 +339,14 @@ window.uiTheme = window.uiTheme || (function()
 			if (value != null)
 			{
 				ui = JSON.parse(value).ui || null;
+			}
+
+			// The stored theme Fusion (Beta, ui=fusion or its alias modern)
+			// does not apply in embeds, which offer no way back to another
+			// theme without themes=1; hosts choose it with ui=fusion
+			if (urlParams['embed'] == '1' && (ui == 'fusion' || ui == 'modern'))
+			{
+				ui = null;
 			}
 		}
 		catch (e)

@@ -46,7 +46,7 @@
 			this.addEntry(dt + 'software system', function()
 		   	{
 			    var bg = new mxCell('', 
-			    		new mxGeometry(0, 0, w * 2.4, h * 1.2), 'rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#1061B0;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#0D5091;metaEdit=1;resizable=0;' + pts);
+			    		new mxGeometry(0, 0, w * 2.4, h * 1.2), 'rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#1061B0;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#0D5091;metaEdit=1;resizable=0;roundedPerimeter=1;' + pts);
 		    	bg.vertex = true;
 		    	bg.setValue(mxUtils.createXmlDocument().createElement('object'));
 		    	bg.setAttribute('placeholders', '1');
@@ -60,7 +60,7 @@
 			this.addEntry(dt + 'external software system', function()
 		   	{
 			    var bg = new mxCell('', 
-			    		new mxGeometry(0, 0, w * 2.4, h * 1.2), 'rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;' + pts);
+			    		new mxGeometry(0, 0, w * 2.4, h * 1.2), 'rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#8C8496;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#736782;metaEdit=1;resizable=0;roundedPerimeter=1;' + pts);
 		    	bg.vertex = true;
 		    	bg.setValue(mxUtils.createXmlDocument().createElement('object'));
 		    	bg.setAttribute('placeholders', '1');
@@ -74,7 +74,7 @@
 			this.addEntry(dt + 'container', function()
 		   	{
 			    var bg = new mxCell('', 
-			    		new mxGeometry(0, 0, w * 2.4, h * 1.2), 'rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#23A2D9;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#0E7DAD;metaEdit=1;resizable=0;' + pts);
+			    		new mxGeometry(0, 0, w * 2.4, h * 1.2), 'rounded=1;whiteSpace=wrap;html=1;fontSize=11;labelBackgroundColor=none;fillColor=#23A2D9;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#0E7DAD;metaEdit=1;resizable=0;roundedPerimeter=1;' + pts);
 		    	bg.vertex = true;
 		    	bg.setValue(mxUtils.createXmlDocument().createElement('object'));
 		    	bg.setAttribute('placeholders', '1');
@@ -104,7 +104,7 @@
 			this.addEntry(dt + 'microservice container', function()
 		   	{
 			    var bg = new mxCell('', 
-			    		new mxGeometry(0, 0, w * 2, h * 1.7), 'shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.5,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];resizable=0;');
+			    		new mxGeometry(0, 0, w * 2, h * 1.7), 'shape=hexagon;size=50;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;rounded=1;labelBackgroundColor=none;fillColor=#23A2D9;fontSize=12;fontColor=#ffffff;align=center;strokeColor=#0E7DAD;metaEdit=1;points=[[0.5,0,0],[1,0.25,1],[1,0.5,0],[1,0.75,1],[0.5,1,0],[0,0.75,1],[0,0.5,0],[0,0.25,1]];resizable=0;');
 		    	bg.vertex = true;
 		    	bg.setValue(mxUtils.createXmlDocument().createElement('object'));
 		    	bg.setAttribute('placeholders', '1');
@@ -164,7 +164,7 @@
 			this.addEntry(dt + 'component', function()
 		   	{
 			    var bg = new mxCell('', 
-			    		new mxGeometry(0, 0, w * 2.4, h * 1.2), 'rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;' + pts);
+			    		new mxGeometry(0, 0, w * 2.4, h * 1.2), 'rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=6;strokeColor=#2086C9;metaEdit=1;resizable=0;roundedPerimeter=1;' + pts);
 		    	bg.vertex = true;
 		    	bg.setValue(mxUtils.createXmlDocument().createElement('object'));
 		    	bg.setAttribute('placeholders', '1');

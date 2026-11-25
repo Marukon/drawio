@@ -359,13 +359,26 @@ Menus.prototype.init = function()
 	{
 		var ss = this.editorUi.getSelectionState();
 		var enabled = ss.vertices.length > 1;
-		menu.addItem(mxResources.get('leftAlign'), null, function() { graph.alignCells(mxConstants.ALIGN_LEFT); }, parent, null, enabled);
-		menu.addItem(mxResources.get('center'), null, function() { graph.alignCells(mxConstants.ALIGN_CENTER); }, parent, null, enabled);
-		menu.addItem(mxResources.get('rightAlign'), null, function() { graph.alignCells(mxConstants.ALIGN_RIGHT); }, parent, null, enabled);
+
+		// Disabled items say why (see getDisabledReason)
+		var addAlign = mxUtils.bind(this, function(key, align)
+		{
+			var item = menu.addItem(mxResources.get(key), null, function() { graph.alignCells(align); }, parent, null, enabled);
+
+			if (!enabled && item != null)
+			{
+				this.editorUi.updateDisabledReason(item, 'alignCellsLeft',
+					item.getAttribute('title'), false, true);
+			}
+		});
+
+		addAlign('leftAlign', mxConstants.ALIGN_LEFT);
+		addAlign('center', mxConstants.ALIGN_CENTER);
+		addAlign('rightAlign', mxConstants.ALIGN_RIGHT);
 		menu.addSeparator(parent);
-		menu.addItem(mxResources.get('topAlign'), null, function() { graph.alignCells(mxConstants.ALIGN_TOP); }, parent, null, enabled);
-		menu.addItem(mxResources.get('middle'), null, function() { graph.alignCells(mxConstants.ALIGN_MIDDLE); }, parent, null, enabled);
-		menu.addItem(mxResources.get('bottomAlign'), null, function() { graph.alignCells(mxConstants.ALIGN_BOTTOM); }, parent, null, enabled);
+		addAlign('topAlign', mxConstants.ALIGN_TOP);
+		addAlign('middle', mxConstants.ALIGN_MIDDLE);
+		addAlign('bottomAlign', mxConstants.ALIGN_BOTTOM);
 		this.addMenuItems(menu, ['-', 'snapToGrid'], parent);
 	})));
 	this.put('distribute', new Menu(mxUtils.bind(this, function(menu, parent)
@@ -397,6 +410,7 @@ Menus.prototype.init = function()
 		this.addSubmenu('navigation', menu, parent);
 		this.addSubmenu('insert', menu, parent);
 		this.addSubmenu('layout', menu, parent);
+		this.addArrangeLayoutItems(menu, parent);
 		this.addMenuItems(menu, ['-'], parent);
 
 		var groupItem = this.addMenuItem(menu, 'group', parent);
@@ -419,6 +433,10 @@ Menus.prototype.init = function()
 		}
 
 		this.addMenuItems(menu, ['ungroup', 'removeFromGroup', '-', 'clearWaypoints', 'autosize'], parent);
+
+		// The ties at the end in every theme, as in … › Arrange of Fusion (the
+		// driver, 19 November 2026); the actions that do not exist are left out
+		this.addMenuItems(menu, ['-', 'bundle', 'drawTie', 'unbundle', 'selectTiedEdges'], parent);
 	}))).isEnabled = isGraphEnabled;
 	this.put('insert', new Menu(mxUtils.bind(this, function(menu, parent)
 	{
@@ -521,6 +539,13 @@ Menus.prototype.addSubmenu = function(name, menu, parent, label)
 			submenu = menu.addItem(label || mxResources.get(name),
 				null, null, parent, null, enabled);
 			this.addMenu(name, menu, submenu);
+
+			// Disabled submenus say why (see getDisabledReason)
+			if (!enabled && submenu != null)
+			{
+				this.editorUi.updateDisabledReason(submenu, name,
+					submenu.getAttribute('title'), false, true);
+			}
 		}
 	}
 
@@ -1132,70 +1157,80 @@ Menus.prototype.edgeStyleChange = function(menu, label, keys, values, sprite, pa
 {
 	return this.showIconOnly(menu.addItem(label, image, mxUtils.bind(this, function()
 	{
-		var graph = this.editorUi.editor.graph;
-		graph.stopEditing(false);
-		
-		// Keeps edge labels where they were if the new route still passes there
-		graph.keepEdgeLabelPositions(graph.getSelectionCells(), mxUtils.bind(this, function()
-		{
-			var cells = graph.getSelectionCells();
-			var edges = [];
-			
-			for (var i = 0; i < cells.length; i++)
-			{
-				var cell = cells[i];
-
-				if (graph.getModel().isEdge(cell))
-				{
-					if (reset)
-					{
-						var geo = graph.getCellGeometry(cell);
-
-						// Resets all edge points
-						if (geo != null)
-						{
-							geo = geo.clone();
-							geo.points = null;
-							graph.getModel().setGeometry(cell, geo);
-						}
-
-						// Clears the inner-loop flag along with the waypoints it
-						// describes (mirrors Graph.resetEdge and Clear Waypoints)
-						graph.setCellStyles('innerLoopWaypoints', null, [cell]);
-					}
-
-					for (var j = 0; j < keys.length; j++)
-					{
-						graph.setCellStyles(keys[j], values[j], [cell]);
-					}
-
-					edges.push(cell);
-				}
-				else if (mxUtils.getValue(graph.getCurrentCellStyle(cell),
-					mxConstants.STYLE_SHAPE) == 'mxgraph.basic.arc')
-				{
-					for (var j = 0; j < keys.length; j++)
-					{
-						graph.setCellStyles(keys[j], values[j], [cell]);
-					}
-
-					edges.push(cell);
-				}
-			}
-			
-			this.editorUi.fireEvent(new mxEventObject(
-				'styleChanged', 'cells', edges,
-				'keys', keys, 'values', values,
-				'force', edges.length == 0));
-
-			// Optional follow-up inside the same update (e.g. libavoid routing the
-			// edges immediately after the style is applied, atomically with it).
-			if (postFn != null)
-			{
-				postFn(graph, edges);
-			}
-		}));
+		this.applyEdgeStyleChange(keys, values, reset, postFn);
 	}), parent, sprite));
+};
+
+/**
+ * Applies the given keys and values of an edge style to the selected edges
+ * (and arcs) as the items of edgeStyleChange do: reset removes the waypoints
+ * and postFn runs after the change inside the same update.
+ */
+Menus.prototype.applyEdgeStyleChange = function(keys, values, reset, postFn)
+{
+	var graph = this.editorUi.editor.graph;
+	graph.stopEditing(false);
+
+	// Keeps edge labels where they were if the new route still passes there
+	graph.keepEdgeLabelPositions(graph.getSelectionCells(), mxUtils.bind(this, function()
+	{
+		var cells = graph.getSelectionCells();
+		var edges = [];
+		
+		for (var i = 0; i < cells.length; i++)
+		{
+			var cell = cells[i];
+
+			if (graph.getModel().isEdge(cell))
+			{
+				if (reset)
+				{
+					var geo = graph.getCellGeometry(cell);
+
+					// Resets all edge points
+					if (geo != null)
+					{
+						geo = geo.clone();
+						geo.points = null;
+						graph.getModel().setGeometry(cell, geo);
+					}
+
+					// Clears the inner-loop flag along with the waypoints it
+					// describes (mirrors Graph.resetEdge and Clear Waypoints)
+					graph.setCellStyles('innerLoopWaypoints', null, [cell]);
+				}
+
+				for (var j = 0; j < keys.length; j++)
+				{
+					graph.setCellStyles(keys[j], values[j], [cell]);
+				}
+
+				edges.push(cell);
+			}
+			else if (mxUtils.getValue(graph.getCurrentCellStyle(cell),
+				mxConstants.STYLE_SHAPE) == 'mxgraph.basic.arc')
+			{
+				for (var j = 0; j < keys.length; j++)
+				{
+					graph.setCellStyles(keys[j], values[j], [cell]);
+				}
+
+				edges.push(cell);
+			}
+		}
+		
+		this.editorUi.fireEvent(new mxEventObject(
+			'styleChanged', 'cells', edges,
+			'keys', keys, 'values', values,
+			'force', edges.length == 0));
+
+		// Optional follow-up inside the same update (e.g. libavoid routing the
+		// edges immediately after the style is applied, atomically with it).
+		if (postFn != null)
+		{
+			postFn(graph, edges);
+		}
+	}));
 };
 
 /**
@@ -1493,6 +1528,18 @@ Menus.prototype.toggleStyle = function(key, defaultValue)
 };
 
 /**
+ * Called for an action that a menu shows without addMenuItem (eg. a button in
+ * a row of a menu), so that the probes of the menus (Omnibox) see it.
+ */
+Menus.prototype.recordMenuAction = function(menu, key) { };
+
+/**
+ * Adds the items after Layout in the arrange menu. This implementation does
+ * nothing.
+ */
+Menus.prototype.addArrangeLayoutItems = function(menu, parent) { };
+
+/**
  * Creates the keyboard event handler for the current graph and history.
  */
 Menus.prototype.addMenuItem = function(menu, key, parent, trigger, sprite, label)
@@ -1525,6 +1572,13 @@ Menus.prototype.addMenuItem = function(menu, key, parent, trigger, sprite, label
 		}
 
 		this.addShortcut(item, action, menu.hideShortcuts);
+
+		// Disabled items say why in their tooltip (see getDisabledReason)
+		if (!action.isEnabled() && item != null)
+		{
+			this.editorUi.updateDisabledReason(item, key,
+				item.getAttribute('title'), false, true);
+		}
 		
 		return item;
 	}
@@ -1628,16 +1682,30 @@ Menus.prototype.addPopupMenuHistoryItems = function(menu, cell, evt)
 };
 
 /**
+ * Paints the label of the given menu item in the color of destructive
+ * actions: red, as Delete in the context menu (Fusion paints it in its
+ * danger color, fusion.css).
+ */
+Menus.prototype.setDangerItem = function(item)
+{
+	if (item != null && item.firstChild != null &&
+		item.firstChild.nextSibling != null)
+	{
+		item.firstChild.nextSibling.style.color = 'red';
+	}
+};
+
+/**
  * Creates the keyboard event handler for the current graph and history.
  */
 Menus.prototype.addPopupDeleteItem = function(menu, cell, evt)
 {
 	var item = this.addMenuItem(menu, 'delete');
+	this.setDangerItem(item);
 
 	if (item != null && item.firstChild != null &&
 		item.firstChild.nextSibling != null)
 	{
-		item.firstChild.nextSibling.style.color = 'red';
 		var graph = this.editorUi.editor.graph;
 
 		if (graph.getSelectionCount() > 1)
@@ -1831,21 +1899,67 @@ Menus.prototype.addPopupMenuCellItems = function(menu, cell, evt)
 			this.addMenuItems(menu, ['clearWaypoints'], null, evt);
 		}
 
-		if (this.isShowCellEditItems() && ss.vertices.length == 0 && ss.edges.length > 1)
-		{
-			this.addMenuItems(menu, ['bundle'], null, evt);
-		}
+		this.addPopupMenuTieItems(menu, evt);
 
-		if (this.isShowCellEditItems() && graph.hasTies(graph.getSelectionCells()))
-		{
-			this.addMenuItems(menu, ['unbundle'], null, evt);
-		}
-		
 		if (this.isShowCellEditItems() &&
 			graph.getSelectionCount() == 1 &&
 			graph.isCellEditable(cell))
 		{
 			this.addPopupMenuCellEditItems(menu, cell, evt);
+		}
+	}
+};
+
+/**
+ * Adds the items of ties in every theme, as the context menu of Fusion (the
+ * driver, 19 November 2026: "Tie muss in Simple und Classic direkt
+ * erreichbar sein, in der Inline Toolbar bei mehreren markierten Kanten und
+ * auch im Kontextmenü"): Bundle for two or more connectors without shapes,
+ * with what it does as its tooltip, Draw a tie after it on coarse pointers
+ * and for touches, which have no Alt+Shift+drag, and Select tied connectors
+ * and Unbundle for ties and connectors with ties. The menus without the edit
+ * items of cells (Simple, Sketch and Minimal) have them in a group of their
+ * own.
+ */
+Menus.prototype.addPopupMenuTieItems = function(menu, evt)
+{
+	var ui = this.editorUi;
+	var graph = ui.editor.graph;
+	var ss = ui.getSelectionState();
+	var bundle = ss.vertices.length == 0 && ss.edges.length > 1;
+	var ties = graph.hasTies(graph.getSelectionCells());
+
+	if (bundle || ties)
+	{
+		if (!this.isShowCellEditItems())
+		{
+			menu.addSeparator();
+		}
+
+		if (bundle)
+		{
+			var item = this.addMenuItem(menu, 'bundle', null, evt);
+
+			if (item != null)
+			{
+				item.setAttribute('title', mxResources.get('bundleHint'));
+			}
+
+			// Also for a touch on a touchscreen laptop (see isCoarseEvent)
+			if (ui.isCoarseEvent(evt))
+			{
+				item = this.addMenuItem(menu, 'drawTie', null, evt);
+
+				if (item != null)
+				{
+					item.setAttribute('title', mxResources.get('drawTieHint'));
+				}
+			}
+		}
+
+		if (ties)
+		{
+			this.addMenuItems(menu, ['selectTiedEdges', 'unbundle'], null, evt);
 		}
 	}
 };
@@ -1978,7 +2092,11 @@ Menus.prototype.createMenubar = function(container)
 };
 
 /**
- * Creates the keyboard event handler for the current graph and history.
+ * Makes the given element follow the enabled state of the given menu. The
+ * menus live as long as the editor while the elements of the Format panel
+ * (Font and Style of the Text tab) and of the menu bar (after a change of
+ * the theme or the language) are created again, so the listener holds the
+ * element weakly (addElementListener) and does not keep removed panels alive.
  */
 Menus.prototype.menuCreated = function(menu, elt, className)
 {
@@ -1986,32 +2104,94 @@ Menus.prototype.menuCreated = function(menu, elt, className)
 	{
 		className = (className != null) ? className : 'geItem';
 		elt.className = className;
-		
-		menu.addListener('stateChanged', function()
+
+		Menus.addElementListener(menu, 'stateChanged', elt, function(item)
 		{
-			elt.enabled = menu.enabled;
-			elt.setAttribute('aria-disabled', (menu.enabled) ? 'false' : 'true');
+			item.enabled = menu.enabled;
+			item.setAttribute('aria-disabled', (menu.enabled) ? 'false' : 'true');
 
 			if (!menu.enabled)
 			{
-				elt.className = className + ' mxDisabled';
-				
+				item.className = className + ' mxDisabled';
+
 				if (document.documentMode == 8)
 				{
-					elt.style.color = '#c3c3c3';
+					item.style.color = '#c3c3c3';
 				}
 			}
 			else
 			{
-				elt.className = className;
-				
+				item.className = className;
+
 				if (document.documentMode == 8)
 				{
-					elt.style.color = '';
+					item.style.color = '';
 				}
 			}
 		});
 	}
+};
+
+/**
+ * Adds a listener for the given event of the given mxEventSource that calls
+ * fn with the given element, the sender and the event while the element
+ * exists. The element is held by a WeakRef (where the browser has one), so
+ * the source, which lives longer, does not keep it alive: fn must not hold
+ * the element itself. The listeners of collected elements are removed when
+ * the next element listener is added to the source (not while an event is
+ * fired, which would skip the next listener).
+ */
+Menus.addElementListener = function(source, name, elt, fn)
+{
+	if (typeof WeakRef !== 'function')
+	{
+		source.addListener(name, function(sender, evt)
+		{
+			fn(elt, sender, evt);
+		});
+	}
+	else
+	{
+		var entries = source.elementListeners;
+
+		if (entries == null)
+		{
+			entries = [];
+			source.elementListeners = entries;
+		}
+		else
+		{
+			for (var i = entries.length - 1; i >= 0; i--)
+			{
+				if (entries[i].ref.deref() == null)
+				{
+					source.removeListener(entries[i].listener);
+					entries.splice(i, 1);
+				}
+			}
+		}
+
+		var entry = Menus.createElementListener(new WeakRef(elt), fn);
+		entries.push(entry);
+		source.addListener(name, entry.listener);
+	}
+};
+
+/**
+ * Returns {ref, listener} for addElementListener. A function of its own, so
+ * the listener holds only the WeakRef and fn.
+ */
+Menus.createElementListener = function(ref, fn)
+{
+	return {ref: ref, listener: function(sender, evt)
+	{
+		var elt = ref.deref();
+
+		if (elt != null)
+		{
+			fn(elt, sender, evt);
+		}
+	}};
 };
 
 /**

@@ -42,6 +42,8 @@ DrawioConfigEditor.installCss = function()
  *   allowedKeys      - if set, only these keys can be edited and everything
  *                      else is hidden and left out of the config (eg. the
  *                      settings an organization sets for its users)
+ *   excludedKeys     - if set, these keys are hidden and left out of the
+ *                      config (eg. the settings an embedding host controls)
  */
 DrawioConfigEditor.install = function(container, options)
 {
@@ -61,11 +63,33 @@ DrawioConfigEditor.install = function(container, options)
 	var isDesktop = (options.isDesktop != null) ? options.isDesktop :
 		(navigator.userAgent.indexOf('Electron') >= 0);
 
+	// The settings of the new look of the Simple theme (the colors of the
+	// Automatic default style) only in its theme (modern), so that the editor
+	// is as before without it
+	var simpleModern = (options.simpleModern != null) ? options.simpleModern :
+		(typeof Editor !== 'undefined' && typeof Editor.isSimpleModern === 'function' &&
+		Editor.isSimpleModern());
+
+	if (!simpleModern)
+	{
+		['#cfg-automaticDefaultStyleColors'].forEach(function(id)
+		{
+			var field = container.querySelector(id);
+
+			if (field != null && field.parentNode != null)
+			{
+				field.parentNode.parentNode.removeChild(field.parentNode);
+			}
+		});
+	}
+
 	var allowedKeys = Array.isArray(options.allowedKeys) ? options.allowedKeys : null;
+	var excludedKeys = Array.isArray(options.excludedKeys) ? options.excludedKeys : null;
 
 	function isAllowed(key)
 	{
-		return allowedKeys == null || allowedKeys.indexOf(key) >= 0;
+		return (allowedKeys == null || allowedKeys.indexOf(key) >= 0) &&
+			(excludedKeys == null || excludedKeys.indexOf(key) < 0);
 	}
 
 	// A copy of the config with the allowed keys only
@@ -268,7 +292,53 @@ DrawioConfigEditor.install = function(container, options)
 			{ key: 'compact' },
 			{ key: 'noAutoFocus' },
 			{ key: 'showSplashOnStart' },
+			{ key: 'newDialog' },
+			{ key: 'startScreen' },
+			{ key: 'editStyleDialog' },
+			{ key: 'editDiagramDialog' },
+			{ key: 'mermaidDialog' },
+			{ key: 'fromTextDialog' },
+			{ key: 'sqlDialog' },
+			{ key: 'plantUmlDialog' },
+			{ key: 'csvDialog' },
+			{ key: 'publishLinkDialog' },
+			{ key: 'embedDialog' },
+			{ key: 'renameDialog' },
+			{ key: 'authDialog' },
+			{ key: 'imageDialog' },
+			{ key: 'cropDialog' },
+			{ key: 'linkDialog' },
+			{ key: 'saveDialog' },
+			{ key: 'revisionDialog' },
+			{ key: 'moreShapesDialog' },
+			{ key: 'editShapeDialog' },
+			{ key: 'backgroundDialog' },
+			{ key: 'dataSourcesDialog' },
+			{ key: 'layoutSettingsDialog' },
+			{ key: 'layoutDialogs' },
+			{ key: 'outlineDialog' },
+			{ key: 'shortcutsDialog' },
+			{ key: 'draftDialog' },
+			{ key: 'homeDialog' },
+			{ key: 'textOutlineWindow' },
+			{ key: 'libraryDialog' },
+			{ key: 'pluginsDialog' },
+			{ key: 'configDialog' },
+			{ key: 'languageDialog' },
+			{ key: 'settingsDialog' },
+			{ key: 'propertiesDialog' },
+			{ key: 'styleRulesDialog' },
+			{ key: 'geometryDialog' },
+			{ key: 'connectionPointsDialog' },
+			{ key: 'polygonDialog' },
+			{ key: 'colorDialog' },
+			{ key: 'fontDialog' },
+			{ key: 'pageSetupDialog' },
+			{ key: 'editDataDialog' },
+			{ key: 'markupDialog' },
 			{ key: 'updateDefaultStyle' },
+			{ key: 'automaticDefaultStyle', i18n: 'automaticDefaultStyle', simpleModern: true },
+			{ key: 'undoToast' },
 			{ key: 'mathOutputSize' },
 			{ key: 'browserTranslate' }
 		],
@@ -289,6 +359,12 @@ DrawioConfigEditor.install = function(container, options)
 			{ key: 'fastRendering' },
 			{ key: 'forceExplore' },
 			{ key: 'springMove' },
+			{ key: 'enableTidy' },
+			{ key: 'enableLayoutPicker' },
+			{ key: 'enableOmnibox' },
+			{ key: 'enableShareMenu' },
+			{ key: 'pageOverview' },
+			{ key: 'smallHelpers' },
 			{ key: 'stopEditingOnEnter' },
 			{ key: 'shiftArrowSelect' },
 			{ key: 'pasteAtMousePointer' },
@@ -297,8 +373,16 @@ DrawioConfigEditor.install = function(container, options)
 			{ key: 'selectParentLayer' },
 			{ key: 'enableInlineToolbar' },
 			{ key: 'enableShapeInlineToolbar' },
+			{ key: 'shapePickerSearch' },
+			{ key: 'enableFormatHints' },
+			{ key: 'namedThemes' },
 			{ key: 'enableWindowDocking' },
 			{ key: 'restoreVisibleWindows' },
+			{ key: 'layersPanel' },
+			{ key: 'tagsPanel' },
+			{ key: 'textOutlinePanel' },
+			{ key: 'panelResize' },
+			{ key: 'touchSupport' },
 			{ key: 'showLinkIcons' },
 			{ key: 'showTooltipIcons' },
 			{ key: 'showNoteIcons' },
@@ -311,12 +395,14 @@ DrawioConfigEditor.install = function(container, options)
 			{ key: 'enableCssDarkMode' },
 			{ key: 'enableLightDarkColors' },
 			{ key: 'systemColors' },
+			{ key: 'enableModernLightbox' },
 			{ key: 'enableAnimations' },
 			{ key: 'insertAnimations' }
 		],
 		'sidebar-toggles': [
 			{ key: 'sidebarTitles' },
-			{ key: 'expandLibraries' }
+			{ key: 'expandLibraries' },
+			{ key: 'usedShapes' }
 		],
 		'library-toggles': [
 			{ key: 'enableCustomLibraries' },
@@ -335,7 +421,12 @@ DrawioConfigEditor.install = function(container, options)
 			{ key: 'foreignObjectImages' },
 			{ key: 'embedSvgFonts' },
 			{ key: 'removeImageMetadata' },
-			{ key: 'expandPatternsForPrint' }
+			{ key: 'expandPatternsForPrint' },
+			{ key: 'printPreview' },
+			{ key: 'exportDialog' },
+			{ key: 'shortMenus' },
+			{ key: 'enableLastExport' },
+			{ key: 'experimentalHtmlInCanvasExport', experimental: true }
 		],
 		'advanced-toggles': [
 			{ key: 'shareCursorPosition' },
@@ -380,6 +471,43 @@ DrawioConfigEditor.install = function(container, options)
 		toggleGroups['desktop-toggles'] = [
 			{ key: 'desktopAutoSync' }
 		];
+	}
+
+	if (!simpleModern)
+	{
+		toggleGroups['general-toggles'] = toggleGroups['general-toggles'].filter(function(toggle)
+		{
+			return !toggle.simpleModern;
+		});
+	}
+
+	// The public build leaves out the features of the work on the theme Fusion
+	// whatever the configuration says (the driver, 22 November 2026: "auf die
+	// bisherigen. fusion theme mit dialogen bleibt in den internen builds"):
+	// their keys have no toggle there (Editor.isFeatureInBuild)
+	if (typeof Editor !== 'undefined' && typeof Editor.isFeatureInBuild === 'function' &&
+		Editor.featureDefaults != null)
+	{
+		var leftOut = {};
+
+		for (var feature in Editor.featureDefaults)
+		{
+			var featureRow = Editor.featureDefaults[feature];
+
+			if (Object.prototype.hasOwnProperty.call(Editor.featureDefaults, feature) &&
+				featureRow != null && featureRow.config != null && !Editor.isFeatureInBuild(feature))
+			{
+				leftOut[featureRow.config] = true;
+			}
+		}
+
+		Object.keys(toggleGroups).forEach(function(containerId)
+		{
+			toggleGroups[containerId] = toggleGroups[containerId].filter(function(toggle)
+			{
+				return !Object.prototype.hasOwnProperty.call(leftOut, toggle.key);
+			});
+		});
 	}
 
 	// ============================================
@@ -548,6 +676,8 @@ DrawioConfigEditor.install = function(container, options)
 			{ picker: 'cfg-shadowColorPicker', text: 'cfg-shadowColor' },
 			{ picker: 'cfg-defaultGridColorPicker', text: 'cfg-defaultGridColor' },
 			{ picker: 'cfg-defaultDarkGridColorPicker', text: 'cfg-defaultDarkGridColor' },
+			{ picker: 'cfg-rulerFontColorPicker', text: 'cfg-rulerFontColor' },
+			{ picker: 'cfg-rulerDarkFontColorPicker', text: 'cfg-rulerDarkFontColor' },
 			{ picker: 'cfg-defaultPageBackgroundColorPicker', text: 'cfg-defaultPageBackgroundColor' },
 			{ picker: 'cfg-defaultDarkPageBackgroundColorPicker', text: 'cfg-defaultDarkPageBackgroundColor' }
 		];
@@ -1253,7 +1383,7 @@ DrawioConfigEditor.install = function(container, options)
 		if (/^#[0-9A-Fa-f]{6}$/.test(shadowColor)) { q('#cfg-shadowColorPicker').value = shadowColor; }
 
 		['defaultGridColor', 'defaultDarkGridColor', 'defaultPageBackgroundColor',
-			'defaultDarkPageBackgroundColor'].forEach(function(key)
+			'defaultDarkPageBackgroundColor', 'rulerFontColor', 'rulerDarkFontColor'].forEach(function(key)
 		{
 			var color = config[key] || '';
 			if (/^#[0-9A-Fa-f]{6}$/.test(color)) { q('#cfg-' + key + 'Picker').value = color; }
@@ -1431,12 +1561,14 @@ DrawioConfigEditor.install = function(container, options)
 		});
 	}
 
-	// Hides what allowedKeys doesn't cover: toggles, fields (by the data-key of
-	// their controls or the key in the IDs of their list editors) and the rows
-	// and sections left empty
+	// Hides what allowedKeys doesn't cover and what excludedKeys has: toggles,
+	// fields (by the data-config-key of the field or of the field it is in,
+	// the data-key of their controls or the key in the IDs of their list
+	// editors) and the rows and sections left empty. Fields without a key,
+	// such as spacers, are only hidden by allowedKeys.
 	function excludeKeys()
 	{
-		if (allowedKeys == null)
+		if (allowedKeys == null && excludedKeys == null)
 		{
 			return;
 		}
@@ -1454,6 +1586,12 @@ DrawioConfigEditor.install = function(container, options)
 		qAll('.field').forEach(function(el)
 		{
 			var keys = [];
+			var owner = el.closest('[data-config-key]');
+
+			if (owner != null)
+			{
+				keys.push(owner.getAttribute('data-config-key'));
+			}
 
 			el.querySelectorAll('[data-key]').forEach(function(control)
 			{
@@ -1470,17 +1608,19 @@ DrawioConfigEditor.install = function(container, options)
 				}
 			});
 
-			if (!keys.some(function(key) { return allowedKeys.indexOf(key) >= 0; }))
+			if ((keys.length > 0) ? !keys.some(isAllowed) : allowedKeys != null)
 			{
 				el.classList.add('config-excluded');
 			}
 		});
 
+		// Fields without controls (spacers) do not count
 		function isEmpty(el, selector)
 		{
 			return Array.prototype.every.call(el.querySelectorAll(selector), function(child)
 			{
-				return child.closest('.config-excluded') != null;
+				return child.closest('.config-excluded') != null ||
+					child.querySelector('input, select, textarea, button') == null;
 			});
 		}
 
@@ -1943,14 +2083,33 @@ DrawioConfigEditor.html = [
 	'          <label for="cfg-foldingIconSize"></label>',
 	'          <input type="number" id="cfg-foldingIconSize" data-key="foldingIconSize" placeholder="9" min="1">',
 	'        </div>',
-	'        <div class="field"></div>',
+	'        <div class="field">',
+	'          <label for="cfg-rulerFontSize"></label>',
+	'          <input type="number" id="cfg-rulerFontSize" data-key="rulerFontSize" placeholder="9" min="1" max="32">',
+	'        </div>',
+	'      </div>',
+	'      <div class="field-row">',
+	'        <div class="field">',
+	'          <label for="cfg-rulerFontColor"></label>',
+	'          <div style="display: flex; gap: 6px; align-items: center;">',
+	'            <input type="color" id="cfg-rulerFontColorPicker" value="#BBBBBB" style="width: 36px; height: 28px; padding: 2px; border: 1px solid var(--color-border); border-radius: var(--radius-sm);">',
+	'            <input type="text" id="cfg-rulerFontColor" data-key="rulerFontColor" placeholder="#BBBBBB" style="flex: 1;">',
+	'          </div>',
+	'        </div>',
+	'        <div class="field">',
+	'          <label for="cfg-rulerDarkFontColor"></label>',
+	'          <div style="display: flex; gap: 6px; align-items: center;">',
+	'            <input type="color" id="cfg-rulerDarkFontColorPicker" value="#BBBBBB" style="width: 36px; height: 28px; padding: 2px; border: 1px solid var(--color-border); border-radius: var(--radius-sm);">',
+	'            <input type="text" id="cfg-rulerDarkFontColor" data-key="rulerDarkFontColor" placeholder="#BBBBBB" style="flex: 1;">',
+	'          </div>',
+	'        </div>',
 	'      </div>',
 	'      <div class="field-row">',
 	'        <div class="field">',
 	'          <label for="cfg-tooltipFontSize"></label>',
 	'          <input type="number" id="cfg-tooltipFontSize" data-key="tooltipFontSize" placeholder="11" min="1">',
 	'        </div>',
-	'        <div class="field">',
+	'        <div class="field" data-config-key="tooltipMaxWidth">',
 	'          <label for="cfg-tooltipMaxWidth"></label>',
 	'          <div style="display: flex; gap: 6px; align-items: center;">',
 	'            <input type="number" id="cfg-tooltipMaxWidth" placeholder="360" min="1" style="flex: 1;">',
@@ -1959,11 +2118,11 @@ DrawioConfigEditor.html = [
 	'        </div>',
 	'      </div>',
 	'      <div class="field-row">',
-	'        <div class="field">',
+	'        <div class="field" data-config-key="pageFormat">',
 	'          <label for="cfg-pageFormatWidth"></label>',
 	'          <input type="number" id="cfg-pageFormatWidth" placeholder="850" min="1">',
 	'        </div>',
-	'        <div class="field">',
+	'        <div class="field" data-config-key="pageFormat">',
 	'          <label for="cfg-pageFormatHeight"></label>',
 	'          <input type="number" id="cfg-pageFormatHeight" placeholder="1100" min="1">',
 	'        </div>',
@@ -2082,6 +2241,11 @@ DrawioConfigEditor.html = [
 	'          <label for="cfg-sidebarTitleSize"></label>',
 	'          <input type="number" id="cfg-sidebarTitleSize" data-key="sidebarTitleSize" placeholder="8" min="1">',
 	'        </div>',
+	'      </div>',
+	'      <div class="field">',
+	'        <label for="cfg-usedShapesMax"></label>',
+	'        <input type="number" id="cfg-usedShapesMax" data-key="usedShapesMax" placeholder="40" min="0" step="1">',
+	'        <p class="field__help"></p>',
 	'      </div>',
 	'      <div class="field">',
 	'        <label for="cfg-shapePicker"></label>',
@@ -2262,6 +2426,11 @@ DrawioConfigEditor.html = [
 	'          <button type="button" class="btn btn--secondary btn--sm" id="useCurrentEdgeStyle" style="display: none;">Use Current</button>',
 	'        </div>',
 	'        <textarea id="cfg-defaultEdgeStyle" data-key="defaultEdgeStyle" data-type="json" placeholder=\'{"edgeStyle": "orthogonalEdgeStyle"}\' style="min-height: 60px;"></textarea>',
+	'      </div>',
+	'      <div class="field" data-search="automatic default style calm colors new shapes fill stroke font dark palette quick styles">',
+	'        <label for="cfg-automaticDefaultStyleColors"></label>',
+	'        <textarea id="cfg-automaticDefaultStyleColors" data-key="automaticDefaultStyleColors" data-type="json" placeholder=\'{"process": {"fill": "#EEF4FF", "stroke": "#9DB8F2", "dark": {"fill": "#171C25"}}}\' style="min-height: 60px;"></textarea>',
+	'        <p class="field__help"></p>',
 	'      </div>',
 	'      <div class="field">',
 	'        <label for="cfg-styles"></label>',
@@ -2448,7 +2617,7 @@ DrawioConfigEditor.html = [
 	'        <input type="number" id="cfg-viewerTimeout" data-key="viewerTimeout" placeholder="e.g. 30000" min="0">',
 	'        <p class="field__help">Timeout in milliseconds before the viewer gives up loading <code>viewerTimeout</code></p>',
 	'      </div>',
-	'      <div class="field">',
+	'      <div class="field" data-config-key="defaultMacroParameters">',
 	'        <label>Default Macro Parameters</label>',
 	'        <div class="field-row">',
 	'          <div class="field">',
@@ -2495,7 +2664,7 @@ DrawioConfigEditor.html = [
 	'    <div class="card__body">',
 	'      <p class="field__help mb-sm">These options only apply to <strong>Confluence Server / Data Center</strong>.</p>',
 	'      <div id="confluence-toggles"></div>',
-	'      <div class="field">',
+	'      <div class="field" data-config-key="defaultMacroParameters">',
 	'        <label>Default Macro Parameters</label>',
 	'        <div class="field-row">',
 	'          <div class="field">',
